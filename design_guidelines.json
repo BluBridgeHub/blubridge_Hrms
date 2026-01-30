@@ -1,0 +1,131 @@
+{
+  "design_system": {
+    "identity": {
+      "name": "BluBridge HRMS",
+      "tone": "Premium Enterprise, Trustworthy, Human-Centric, Efficient",
+      "archetype": "Organic & Earthy (with Enterprise Precision)",
+      "vibe": "Stripe Admin meets Architectural Digest. Clean, warm, but data-dense."
+    },
+    "typography": {
+      "font_family": {
+        "headings": "Outfit, sans-serif",
+        "body": "Public Sans, sans-serif",
+        "mono": "JetBrains Mono, monospace"
+      },
+      "scale": {
+        "h1": "text-4xl font-bold tracking-tight",
+        "h2": "text-3xl font-semibold tracking-tight",
+        "h3": "text-2xl font-semibold",
+        "body": "text-sm leading-relaxed",
+        "small": "text-xs font-medium tracking-wide uppercase text-muted-foreground"
+      }
+    },
+    "colors": {
+      "palette": {
+        "background": "#efede5",
+        "container": "#fffdf7",
+        "primary": "#004EEB",
+        "primary_foreground": "#ffffff",
+        "secondary": "#e2e8f0",
+        "accent": "#F59E0B",
+        "text_main": "#0f172a",
+        "text_muted": "#64748b",
+        "border": "#e2e8f0",
+        "success": "#10b981",
+        "warning": "#f59e0b",
+        "error": "#ef4444"
+      },
+      "usage": {
+        "global_bg": "bg-[#efede5]",
+        "card_bg": "bg-[#fffdf7]",
+        "sidebar_bg": "bg-[#fffdf7]/80 backdrop-blur-xl border-r border-white/20",
+        "header_bg": "bg-[#fffdf7]/60 backdrop-blur-md border-b border-black/5"
+      }
+    },
+    "layout": {
+      "spacing": "Generous. Use p-6 or p-8 for cards. Gap-6 for grids.",
+      "radius": "rounded-xl",
+      "container_width": "max-w-7xl mx-auto",
+      "grid_system": "Bento Grid for Dashboard (mix of col-span-1, col-span-2, row-span-2)",
+      "sidebar_width": "w-64"
+    },
+    "components": {
+      "cards": {
+        "style": "Flat with subtle border. No heavy shadows.",
+        "classes": "bg-[#fffdf7] border border-black/5 shadow-sm hover:shadow-md transition-all duration-200 rounded-xl"
+      },
+      "buttons": {
+        "primary": "bg-[#004EEB] hover:bg-[#003cc9] text-white shadow-sm rounded-lg px-4 py-2 font-medium transition-transform active:scale-95",
+        "secondary": "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2 font-medium",
+        "ghost": "hover:bg-black/5 text-gray-600 hover:text-black rounded-lg px-3 py-2"
+      },
+      "inputs": {
+        "style": "Minimalist, light background.",
+        "classes": "bg-white border-gray-200 focus:border-[#004EEB] focus:ring-2 focus:ring-[#004EEB]/20 rounded-lg"
+      },
+      "badges": {
+        "style": "Soft pastel background with dark text.",
+        "classes": "rounded-full px-2.5 py-0.5 text-xs font-semibold"
+      }
+    },
+    "visual_enhancers": {
+      "glassmorphism": "Use heavily in Sidebar and Sticky Headers. backdrop-blur-xl bg-[#fffdf7]/70",
+      "gradients": "Subtle mesh gradients allowed ONLY in 'Star Rewards' cards or specific hero areas. NO full screen gradients.",
+      "shadows": "shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+      "micro_interactions": "All interactive elements must have hover/active states. Use 'framer-motion' for page transitions."
+    },
+    "assets": {
+      "icons": "Lucide React (default). Use stroke-width={1.5} for elegance.",
+      "images": {
+        "employee_avatars": [
+          "https://images.unsplash.com/photo-1589668944320-409833e5ba10?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "https://images.unsplash.com/photo-1589220286904-3dcef62c68ee?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "https://images.pexels.com/photos/29852895/pexels-photo-29852895.jpeg",
+          "https://images.unsplash.com/photo-1660074127797-1c429fbb8cd6?crop=entropy&cs=srgb&fm=jpg&q=85"
+        ],
+        "team_collaboration": [
+          "https://images.unsplash.com/photo-1758873268663-5a362616b5a7?crop=entropy&cs=srgb&fm=jpg&q=85",
+          "https://images.unsplash.com/photo-1758518729685-f88df7890776?crop=entropy&cs=srgb&fm=jpg&q=85"
+        ],
+        "placeholders": {
+          "logo": "Use text 'BluBridge' in Outfit Bold, or a simple geometric shape SVG."
+        }
+      }
+    }
+  },
+  "implementation_steps": [
+    {
+      "step": 1,
+      "action": "Setup Global Theme",
+      "details": "Update index.css with new CSS variables for colors (#efede5, #fffdf7). Install fonts 'Outfit' and 'Public Sans'."
+    },
+    {
+      "step": 2,
+      "action": "Layout Skeleton",
+      "details": "Create the AppShell layout with Sidebar (Left) and Header (Top). Ensure the main content area has the global background #efede5."
+    },
+    {
+      "step": 3,
+      "action": "Dashboard Implementation",
+      "details": "Build the 'Bento Grid' dashboard. Create 'StatCard' component. Use Recharts for simple line/bar charts (Attendance trends)."
+    },
+    {
+      "step": 4,
+      "action": "Feature Modules",
+      "details": "Implement 'Attendance', 'Leave Management', 'Star Rewards' using Shadcn Table and Card components. Customize them to match the 'Flat/Warm' aesthetic."
+    },
+    {
+      "step": 5,
+      "action": "Polish",
+      "details": "Add 'sonner' for toasts. Add 'framer-motion' for smooth page transitions. Ensure all buttons have active states."
+    }
+  ],
+  "universal_guidelines": [
+    "DO NOT use generic 'Inter' font for headings. Use 'Outfit'.",
+    "DO NOT use pure black (#000000). Use Slate-900 (#0f172a).",
+    "Ensure all containers have the specific warm white background #fffdf7.",
+    "Use 'data-testid' on all interactive elements.",
+    "Avoid 'card' look for everything. Some sections can just be text on the background if hierarchy permits.",
+    "For 'Star Rewards', use a gold/amber accent color to make it special."
+  ]
+}
