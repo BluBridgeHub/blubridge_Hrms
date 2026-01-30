@@ -12,7 +12,7 @@
         --card-foreground: 222 47% 11%;
         --popover: 45 100% 98%;
         --popover-foreground: 222 47% 11%;
-        --primary: 221 100% 46%;
+        --primary: 215 76% 14%;
         --primary-foreground: 0 0% 100%;
         --secondary: 214 32% 91%;
         --secondary-foreground: 222 47% 11%;
@@ -24,13 +24,13 @@
         --destructive-foreground: 0 0% 98%;
         --border: 214 32% 91%;
         --input: 214 32% 91%;
-        --ring: 221 100% 46%;
+        --ring: 215 76% 14%;
         --radius: 0.75rem;
         
         /* BluBridge Custom Colors */
         --blubridge-bg: #efede5;
         --blubridge-container: #fffdf7;
-        --blubridge-primary: #004EEB;
+        --blubridge-primary: #0b1f3b;
         --blubridge-success: #10b981;
         --blubridge-warning: #f59e0b;
         --blubridge-error: #ef4444;

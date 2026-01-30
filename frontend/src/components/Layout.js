@@ -79,7 +79,7 @@ const Layout = ({ children }) => {
                 flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
                 transition-all duration-200
                 ${isActive 
-                  ? 'bg-[#004EEB] text-white shadow-lg shadow-[#004EEB]/20' 
+                  ? 'bg-[#0b1f3b] text-white shadow-lg shadow-[#0b1f3b]/20' 
                   : 'text-gray-600 hover:bg-black/5 hover:text-gray-900'
                 }
               `}

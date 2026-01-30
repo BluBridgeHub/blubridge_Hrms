@@ -66,7 +66,7 @@ const Login = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-[#004EEB] flex items-center justify-center shadow-lg shadow-[#004EEB]/20">
+            <div className="w-12 h-12 rounded-xl bg-[#0b1f3b] flex items-center justify-center shadow-lg shadow-[#0b1f3b]/20">
               <span className="text-white font-bold text-xl">B</span>
             </div>
           </div>
@@ -132,7 +132,7 @@ const Login = () => {
             <Button
               type="submit"
               disabled={loading || seeding}
-              className="w-full h-12 bg-[#004EEB] hover:bg-[#003cc9] text-white font-medium rounded-xl shadow-lg shadow-[#004EEB]/20 transition-all duration-200"
+              className="w-full h-12 bg-[#0b1f3b] hover:bg-[#162d4d] text-white font-medium rounded-xl shadow-lg shadow-[#0b1f3b]/20 transition-all duration-200"
               data-testid="login-submit-btn"
             >
               {loading ? (
