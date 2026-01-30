@@ -283,7 +283,7 @@ async def create_employee(data: EmployeeCreate, current_user: dict = Depends(get
     employee = Employee(emp_id=emp_id, **data.model_dump())
     doc = employee.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
-    await db.employees.insert_one(doc)
+    await db.employees.insert_one(doc.copy())
     
     await log_audit(current_user["id"], "create", "employee", employee.id)
     return serialize_doc(doc)
