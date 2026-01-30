@@ -546,7 +546,7 @@ async def add_star_reward(data: StarRewardCreate, current_user: dict = Depends(g
     )
     doc = reward.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
-    await db.star_rewards.insert_one(doc)
+    await db.star_rewards.insert_one(doc.copy())
     
     new_stars = employee.get("stars", 0) + data.stars
     await db.employees.update_one({"id": data.employee_id}, {"$set": {"stars": new_stars}})
