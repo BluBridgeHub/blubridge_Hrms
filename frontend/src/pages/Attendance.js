@@ -131,8 +131,8 @@ const Attendance = () => {
     <div className="space-y-6 animate-fade-in" data-testid="attendance-page">
       {/* Page Header */}
       <div className="flex items-center gap-3">
-        <CalendarCheck className="w-6 h-6 text-[#004EEB]" />
-        <h1 className="text-2xl font-bold text-[#004EEB]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+        <CalendarCheck className="w-6 h-6 text-[#0b1f3b]" />
+        <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
           Attendance
         </h1>
       </div>
@@ -207,7 +207,7 @@ const Attendance = () => {
               </Select>
               <Button 
                 onClick={handleFilter}
-                className="bg-[#004EEB] hover:bg-[#003cc9] text-white"
+                className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
                 data-testid="apply-filter-btn"
               >
                 Filter
@@ -221,7 +221,7 @@ const Attendance = () => {
       <div className="bg-[#fffdf7] rounded-xl border border-black/5 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004EEB]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b1f3b]"></div>
           </div>
         ) : (
           <div className="overflow-x-auto">

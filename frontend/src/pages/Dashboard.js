@@ -90,7 +90,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004EEB]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b1f3b]"></div>
       </div>
     );
   }
@@ -175,7 +175,7 @@ const Dashboard = () => {
           </div>
           <Button 
             onClick={handleFilter}
-            className="bg-[#004EEB] hover:bg-[#003cc9] text-white"
+            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
             data-testid="filter-btn"
           >
             <Filter className="w-4 h-4 mr-2" />
