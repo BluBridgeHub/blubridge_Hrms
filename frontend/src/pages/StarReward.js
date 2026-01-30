@@ -320,7 +320,7 @@ const StarReward = () => {
 
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004EEB]"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b1f3b]"></div>
             </div>
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -362,7 +362,7 @@ const StarReward = () => {
                         <td className="px-6 py-4 text-sm text-amber-600 font-semibold">{employee.unsafe_count}</td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
-                            <Button size="sm" onClick={() => handleViewEmployee(employee)} className="bg-[#004EEB] hover:bg-[#003cc9] text-white">
+                            <Button size="sm" onClick={() => handleViewEmployee(employee)} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white">
                               View
                             </Button>
                             {canAddStars && (

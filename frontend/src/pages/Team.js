@@ -88,8 +88,8 @@ const Team = () => {
     <div className="space-y-6 animate-fade-in" data-testid="team-page">
       {/* Page Header */}
       <div className="flex items-center gap-3">
-        <Users className="w-6 h-6 text-[#004EEB]" />
-        <h1 className="text-2xl font-bold text-[#004EEB]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+        <Users className="w-6 h-6 text-[#0b1f3b]" />
+        <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
           Team Dashboard
         </h1>
       </div>
@@ -103,7 +103,7 @@ const Team = () => {
                 <TabsTrigger 
                   key={dept.id}
                   value={dept.name} 
-                  className="px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#004EEB] data-[state=active]:bg-[#004EEB] data-[state=active]:text-white whitespace-nowrap"
+                  className="px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#0b1f3b] data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white whitespace-nowrap"
                   data-testid={`tab-${dept.name.replace(/\s+/g, '-').toLowerCase()}`}
                 >
                   {dept.name}
