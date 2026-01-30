@@ -468,7 +468,7 @@ async def create_leave(data: LeaveRequestCreate, current_user: dict = Depends(ge
     )
     doc = leave.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
-    await db.leaves.insert_one(doc)
+    await db.leaves.insert_one(doc.copy())
     
     await log_audit(current_user["id"], "create", "leave", leave.id)
     return serialize_doc(doc)
