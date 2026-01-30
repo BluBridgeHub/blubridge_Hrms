@@ -29,7 +29,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const EmployeeCard = ({ employee, onView, onAdd, canAdd }) => (
   <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6 hover:shadow-lg transition-all duration-200 card-hover">
-    <h3 className="font-semibold text-[#004EEB]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+    <h3 className="font-semibold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
       {employee.name}
     </h3>
     <p className="text-sm text-gray-500 mt-1">{employee.email}</p>
@@ -52,7 +52,7 @@ const EmployeeCard = ({ employee, onView, onAdd, canAdd }) => (
       <Button
         size="sm"
         onClick={() => onView(employee)}
-        className="bg-[#004EEB] hover:bg-[#003cc9] text-white flex-1"
+        className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white flex-1"
         data-testid={`view-btn-${employee.id}`}
       >
         <Eye className="w-4 h-4 mr-1" />
@@ -224,7 +224,7 @@ const StarReward = () => {
           <Button
             variant={activeView === 'employees' ? 'default' : 'outline'}
             onClick={() => setActiveView('employees')}
-            className={activeView === 'employees' ? 'bg-[#004EEB] text-white' : ''}
+            className={activeView === 'employees' ? 'bg-[#0b1f3b] text-white' : ''}
             data-testid="view-employees-btn"
           >
             Employees
@@ -232,7 +232,7 @@ const StarReward = () => {
           <Button
             variant={activeView === 'teams' ? 'default' : 'outline'}
             onClick={() => setActiveView('teams')}
-            className={activeView === 'teams' ? 'bg-[#004EEB] text-white' : ''}
+            className={activeView === 'teams' ? 'bg-[#0b1f3b] text-white' : ''}
             data-testid="view-teams-btn"
           >
             Teams
@@ -282,14 +282,14 @@ const StarReward = () => {
 
           <Button 
             onClick={handleApply}
-            className="bg-[#004EEB] hover:bg-[#003cc9] text-white"
+            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
             data-testid="apply-btn"
           >
             Apply
           </Button>
           <Button 
             onClick={handleExportCSV}
-            className="bg-[#004EEB] hover:bg-[#003cc9] text-white"
+            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
             data-testid="export-csv-btn"
           >
             <Download className="w-4 h-4 mr-2" />
