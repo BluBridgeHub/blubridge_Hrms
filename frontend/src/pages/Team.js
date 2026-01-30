@@ -29,7 +29,7 @@ const TeamCard = ({ team, onViewDetails }) => (
 
     <Button
       onClick={() => onViewDetails(team)}
-      className="w-full mt-4 bg-[#004EEB] hover:bg-[#003cc9] text-white"
+      className="w-full mt-4 bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
       data-testid={`view-team-btn-${team.id}`}
     >
       View Details
@@ -116,7 +116,7 @@ const Team = () => {
             <TabsContent key={dept.id} value={dept.name} className="mt-0 p-6">
               {/* Department Summary */}
               <div className="flex items-center justify-between mb-6 p-4 bg-gray-50/50 rounded-lg">
-                <h2 className="text-lg font-semibold text-[#004EEB]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                <h2 className="text-lg font-semibold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
                   {dept.name}
                 </h2>
                 <div className="text-right">
@@ -174,7 +174,7 @@ const Team = () => {
                 {teamMembers.map((member) => (
                   <div key={member.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#004EEB] flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-[#0b1f3b] flex items-center justify-center">
                         <span className="text-white font-medium text-sm">
                           {member.name?.charAt(0)?.toUpperCase()}
                         </span>
