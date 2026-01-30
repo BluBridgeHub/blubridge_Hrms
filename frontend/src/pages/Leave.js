@@ -157,8 +157,8 @@ const Leave = () => {
     <div className="space-y-6 animate-fade-in" data-testid="leave-page">
       {/* Page Header */}
       <div className="flex items-center gap-3">
-        <CalendarDays className="w-6 h-6 text-[#004EEB]" />
-        <h1 className="text-2xl font-bold text-[#004EEB]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+        <CalendarDays className="w-6 h-6 text-[#0b1f3b]" />
+        <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
           Leave Management
         </h1>
       </div>
@@ -253,7 +253,7 @@ const Leave = () => {
         <div className="flex gap-2 mt-4">
           <Button 
             onClick={handleFilter}
-            className="bg-[#004EEB] hover:bg-[#003cc9] text-white"
+            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
             data-testid="filter-btn"
           >
             <Filter className="w-4 h-4 mr-2" />
@@ -278,14 +278,14 @@ const Leave = () => {
             <TabsList className="bg-transparent h-auto p-0">
               <TabsTrigger 
                 value="requests" 
-                className="px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#004EEB] data-[state=active]:bg-[#004EEB] data-[state=active]:text-white"
+                className="px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#0b1f3b] data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white"
                 data-testid="tab-requests"
               >
                 Leave Request
               </TabsTrigger>
               <TabsTrigger 
                 value="history" 
-                className="px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#004EEB] data-[state=active]:bg-[#004EEB] data-[state=active]:text-white"
+                className="px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#0b1f3b] data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white"
                 data-testid="tab-history"
               >
                 Leave History
@@ -296,7 +296,7 @@ const Leave = () => {
           <TabsContent value="requests" className="mt-0">
             {loading ? (
               <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004EEB]"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b1f3b]"></div>
               </div>
             ) : (
               <div className="overflow-x-auto">
