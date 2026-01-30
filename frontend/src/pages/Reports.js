@@ -123,8 +123,8 @@ const Reports = () => {
     <div className="space-y-6 animate-fade-in" data-testid="reports-page">
       {/* Page Header */}
       <div className="flex items-center gap-3">
-        <FileText className="w-6 h-6 text-[#004EEB]" />
-        <h1 className="text-2xl font-bold text-[#004EEB]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+        <FileText className="w-6 h-6 text-[#0b1f3b]" />
+        <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
           Reports
         </h1>
       </div>
@@ -135,8 +135,8 @@ const Reports = () => {
           onClick={() => { setActiveReport('attendance'); setReportData([]); }}
           className={`p-6 rounded-xl border transition-all duration-200 text-left ${
             activeReport === 'attendance' 
-              ? 'bg-[#004EEB] text-white border-[#004EEB]' 
-              : 'bg-[#fffdf7] border-black/5 hover:border-[#004EEB]/30'
+              ? 'bg-[#0b1f3b] text-white border-[#0b1f3b]' 
+              : 'bg-[#fffdf7] border-black/5 hover:border-[#0b1f3b]/30'
           }`}
           data-testid="report-attendance-btn"
         >
@@ -151,8 +151,8 @@ const Reports = () => {
           onClick={() => { setActiveReport('leaves'); setReportData([]); }}
           className={`p-6 rounded-xl border transition-all duration-200 text-left ${
             activeReport === 'leaves' 
-              ? 'bg-[#004EEB] text-white border-[#004EEB]' 
-              : 'bg-[#fffdf7] border-black/5 hover:border-[#004EEB]/30'
+              ? 'bg-[#0b1f3b] text-white border-[#0b1f3b]' 
+              : 'bg-[#fffdf7] border-black/5 hover:border-[#0b1f3b]/30'
           }`}
           data-testid="report-leaves-btn"
         >
@@ -165,7 +165,7 @@ const Reports = () => {
 
         <button
           onClick={() => toast.info('Coming soon')}
-          className="p-6 rounded-xl border border-black/5 bg-[#fffdf7] hover:border-[#004EEB]/30 transition-all duration-200 text-left opacity-60"
+          className="p-6 rounded-xl border border-black/5 bg-[#fffdf7] hover:border-[#0b1f3b]/30 transition-all duration-200 text-left opacity-60"
           data-testid="report-summary-btn"
         >
           <ClipboardList className="w-8 h-8 mb-3" strokeWidth={1.5} />
@@ -239,7 +239,7 @@ const Reports = () => {
           <Button 
             onClick={fetchReport}
             disabled={loading}
-            className="bg-[#004EEB] hover:bg-[#003cc9] text-white"
+            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
             data-testid="generate-report-btn"
           >
             {loading ? (
