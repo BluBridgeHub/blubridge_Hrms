@@ -207,7 +207,7 @@ async def log_audit(user_id: str, action: str, resource: str, resource_id: str =
     log = AuditLog(user_id=user_id, action=action, resource=resource, resource_id=resource_id, details=details)
     doc = log.model_dump()
     doc['timestamp'] = doc['timestamp'].isoformat()
-    await db.audit_logs.insert_one(doc)
+    await db.audit_logs.insert_one(doc.copy())
 
 def serialize_doc(doc: dict) -> dict:
     if doc and 'created_at' in doc and isinstance(doc['created_at'], str):
