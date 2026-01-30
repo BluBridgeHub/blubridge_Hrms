@@ -53,7 +53,7 @@ const Layout = ({ children }) => {
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b border-black/5">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#004EEB] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[#0b1f3b] flex items-center justify-center">
               <span className="text-white font-bold text-sm">B</span>
             </div>
             <span className="text-xl font-bold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
