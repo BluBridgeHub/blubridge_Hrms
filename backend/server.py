@@ -370,7 +370,7 @@ async def check_in(employee_id: str, current_user: dict = Depends(get_current_us
     )
     doc = attendance.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
-    await db.attendance.insert_one(doc)
+    await db.attendance.insert_one(doc.copy())
     
     return serialize_doc(doc)
 
