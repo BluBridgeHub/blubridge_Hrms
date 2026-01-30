@@ -71,7 +71,7 @@ const Login = () => {
             </div>
           </div>
           <h1 className="text-3xl font-bold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            BLU<span className="text-[#004EEB]">BRIDGE</span>
+            BLU<span className="text-[#0b1f3b]">BRIDGE</span>
           </h1>
           <p className="text-gray-500 mt-2">Human Resource Management System</p>
         </div>

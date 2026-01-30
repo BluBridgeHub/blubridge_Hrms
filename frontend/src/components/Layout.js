@@ -57,7 +57,7 @@ const Layout = ({ children }) => {
               <span className="text-white font-bold text-sm">B</span>
             </div>
             <span className="text-xl font-bold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              BLU<span className="text-[#004EEB]">BRIDGE</span>
+              BLU<span className="text-[#0b1f3b]">BRIDGE</span>
             </span>
           </div>
           <button 
@@ -127,7 +127,7 @@ const Layout = ({ children }) => {
                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                 <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-[#004EEB] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-[#0b1f3b] flex items-center justify-center">
                 <span className="text-white font-medium">
                   {user?.name?.charAt(0)?.toUpperCase()}
                 </span>
