@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -11,37 +11,51 @@ import {
   LogOut as LogOutIcon,
   AlertCircle,
   Timer,
-  Calendar,
   Filter,
   RotateCcw,
-  Eye
+  Eye,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '../components/ui/sheet';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const StatCard = ({ title, value, icon: Icon, color, bgColor }) => (
-  <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6 hover:shadow-lg transition-all duration-200 card-hover">
+const StatCard = ({ title, value, icon: Icon, color, bgColor, onClick }) => (
+  <div 
+    onClick={onClick}
+    className={`bg-[#fffdf7] rounded-xl border border-black/5 p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer' : ''}`}
+  >
     <div className="flex items-start justify-between">
       <div>
         <p className="text-sm text-gray-500 font-medium">{title}</p>
-        <p className="text-3xl font-bold mt-2" style={{ fontFamily: 'Outfit, sans-serif', color: '#0f172a' }}>
+        <p className="text-3xl font-bold mt-2 transition-all duration-300" style={{ fontFamily: 'Outfit, sans-serif', color: '#0f172a' }}>
           {value}
         </p>
       </div>
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${bgColor}`}>
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${bgColor} transition-transform duration-300 hover:scale-110`}>
         <Icon className="w-6 h-6" style={{ color }} strokeWidth={1.5} />
       </div>
     </div>
   </div>
 );
 
-const AttendanceStatCard = ({ title, value, icon: Icon, borderColor }) => (
-  <div className={`bg-[#fffdf7] rounded-xl border-l-4 p-4 text-center`} style={{ borderLeftColor: borderColor }}>
-    <p className="text-3xl font-bold" style={{ fontFamily: 'Outfit, sans-serif' }}>{value}</p>
+const AttendanceStatCard = ({ title, value, icon: Icon, borderColor, isActive, onClick }) => (
+  <div 
+    onClick={onClick}
+    className={`bg-[#fffdf7] rounded-xl border-l-4 p-4 text-center cursor-pointer transition-all duration-300 hover:shadow-md ${isActive ? 'ring-2 ring-[#0b1f3b] shadow-lg' : ''}`} 
+    style={{ borderLeftColor: borderColor }}
+  >
+    <p className="text-3xl font-bold transition-all duration-300" style={{ fontFamily: 'Outfit, sans-serif' }}>{value}</p>
     <p className="text-xs text-gray-500 mt-1">{title}</p>
   </div>
 );
@@ -51,17 +65,18 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [leaveList, setLeaveList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeAttendanceTab, setActiveAttendanceTab] = useState('not_logged');
+  const [attendanceDetails, setAttendanceDetails] = useState([]);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [showDetailSheet, setShowDetailSheet] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [filters, setFilters] = useState({
     fromDate: '',
     toDate: '',
     leaveType: 'All'
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const [statsRes, leaveRes] = await Promise.all([
@@ -76,15 +91,66 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
+  }, [getAuthHeaders]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const fetchAttendanceByStatus = async (statusType) => {
+    setActiveAttendanceTab(statusType);
+    setLoadingDetails(true);
+    
+    try {
+      const today = new Date().toLocaleDateString('en-GB').split('/').join('-');
+      let statusFilter = '';
+      
+      switch (statusType) {
+        case 'logged_in':
+          statusFilter = 'Login';
+          break;
+        case 'logout':
+          statusFilter = 'Completed';
+          break;
+        case 'early_out':
+          statusFilter = 'Early Out';
+          break;
+        case 'late_login':
+          statusFilter = 'Late Login';
+          break;
+        default:
+          // For not_logged, we show the leave list
+          setAttendanceDetails(leaveList);
+          setLoadingDetails(false);
+          return;
+      }
+      
+      const response = await axios.get(`${API}/attendance`, {
+        headers: getAuthHeaders(),
+        params: { status: statusFilter, from_date: today, to_date: today }
+      });
+      setAttendanceDetails(response.data);
+    } catch (error) {
+      console.error('Failed to fetch attendance details:', error);
+      toast.error('Failed to load attendance details');
+    } finally {
+      setLoadingDetails(false);
+    }
   };
 
   const handleFilter = () => {
-    toast.info('Filtering applied');
+    toast.success('Filters applied');
+    fetchData();
   };
 
   const handleReset = () => {
     setFilters({ fromDate: '', toDate: '', leaveType: 'All' });
     toast.info('Filters reset');
+  };
+
+  const handleViewEmployee = (employee) => {
+    setSelectedEmployee(employee);
+    setShowDetailSheet(true);
   };
 
   if (loading) {
@@ -95,27 +161,38 @@ const Dashboard = () => {
     );
   }
 
+  const attendanceTabs = [
+    { key: 'not_logged', label: 'Leaves/No Login', value: stats?.attendance?.not_logged || 0, color: '#f59e0b' },
+    { key: 'logged_in', label: 'Login', value: stats?.attendance?.logged_in || 0, color: '#10b981' },
+    { key: 'early_out', label: 'Early Out', value: stats?.attendance?.early_out || 0, color: '#ef4444' },
+    { key: 'logout', label: 'Logout', value: stats?.attendance?.logout || 0, color: '#6366f1' },
+    { key: 'late_login', label: 'Late Login', value: stats?.attendance?.late_login || 0, color: '#8b5cf6' },
+  ];
+
   return (
     <div className="space-y-6 animate-fade-in" data-testid="dashboard-page">
       {/* Page Header */}
-      <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
           Dashboard
         </h1>
+        <p className="text-sm text-gray-500">
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
       </div>
 
       {/* Main Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           title="Total Research Unit" 
-          value={stats?.total_research_unit || 29} 
+          value={stats?.total_research_unit || 0} 
           icon={Users}
-          color="#004EEB"
+          color="#0b1f3b"
           bgColor="bg-blue-100"
         />
         <StatCard 
           title="Upcoming Leaves" 
-          value={stats?.upcoming_leaves || 1} 
+          value={stats?.upcoming_leaves || 0} 
           icon={CalendarDays}
           color="#10b981"
           bgColor="bg-emerald-100"
@@ -129,7 +206,7 @@ const Dashboard = () => {
         />
         <StatCard 
           title="Total Support Staff" 
-          value={stats?.total_support_staff || 4} 
+          value={stats?.total_support_staff || 0} 
           icon={UserCheck}
           color="#f97316"
           bgColor="bg-orange-100"
@@ -137,7 +214,7 @@ const Dashboard = () => {
       </div>
 
       {/* Filter Section */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6">
+      <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6 transition-all duration-300 hover:shadow-md">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">From:</span>
@@ -145,7 +222,7 @@ const Dashboard = () => {
               type="date"
               value={filters.fromDate}
               onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
-              className="w-40 bg-white"
+              className="w-40 bg-white transition-all duration-200 focus:ring-2 focus:ring-[#0b1f3b]/20"
               data-testid="filter-from-date"
             />
           </div>
@@ -155,7 +232,7 @@ const Dashboard = () => {
               type="date"
               value={filters.toDate}
               onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
-              className="w-40 bg-white"
+              className="w-40 bg-white transition-all duration-200 focus:ring-2 focus:ring-[#0b1f3b]/20"
               data-testid="filter-to-date"
             />
           </div>
@@ -175,7 +252,7 @@ const Dashboard = () => {
           </div>
           <Button 
             onClick={handleFilter}
-            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
+            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white transition-all duration-200 hover:shadow-lg"
             data-testid="filter-btn"
           >
             <Filter className="w-4 h-4 mr-2" />
@@ -184,7 +261,7 @@ const Dashboard = () => {
           <Button 
             variant="secondary"
             onClick={handleReset}
-            className="bg-gray-500 hover:bg-gray-600 text-white"
+            className="bg-gray-500 hover:bg-gray-600 text-white transition-all duration-200"
             data-testid="reset-btn"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
@@ -193,96 +270,167 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Attendance Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <AttendanceStatCard 
-          title="Leaves/No Login" 
-          value={stats?.attendance?.not_logged || 3} 
-          icon={AlertCircle}
-          borderColor="#f59e0b"
-        />
-        <AttendanceStatCard 
-          title="Login" 
-          value={stats?.attendance?.logged_in || 34} 
-          icon={LogIn}
-          borderColor="#10b981"
-        />
-        <AttendanceStatCard 
-          title="Early Out" 
-          value={stats?.attendance?.early_out || 0} 
-          icon={Timer}
-          borderColor="#ef4444"
-        />
-        <AttendanceStatCard 
-          title="Logout" 
-          value={stats?.attendance?.logout || 0} 
-          icon={LogOutIcon}
-          borderColor="#6366f1"
-        />
-        <AttendanceStatCard 
-          title="Late Login" 
-          value={stats?.attendance?.late_login || 0} 
-          icon={Clock}
-          borderColor="#8b5cf6"
-        />
+      {/* Attendance Stats Tabs */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold" style={{ fontFamily: 'Outfit, sans-serif' }}>
+          Today's Attendance Overview
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {attendanceTabs.map((tab) => (
+            <AttendanceStatCard 
+              key={tab.key}
+              title={tab.label}
+              value={tab.value}
+              borderColor={tab.color}
+              isActive={activeAttendanceTab === tab.key}
+              onClick={() => fetchAttendanceByStatus(tab.key)}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Leave List */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 overflow-hidden">
-        <div className="p-6 border-b border-black/5">
+      {/* Attendance Details Table */}
+      <div className="bg-[#fffdf7] rounded-xl border border-black/5 overflow-hidden transition-all duration-300">
+        <div className="p-6 border-b border-black/5 flex items-center justify-between">
           <h2 className="text-lg font-semibold" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Leave List
+            {activeAttendanceTab === 'not_logged' ? 'Leave List / Not Logged In' : `${attendanceTabs.find(t => t.key === activeAttendanceTab)?.label || ''} Details`}
           </h2>
+          <Badge className="bg-[#0b1f3b] text-white">
+            {activeAttendanceTab === 'not_logged' ? leaveList.length : attendanceDetails.length} records
+          </Badge>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50/50">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Emp Name</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Team</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Leave Type</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {leaveList.length === 0 ? (
+        
+        {loadingDetails ? (
+          <div className="flex items-center justify-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0b1f3b]"></div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50/50">
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
-                    No records found
-                  </td>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Emp Name</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Team</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {activeAttendanceTab === 'not_logged' ? 'Leave Type' : 'Check-In'}
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {activeAttendanceTab === 'not_logged' ? 'Date' : 'Check-Out'}
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                 </tr>
-              ) : (
-                leaveList.map((item, index) => (
-                  <tr key={index} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <button className="p-1 hover:bg-gray-100 rounded" data-testid={`view-btn-${index}`}>
-                        <Eye className="w-4 h-4 text-gray-400" />
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.emp_name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{item.team}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{item.leave_type}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{item.date}</td>
-                    <td className="px-6 py-4">
-                      <Badge 
-                        className={`
-                          ${item.status === 'Not Login' ? 'bg-amber-100 text-amber-700' : ''}
-                          ${item.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : ''}
-                          ${item.status === 'pending' ? 'bg-blue-100 text-blue-700' : ''}
-                        `}
-                      >
-                        {item.status}
-                      </Badge>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {(activeAttendanceTab === 'not_logged' ? leaveList : attendanceDetails).length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                      No records found
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  (activeAttendanceTab === 'not_logged' ? leaveList : attendanceDetails).map((item, index) => (
+                    <tr 
+                      key={index} 
+                      className="hover:bg-gray-50/50 transition-colors duration-150 cursor-pointer"
+                      onClick={() => handleViewEmployee(item)}
+                    >
+                      <td className="px-6 py-4">
+                        <button className="p-1 hover:bg-gray-100 rounded transition-colors" data-testid={`view-btn-${index}`}>
+                          <Eye className="w-4 h-4 text-gray-400" />
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.emp_name}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{item.team}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {activeAttendanceTab === 'not_logged' ? item.leave_type : (item.check_in || '-')}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {activeAttendanceTab === 'not_logged' ? item.date : (item.check_out || '-')}
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge 
+                          className={`
+                            transition-all duration-200
+                            ${item.status === 'Not Login' ? 'bg-amber-100 text-amber-700' : ''}
+                            ${item.status === 'Login' ? 'bg-emerald-100 text-emerald-700' : ''}
+                            ${item.status === 'Completed' ? 'bg-blue-100 text-blue-700' : ''}
+                            ${item.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : ''}
+                            ${item.status === 'pending' ? 'bg-amber-100 text-amber-700' : ''}
+                            ${item.status === 'Early Out' ? 'bg-red-100 text-red-700' : ''}
+                            ${item.status === 'Late Login' ? 'bg-purple-100 text-purple-700' : ''}
+                          `}
+                        >
+                          {item.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
+
+      {/* Employee Detail Sheet */}
+      <Sheet open={showDetailSheet} onOpenChange={setShowDetailSheet}>
+        <SheetContent className="w-full sm:max-w-md bg-[#fffdf7]">
+          <SheetHeader>
+            <SheetTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Employee Details</SheetTitle>
+          </SheetHeader>
+          {selectedEmployee && (
+            <div className="py-6 space-y-4">
+              <div className="flex items-center gap-4 pb-4 border-b">
+                <div className="w-14 h-14 rounded-full bg-[#0b1f3b] flex items-center justify-center">
+                  <span className="text-white text-xl font-bold">
+                    {selectedEmployee.emp_name?.charAt(0)?.toUpperCase()}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">{selectedEmployee.emp_name}</h3>
+                  <p className="text-sm text-gray-500">{selectedEmployee.team}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between py-2 border-b border-dashed">
+                  <span className="text-gray-500">Department</span>
+                  <span className="font-medium">{selectedEmployee.department || '-'}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-dashed">
+                  <span className="text-gray-500">Status</span>
+                  <Badge className={
+                    selectedEmployee.status === 'Login' ? 'bg-emerald-100 text-emerald-700' :
+                    selectedEmployee.status === 'Not Login' ? 'bg-amber-100 text-amber-700' :
+                    'bg-gray-100 text-gray-700'
+                  }>
+                    {selectedEmployee.status}
+                  </Badge>
+                </div>
+                {selectedEmployee.check_in && (
+                  <div className="flex justify-between py-2 border-b border-dashed">
+                    <span className="text-gray-500">Check-In</span>
+                    <span className="font-medium">{selectedEmployee.check_in}</span>
+                  </div>
+                )}
+                {selectedEmployee.check_out && (
+                  <div className="flex justify-between py-2 border-b border-dashed">
+                    <span className="text-gray-500">Check-Out</span>
+                    <span className="font-medium">{selectedEmployee.check_out}</span>
+                  </div>
+                )}
+                {selectedEmployee.leave_type && (
+                  <div className="flex justify-between py-2 border-b border-dashed">
+                    <span className="text-gray-500">Leave Type</span>
+                    <span className="font-medium">{selectedEmployee.leave_type}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
