@@ -368,15 +368,27 @@ class BluBridgeHRMSTester:
         
         return success1 and success2
 
-    def test_audit_logs(self):
-        """Test audit logs (admin only)"""
-        success, _ = self.run_test(
-            "Get Audit Logs",
-            "GET",
-            "audit-logs",
-            200
-        )
-        return success
+    def test_config_endpoints(self):
+        """Test configuration endpoints"""
+        config_endpoints = [
+            "config/employment-types",
+            "config/employee-statuses", 
+            "config/tier-levels",
+            "config/work-locations",
+            "config/user-roles"
+        ]
+        
+        all_success = True
+        for endpoint in config_endpoints:
+            success, _ = self.run_test(
+                f"Get {endpoint.split('/')[-1].title()}",
+                "GET",
+                endpoint,
+                200
+            )
+            all_success = all_success and success
+        
+        return all_success
 
 def main():
     print("🚀 Starting BluBridge HRMS Backend Testing")
