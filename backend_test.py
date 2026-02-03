@@ -141,12 +141,15 @@ class BluBridgeHRMSTester:
             "employees",
             200,
             data={
-                "name": "Test Employee",
-                "email": "test@blubridge.com",
+                "full_name": "Test Employee",
+                "official_email": "test@blubridge.com",
                 "department": "Research Unit",
                 "team": "Data",
                 "designation": "Software Engineer",
-                "join_date": "2024-01-01"
+                "date_of_joining": "2024-01-01",
+                "employment_type": "Full-time",
+                "tier_level": "Mid",
+                "work_location": "Office"
             }
         )
         
