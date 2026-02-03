@@ -372,7 +372,7 @@ const Employees = () => {
             <Label className="text-sm font-medium">Full Name <span className="text-red-500">*</span></Label>
             <Input
               value={form.full_name}
-              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+              onChange={(e) => setForm(prev => ({ ...prev, full_name: e.target.value }))}
               placeholder="Enter full name"
               className="mt-1 bg-white"
               data-testid="input-full-name"
