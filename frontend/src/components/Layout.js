@@ -56,7 +56,7 @@ const Layout = ({ children }) => {
             <img 
               src="https://customer-assets.emergentagent.com/job_25d72bd1-2848-402d-8255-1f5e67431c0e/artifacts/o66msiwa_logo-main2.png" 
               alt="BluBridge" 
-              className="h-8 w-auto"
+              className="w-auto"
             />
           </div>
           <button 
