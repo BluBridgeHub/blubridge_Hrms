@@ -344,6 +344,130 @@ async def generate_emp_id():
     count = await db.employees.count_documents({})
     return f"EMP{str(count + 1).zfill(4)}"
 
+# ============== EMAIL HELPERS ==============
+
+async def send_email_notification(to_email: str, subject: str, html_content: str):
+    """Send email notification using Resend"""
+    if not resend.api_key:
+        logger.warning("Resend API key not configured, skipping email")
+        return None
+    
+    try:
+        params = {
+            "from": SENDER_EMAIL,
+            "to": [to_email],
+            "subject": subject,
+            "html": html_content
+        }
+        result = await asyncio.to_thread(resend.Emails.send, params)
+        logger.info(f"Email sent to {to_email}: {result.get('id')}")
+        return result
+    except Exception as e:
+        logger.error(f"Failed to send email: {str(e)}")
+        return None
+
+def get_leave_approval_email(emp_name: str, leave_type: str, start_date: str, end_date: str, status: str):
+    """Generate HTML email for leave approval/rejection"""
+    status_color = "#10b981" if status == "approved" else "#ef4444"
+    status_text = "Approved" if status == "approved" else "Rejected"
+    
+    return f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #0b1f3b; padding: 20px; border-radius: 8px 8px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">BluBridge HRMS</h1>
+        </div>
+        <div style="background: #fffdf7; padding: 30px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px;">
+            <h2 style="color: #0b1f3b; margin-top: 0;">Leave Request {status_text}</h2>
+            <p style="color: #666;">Dear {emp_name},</p>
+            <p style="color: #666;">Your leave request has been <span style="color: {status_color}; font-weight: bold;">{status_text.lower()}</span>.</p>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 5px 0;"><strong>Leave Type:</strong> {leave_type}</p>
+                <p style="margin: 5px 0;"><strong>From:</strong> {start_date}</p>
+                <p style="margin: 5px 0;"><strong>To:</strong> {end_date}</p>
+                <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: {status_color};">{status_text}</span></p>
+            </div>
+            <p style="color: #999; font-size: 12px; margin-top: 30px;">This is an automated notification from BluBridge HRMS.</p>
+        </div>
+    </div>
+    """
+
+def get_star_reward_email(emp_name: str, stars: int, reason: str, awarded_by: str):
+    """Generate HTML email for star reward notification"""
+    star_color = "#10b981" if stars > 0 else "#ef4444"
+    star_text = f"+{stars}" if stars > 0 else str(stars)
+    
+    return f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #0b1f3b; padding: 20px; border-radius: 8px 8px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">BluBridge HRMS</h1>
+        </div>
+        <div style="background: #fffdf7; padding: 30px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px;">
+            <h2 style="color: #0b1f3b; margin-top: 0;">Star Reward Notification</h2>
+            <p style="color: #666;">Dear {emp_name},</p>
+            <p style="color: #666;">You have received a star reward!</p>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                <p style="font-size: 48px; margin: 0; color: {star_color};">{star_text} ⭐</p>
+                <p style="margin: 10px 0 0 0; color: #666;">{reason}</p>
+            </div>
+            <p style="color: #999; font-size: 12px;">Awarded by: {awarded_by}</p>
+            <p style="color: #999; font-size: 12px; margin-top: 30px;">This is an automated notification from BluBridge HRMS.</p>
+        </div>
+    </div>
+    """
+
+# ============== CLOUDINARY ROUTES ==============
+
+@api_router.get("/cloudinary/signature")
+async def get_cloudinary_signature(
+    resource_type: str = Query("image", enum=["image", "video"]),
+    folder: str = Query("employees"),
+    current_user: dict = Depends(get_current_user)
+):
+    """Generate signed upload params for Cloudinary"""
+    ALLOWED_FOLDERS = ("employees", "documents", "avatars")
+    if folder not in ALLOWED_FOLDERS:
+        raise HTTPException(status_code=400, detail="Invalid folder path")
+    
+    timestamp = int(time.time())
+    params = {
+        "timestamp": timestamp,
+        "folder": f"blubridge/{folder}",
+        "resource_type": resource_type
+    }
+    
+    signature = cloudinary.utils.api_sign_request(
+        params,
+        os.environ.get("CLOUDINARY_API_SECRET")
+    )
+    
+    return {
+        "signature": signature,
+        "timestamp": timestamp,
+        "cloud_name": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        "api_key": os.environ.get("CLOUDINARY_API_KEY"),
+        "folder": f"blubridge/{folder}",
+        "resource_type": resource_type
+    }
+
+@api_router.delete("/cloudinary/{public_id:path}")
+async def delete_cloudinary_asset(
+    public_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete asset from Cloudinary"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+        raise HTTPException(status_code=403, detail="Permission denied")
+    
+    try:
+        result = await asyncio.to_thread(
+            cloudinary.uploader.destroy,
+            public_id,
+            invalidate=True
+        )
+        return {"success": True, "result": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ============== AUTH ROUTES ==============
 
 @api_router.post("/auth/login", response_model=LoginResponse)
