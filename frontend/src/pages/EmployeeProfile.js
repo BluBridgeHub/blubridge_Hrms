@@ -12,9 +12,23 @@ import {
   Calendar,
   MapPin,
   Shield,
-  Star
+  Star,
+  Lock,
+  Eye,
+  EyeOff,
+  Loader2
 } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '../components/ui/dialog';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -34,6 +48,18 @@ const EmployeeProfile = () => {
   const { getAuthHeaders } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Password change state
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
+  });
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -53,6 +79,59 @@ const EmployeeProfile = () => {
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  const handlePasswordChange = (field, value) => {
+    setPasswordForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const resetPasswordForm = () => {
+    setPasswordForm({
+      current_password: '',
+      new_password: '',
+      confirm_password: ''
+    });
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+  };
+
+  const handleSubmitPasswordChange = async () => {
+    // Validation
+    if (!passwordForm.current_password) {
+      toast.error('Please enter your current password');
+      return;
+    }
+    if (!passwordForm.new_password) {
+      toast.error('Please enter a new password');
+      return;
+    }
+    if (passwordForm.new_password.length < 6) {
+      toast.error('New password must be at least 6 characters');
+      return;
+    }
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    if (passwordForm.current_password === passwordForm.new_password) {
+      toast.error('New password must be different from current password');
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      await axios.post(`${API}/employee/change-password`, passwordForm, {
+        headers: getAuthHeaders()
+      });
+      toast.success('Password changed successfully!');
+      setShowPasswordModal(false);
+      resetPasswordForm();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to change password');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -74,11 +153,21 @@ const EmployeeProfile = () => {
   return (
     <div className="space-y-6 animate-fade-in" data-testid="employee-profile-page">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          Profile
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">Your personal information</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            Profile
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">Your personal information</p>
+        </div>
+        <Button 
+          onClick={() => setShowPasswordModal(true)}
+          className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
+          data-testid="change-password-btn"
+        >
+          <Lock className="w-4 h-4 mr-2" />
+          Change Password
+        </Button>
       </div>
 
       {/* Profile Header Card */}
@@ -263,6 +352,132 @@ const EmployeeProfile = () => {
           </div>
         </div>
       </div>
+
+      {/* Password Change Modal */}
+      <Dialog open={showPasswordModal} onOpenChange={(open) => { setShowPasswordModal(open); if (!open) resetPasswordForm(); }}>
+        <DialogContent className="bg-[#fffdf7] sm:max-w-md" aria-describedby="password-change-desc">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
+              <div className="flex items-center gap-2">
+                <Lock className="w-5 h-5 text-[#0b1f3b]" />
+                Change Password
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          <p id="password-change-desc" className="sr-only">Form to change your account password</p>
+          
+          <div className="space-y-4 py-4">
+            {/* Current Password */}
+            <div className="space-y-2">
+              <Label>Current Password <span className="text-red-500">*</span></Label>
+              <div className="relative">
+                <Input
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={passwordForm.current_password}
+                  onChange={(e) => handlePasswordChange('current_password', e.target.value)}
+                  placeholder="Enter current password"
+                  className="bg-white pr-10"
+                  data-testid="current-password-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* New Password */}
+            <div className="space-y-2">
+              <Label>New Password <span className="text-red-500">*</span></Label>
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  value={passwordForm.new_password}
+                  onChange={(e) => handlePasswordChange('new_password', e.target.value)}
+                  placeholder="Enter new password (min 6 characters)"
+                  className="bg-white pr-10"
+                  data-testid="new-password-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {passwordForm.new_password && passwordForm.new_password.length < 6 && (
+                <p className="text-xs text-red-500">Password must be at least 6 characters</p>
+              )}
+            </div>
+
+            {/* Confirm New Password */}
+            <div className="space-y-2">
+              <Label>Confirm New Password <span className="text-red-500">*</span></Label>
+              <div className="relative">
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={passwordForm.confirm_password}
+                  onChange={(e) => handlePasswordChange('confirm_password', e.target.value)}
+                  placeholder="Confirm new password"
+                  className="bg-white pr-10"
+                  data-testid="confirm-password-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {passwordForm.confirm_password && passwordForm.new_password !== passwordForm.confirm_password && (
+                <p className="text-xs text-red-500">Passwords do not match</p>
+              )}
+              {passwordForm.confirm_password && passwordForm.new_password === passwordForm.confirm_password && passwordForm.new_password.length >= 6 && (
+                <p className="text-xs text-emerald-600">✓ Passwords match</p>
+              )}
+            </div>
+
+            {/* Password Requirements */}
+            <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600">
+              <p className="font-medium mb-1">Password Requirements:</p>
+              <ul className="list-disc list-inside space-y-0.5">
+                <li>Minimum 6 characters</li>
+                <li>Must be different from current password</li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => { setShowPasswordModal(false); resetPasswordForm(); }}
+              data-testid="cancel-password-btn"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmitPasswordChange}
+              disabled={passwordLoading}
+              className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
+              data-testid="submit-password-btn"
+            >
+              {passwordLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Changing...
+                </>
+              ) : (
+                'Change Password'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
