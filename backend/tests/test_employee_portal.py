@@ -250,18 +250,19 @@ class TestEmployeeLeaves:
         
         print(f"✓ Leave applied successfully, ID: {data['leave_id']}")
     
-    def test_apply_leave_validation(self, employee_token):
-        """Test leave validation - short reason"""
+    def test_apply_leave_past_date_validation(self, employee_token):
+        """Test leave validation - past date should be rejected"""
         headers = {"Authorization": f"Bearer {employee_token}"}
         leave_data = {
             "leave_type": "Sick",
-            "leave_date": "21-02-2026",
+            "leave_date": "01-01-2020",  # Past date
             "duration": "First Half",
-            "reason": "short"  # Too short
+            "reason": "Testing past date validation"
         }
         response = requests.post(f"{BASE_URL}/api/employee/leaves/apply", json=leave_data, headers=headers)
         assert response.status_code == 400
-        print("✓ Leave validation correctly rejects short reason")
+        assert "past dates" in response.json().get("detail", "").lower()
+        print("✓ Leave validation correctly rejects past dates")
     
     def test_leaves_requires_auth(self):
         """Test leaves requires authentication"""
