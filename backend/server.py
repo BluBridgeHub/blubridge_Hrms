@@ -920,14 +920,32 @@ async def approve_leave(leave_id: str, current_user: dict = Depends(get_current_
     if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
-    result = await db.leaves.update_one(
-        {"id": leave_id},
-        {"$set": {"status": "approved", "approved_by": current_user["id"]}}
-    )
-    if result.matched_count == 0:
+    leave = await db.leaves.find_one({"id": leave_id}, {"_id": 0})
+    if not leave:
         raise HTTPException(status_code=404, detail="Leave request not found")
     
+    result = await db.leaves.update_one(
+        {"id": leave_id},
+        {"$set": {"status": "approved", "approved_by": current_user["id"], "approved_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
     await log_audit(current_user["id"], "approve", "leave", leave_id)
+    
+    # Send email notification
+    employee = await db.employees.find_one({"id": leave["employee_id"]}, {"_id": 0})
+    if employee and employee.get("official_email"):
+        email_html = get_leave_approval_email(
+            employee["full_name"],
+            leave["leave_type"],
+            leave["start_date"],
+            leave["end_date"],
+            "approved"
+        )
+        asyncio.create_task(send_email_notification(
+            employee["official_email"],
+            "Leave Request Approved - BluBridge HRMS",
+            email_html
+        ))
     leave = await db.leaves.find_one({"id": leave_id}, {"_id": 0})
     return serialize_doc(leave)
 
