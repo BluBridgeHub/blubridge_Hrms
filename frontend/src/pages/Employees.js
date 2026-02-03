@@ -863,12 +863,13 @@ const Employees = () => {
 
       {/* View Employee Dialog */}
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
-        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="view-employee-desc">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
               Employee Details - {selectedEmployee?.emp_id}
             </DialogTitle>
           </DialogHeader>
+          <p id="view-employee-desc" className="sr-only">View detailed employee information</p>
           {selectedEmployee && (
             <div className="space-y-6 py-4">
               <div className="flex items-center gap-4 pb-4 border-b">
@@ -939,11 +940,11 @@ const Employees = () => {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="bg-[#fffdf7]">
+        <DialogContent className="bg-[#fffdf7]" aria-describedby="delete-employee-desc">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Deactivate Employee</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4" id="delete-employee-desc">
             <p className="text-gray-600">
               Are you sure you want to deactivate <span className="font-semibold">{selectedEmployee?.full_name}</span>?
             </p>
