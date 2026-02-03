@@ -1310,6 +1310,427 @@ async def get_work_locations():
 async def get_user_roles():
     return [UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD, UserRole.EMPLOYEE]
 
+# ============== EMPLOYEE PORTAL MODELS ==============
+
+class EmployeeLeaveCreate(BaseModel):
+    leave_type: str  # Sick, Emergency, Preplanned
+    leave_date: str  # dd-mm-yyyy
+    duration: str  # First Half, Second Half, Full Day
+    reason: str
+    supporting_document_url: Optional[str] = None
+    supporting_document_name: Optional[str] = None
+
+class EmployeeAttendanceRecord(BaseModel):
+    date: str
+    login: Optional[str] = None
+    logout: Optional[str] = None
+    total_hours: Optional[str] = None
+    status: str  # Present, Late, Early Out, Absent, Leave, NA, Sunday
+
+# ============== EMPLOYEE PORTAL ROUTES ==============
+
+@api_router.get("/employee/profile")
+async def get_employee_profile(current_user: dict = Depends(get_current_user)):
+    """Get logged-in employee's profile"""
+    if not current_user.get("employee_id"):
+        raise HTTPException(status_code=404, detail="No employee profile linked")
+    
+    employee = await db.employees.find_one({"id": current_user["employee_id"], "is_deleted": {"$ne": True}}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee profile not found")
+    
+    return serialize_doc(employee)
+
+@api_router.get("/employee/dashboard")
+async def get_employee_dashboard(current_user: dict = Depends(get_current_user)):
+    """Get employee dashboard data with summary cards and clock info"""
+    if not current_user.get("employee_id"):
+        raise HTTPException(status_code=404, detail="No employee profile linked")
+    
+    employee_id = current_user["employee_id"]
+    employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Get current month attendance stats
+    now = datetime.now(timezone.utc)
+    current_month = now.strftime("%m-%Y")
+    today_str = now.strftime("%d-%m-%Y")
+    
+    # Calculate month boundaries
+    first_day = now.replace(day=1)
+    if now.month == 12:
+        next_month = now.replace(year=now.year + 1, month=1, day=1)
+    else:
+        next_month = now.replace(month=now.month + 1, day=1)
+    last_day = next_month - timedelta(days=1)
+    
+    # Get all attendance records for this month
+    attendance_records = await db.attendance.find({
+        "employee_id": employee_id,
+        "date": {"$regex": f"-{now.strftime('%m-%Y')}$"}
+    }, {"_id": 0}).to_list(31)
+    
+    # Calculate summary stats
+    active_days = 0
+    inactive_days = 0
+    late_arrivals = 0
+    early_outs = 0
+    
+    for record in attendance_records:
+        status = record.get("status", "")
+        if status in ["Login", "Completed", "Present"]:
+            active_days += 1
+        elif status in ["Absent", "NA", "Not Logged"]:
+            inactive_days += 1
+        if status == "Late Login" or status == "Late":
+            late_arrivals += 1
+            active_days += 1
+        if status == "Early Out":
+            early_outs += 1
+            active_days += 1
+    
+    # Get today's attendance
+    today_attendance = await db.attendance.find_one({
+        "employee_id": employee_id,
+        "date": today_str
+    }, {"_id": 0})
+    
+    login_time = None
+    logout_time = None
+    hours_today = None
+    
+    if today_attendance:
+        login_time = today_attendance.get("check_in")
+        logout_time = today_attendance.get("check_out")
+        hours_today = today_attendance.get("total_hours")
+    
+    return {
+        "employee_name": employee.get("full_name"),
+        "employee_id": employee.get("emp_id"),
+        "department": employee.get("department"),
+        "team": employee.get("team"),
+        "summary": {
+            "active_days": active_days,
+            "inactive_days": inactive_days,
+            "late_arrivals": late_arrivals,
+            "early_outs": early_outs
+        },
+        "today": {
+            "date": today_str,
+            "login_time": login_time,
+            "logout_time": logout_time,
+            "hours_today": hours_today,
+            "is_logged_in": login_time is not None,
+            "is_logged_out": logout_time is not None
+        },
+        "current_month": now.strftime("%B %Y")
+    }
+
+@api_router.post("/employee/clock-in")
+async def employee_clock_in(current_user: dict = Depends(get_current_user)):
+    """Employee self clock-in"""
+    if not current_user.get("employee_id"):
+        raise HTTPException(status_code=404, detail="No employee profile linked")
+    
+    employee_id = current_user["employee_id"]
+    employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    if not employee.get("attendance_tracking_enabled", True):
+        raise HTTPException(status_code=400, detail="Attendance tracking disabled")
+    
+    now = datetime.now(timezone.utc)
+    today_str = now.strftime("%d-%m-%Y")
+    check_in_time = now.strftime("%I:%M %p")
+    
+    existing = await db.attendance.find_one({"employee_id": employee_id, "date": today_str})
+    if existing and existing.get("check_in"):
+        raise HTTPException(status_code=400, detail="Already clocked in today")
+    
+    # Determine status (Late if after 9:30 AM)
+    status = "Login"
+    if now.hour > 9 or (now.hour == 9 and now.minute > 30):
+        status = "Late Login"
+    
+    attendance = Attendance(
+        employee_id=employee_id,
+        emp_name=employee["full_name"],
+        team=employee["team"],
+        department=employee["department"],
+        date=today_str,
+        check_in=check_in_time,
+        status=status
+    )
+    doc = attendance.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.attendance.insert_one(doc.copy())
+    
+    return {"message": "Clocked in successfully", "time": check_in_time, "status": status}
+
+@api_router.post("/employee/clock-out")
+async def employee_clock_out(current_user: dict = Depends(get_current_user)):
+    """Employee self clock-out"""
+    if not current_user.get("employee_id"):
+        raise HTTPException(status_code=404, detail="No employee profile linked")
+    
+    employee_id = current_user["employee_id"]
+    now = datetime.now(timezone.utc)
+    today_str = now.strftime("%d-%m-%Y")
+    check_out_time = now.strftime("%I:%M %p")
+    
+    attendance = await db.attendance.find_one({"employee_id": employee_id, "date": today_str}, {"_id": 0})
+    if not attendance:
+        raise HTTPException(status_code=404, detail="No clock-in found for today")
+    if attendance.get("check_out"):
+        raise HTTPException(status_code=400, detail="Already clocked out")
+    
+    # Calculate total hours
+    try:
+        check_in_str = attendance.get("check_in", "")
+        check_in_dt = datetime.strptime(f"{today_str} {check_in_str}", "%d-%m-%Y %I:%M %p")
+        check_out_dt = datetime.strptime(f"{today_str} {check_out_time}", "%d-%m-%Y %I:%M %p")
+        diff = check_out_dt - check_in_dt
+        hours = diff.seconds // 3600
+        minutes = (diff.seconds % 3600) // 60
+        total_hours = f"{hours}h {minutes}m"
+    except:
+        total_hours = None
+    
+    # Determine status (Early Out if before 6:00 PM)
+    status = "Completed"
+    if now.hour < 18:
+        status = "Early Out"
+    
+    await db.attendance.update_one(
+        {"employee_id": employee_id, "date": today_str},
+        {"$set": {"check_out": check_out_time, "total_hours": total_hours, "status": status}}
+    )
+    
+    return {"message": "Clocked out successfully", "time": check_out_time, "total_hours": total_hours, "status": status}
+
+@api_router.get("/employee/attendance")
+async def get_employee_attendance(
+    duration: Optional[str] = "this_week",  # this_week, last_week, this_month, last_month, custom
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    status_filter: Optional[str] = "All",
+    current_user: dict = Depends(get_current_user)
+):
+    """Get employee's own attendance records with filters"""
+    if not current_user.get("employee_id"):
+        raise HTTPException(status_code=404, detail="No employee profile linked")
+    
+    employee_id = current_user["employee_id"]
+    now = datetime.now(timezone.utc)
+    
+    # Calculate date range based on duration
+    if duration == "this_week":
+        # Monday to Sunday of current week
+        start = now - timedelta(days=now.weekday())
+        end = start + timedelta(days=6)
+    elif duration == "last_week":
+        start = now - timedelta(days=now.weekday() + 7)
+        end = start + timedelta(days=6)
+    elif duration == "this_month":
+        start = now.replace(day=1)
+        if now.month == 12:
+            end = now.replace(year=now.year + 1, month=1, day=1) - timedelta(days=1)
+        else:
+            end = now.replace(month=now.month + 1, day=1) - timedelta(days=1)
+    elif duration == "last_month":
+        first_this_month = now.replace(day=1)
+        end = first_this_month - timedelta(days=1)
+        start = end.replace(day=1)
+    elif duration == "custom" and start_date and end_date:
+        start = datetime.strptime(start_date, "%d-%m-%Y")
+        end = datetime.strptime(end_date, "%d-%m-%Y")
+    else:
+        # Default to this week
+        start = now - timedelta(days=now.weekday())
+        end = start + timedelta(days=6)
+    
+    # Generate all dates in range
+    records = []
+    current_date = start
+    while current_date <= end:
+        date_str = current_date.strftime("%d-%m-%Y")
+        day_name = current_date.strftime("%A")
+        
+        # Check if Sunday
+        if day_name == "Sunday":
+            record = {
+                "date": date_str,
+                "day": day_name,
+                "login": "-",
+                "logout": "-",
+                "total_hours": "-",
+                "status": "Sunday"
+            }
+        elif current_date > now:
+            # Future date
+            record = {
+                "date": date_str,
+                "day": day_name,
+                "login": "-",
+                "logout": "-",
+                "total_hours": "-",
+                "status": "NA"
+            }
+        else:
+            # Look up actual attendance
+            att = await db.attendance.find_one({
+                "employee_id": employee_id,
+                "date": date_str
+            }, {"_id": 0})
+            
+            # Check for approved leave
+            leave = await db.leaves.find_one({
+                "employee_id": employee_id,
+                "status": "approved",
+                "start_date": {"$lte": current_date.strftime("%Y-%m-%d")},
+                "end_date": {"$gte": current_date.strftime("%Y-%m-%d")}
+            }, {"_id": 0})
+            
+            if leave:
+                record = {
+                    "date": date_str,
+                    "day": day_name,
+                    "login": "-",
+                    "logout": "-",
+                    "total_hours": "-",
+                    "status": "Leave"
+                }
+            elif att:
+                # Determine display status
+                display_status = "Present"
+                if att.get("status") == "Late Login":
+                    display_status = "Late"
+                elif att.get("status") == "Early Out":
+                    display_status = "Early Out"
+                elif att.get("status") == "Completed":
+                    display_status = "Present"
+                elif att.get("status") == "Login":
+                    display_status = "Present"
+                
+                record = {
+                    "date": date_str,
+                    "day": day_name,
+                    "login": att.get("check_in", "-"),
+                    "logout": att.get("check_out", "-"),
+                    "total_hours": att.get("total_hours", "-"),
+                    "status": display_status
+                }
+            else:
+                # No attendance record - absent
+                record = {
+                    "date": date_str,
+                    "day": day_name,
+                    "login": "-",
+                    "logout": "-",
+                    "total_hours": "-",
+                    "status": "Absent"
+                }
+        
+        # Apply status filter
+        if status_filter == "All" or record["status"] == status_filter:
+            records.append(record)
+        
+        current_date += timedelta(days=1)
+    
+    return records
+
+@api_router.get("/employee/leaves")
+async def get_employee_leaves(current_user: dict = Depends(get_current_user)):
+    """Get employee's leave requests and history"""
+    if not current_user.get("employee_id"):
+        raise HTTPException(status_code=404, detail="No employee profile linked")
+    
+    employee_id = current_user["employee_id"]
+    now = datetime.now(timezone.utc)
+    today_str = now.strftime("%Y-%m-%d")
+    
+    # Get all leaves for this employee
+    all_leaves = await db.leaves.find({"employee_id": employee_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    # Separate into requests (future/current) and history (past)
+    requests = []
+    history = []
+    
+    for leave in all_leaves:
+        leave_data = serialize_doc(leave)
+        # Convert date format for display
+        if leave.get("start_date"):
+            try:
+                dt = datetime.strptime(leave["start_date"], "%Y-%m-%d")
+                leave_data["display_date"] = dt.strftime("%d-%m-%Y")
+            except:
+                leave_data["display_date"] = leave["start_date"]
+        
+        if leave.get("start_date", "") >= today_str:
+            requests.append(leave_data)
+        else:
+            history.append(leave_data)
+    
+    return {
+        "requests": requests,
+        "history": history,
+        "requests_count": len(requests),
+        "history_count": len(history)
+    }
+
+@api_router.post("/employee/leaves/apply")
+async def apply_employee_leave(data: EmployeeLeaveCreate, current_user: dict = Depends(get_current_user)):
+    """Apply for leave with optional document upload"""
+    if not current_user.get("employee_id"):
+        raise HTTPException(status_code=404, detail="No employee profile linked")
+    
+    employee_id = current_user["employee_id"]
+    employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Parse and validate leave date
+    try:
+        leave_dt = datetime.strptime(data.leave_date, "%d-%m-%Y")
+        start_date = leave_dt.strftime("%Y-%m-%d")
+        end_date = start_date  # Single day leave
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use dd-mm-yyyy")
+    
+    # Validate not in past
+    if leave_dt.date() < datetime.now(timezone.utc).date():
+        raise HTTPException(status_code=400, detail="Cannot apply leave for past dates")
+    
+    # Create leave request
+    leave = LeaveRequest(
+        employee_id=employee_id,
+        emp_name=employee["full_name"],
+        team=employee["team"],
+        department=employee["department"],
+        leave_type=data.leave_type,
+        start_date=start_date,
+        end_date=end_date,
+        duration=data.duration,
+        reason=data.reason,
+        status="pending"
+    )
+    
+    doc = leave.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    # Add supporting document info if provided
+    if data.supporting_document_url:
+        doc['supporting_document_url'] = data.supporting_document_url
+        doc['supporting_document_name'] = data.supporting_document_name
+    
+    await db.leaves.insert_one(doc.copy())
+    
+    await log_audit(current_user["id"], "apply_leave", "leave", leave.id)
+    
+    return {"message": "Leave request submitted successfully", "leave_id": leave.id}
+
 # ============== SEED DATA ==============
 
 @api_router.post("/seed")
@@ -1317,6 +1738,25 @@ async def seed_database():
     # Check if already seeded
     admin_exists = await db.users.find_one({"username": "admin"})
     if admin_exists:
+        # Also ensure employee user exists
+        employee_user_exists = await db.users.find_one({"username": "user"})
+        if not employee_user_exists:
+            # Find first employee to link
+            first_emp = await db.employees.find_one({"is_deleted": {"$ne": True}}, {"_id": 0})
+            if first_emp:
+                emp_user = User(
+                    username="user",
+                    email="user@blubridge.com",
+                    password_hash=hash_password("user"),
+                    name=first_emp.get("full_name", "Employee User"),
+                    role=UserRole.EMPLOYEE,
+                    employee_id=first_emp["id"],
+                    department=first_emp.get("department"),
+                    team=first_emp.get("team")
+                )
+                doc = emp_user.model_dump()
+                doc['created_at'] = doc['created_at'].isoformat()
+                await db.users.insert_one(doc.copy())
         return {"message": "Database already seeded"}
     
     # Create admin user
