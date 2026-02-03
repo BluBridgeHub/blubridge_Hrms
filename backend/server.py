@@ -1691,6 +1691,10 @@ async def apply_employee_leave(data: EmployeeLeaveCreate, current_user: dict = D
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     
+    # Validate reason length
+    if not data.reason or len(data.reason.strip()) < 10:
+        raise HTTPException(status_code=400, detail="Reason must be at least 10 characters")
+    
     # Parse and validate leave date
     try:
         leave_dt = datetime.strptime(data.leave_date, "%d-%m-%Y")
