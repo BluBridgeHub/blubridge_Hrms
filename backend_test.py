@@ -115,11 +115,34 @@ class BluBridgeHRMSTester:
 
     def test_employees_crud(self):
         """Test employee CRUD operations"""
+        # Get employee stats
+        success0, stats = self.run_test(
+            "Get Employee Stats",
+            "GET",
+            "employees/stats",
+            200
+        )
+        if success0:
+            required_fields = ['total', 'active', 'inactive', 'resigned']
+            for field in required_fields:
+                if field not in stats:
+                    print(f"   ⚠️  Missing stats field: {field}")
+        
         # Get employees
-        success1, employees = self.run_test(
+        success1, employees_response = self.run_test(
             "Get Employees",
             "GET",
             "employees",
+            200
+        )
+        
+        employees = employees_response.get('employees', []) if success1 else []
+        
+        # Get all employees (for dropdowns)
+        success1a, all_employees = self.run_test(
+            "Get All Employees",
+            "GET",
+            "employees/all",
             200
         )
         
@@ -164,8 +187,18 @@ class BluBridgeHRMSTester:
                 200,
                 data={"full_name": "Updated Test Employee"}
             )
+            
+            # Test employee deactivation (soft delete)
+            success5, _ = self.run_test(
+                "Deactivate Employee",
+                "DELETE",
+                f"employees/{emp_id}",
+                200
+            )
+        else:
+            success5 = True
         
-        return success1 and success2 and success3 and success4
+        return success0 and success1 and success1a and success2 and success3 and success4 and success5
 
     def test_attendance_operations(self):
         """Test attendance operations"""
