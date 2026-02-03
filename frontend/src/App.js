@@ -3,6 +3,7 @@ import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Employees from "./pages/Employees";
 import Attendance from "./pages/Attendance";
 import Leave from "./pages/Leave";
 import StarReward from "./pages/StarReward";
@@ -48,6 +49,7 @@ function App() {
           <Route path="/admin" element={<Login />} />
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
           <Route path="/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
           <Route path="/leave" element={<ProtectedRoute><Leave /></ProtectedRoute>} />
           <Route path="/star-reward" element={<ProtectedRoute><StarReward /></ProtectedRoute>} />
