@@ -823,10 +823,17 @@ async def get_star_rewards(
     if search:
         query["$or"] = [
             {"full_name": {"$regex": search, "$options": "i"}},
-            {"official_email": {"$regex": search, "$options": "i"}}
+            {"official_email": {"$regex": search, "$options": "i"}},
+            {"emp_id": {"$regex": search, "$options": "i"}}
         ]
     
     employees = await db.employees.find(query, {"_id": 0}).to_list(1000)
+    
+    # Map full_name to name for backward compatibility
+    for emp in employees:
+        emp["name"] = emp.get("full_name", "")
+        emp["email"] = emp.get("official_email", "")
+    
     return [serialize_doc(e) for e in employees]
 
 @api_router.post("/star-rewards")
