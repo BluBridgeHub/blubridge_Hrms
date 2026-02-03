@@ -825,41 +825,43 @@ const Employees = () => {
         )}
       </div>
 
-      {/* Add Employee Sheet */}
-      <Sheet open={showAddSheet} onOpenChange={setShowAddSheet}>
-        <SheetContent className="w-full sm:max-w-xl bg-[#fffdf7] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Add New Employee</SheetTitle>
-          </SheetHeader>
-          <div className="py-6">
+      {/* Add Employee Dialog */}
+      <Dialog open={showAddSheet} onOpenChange={setShowAddSheet}>
+        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[85vh] overflow-y-auto" aria-describedby="add-employee-desc">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Add New Employee</DialogTitle>
+          </DialogHeader>
+          <p id="add-employee-desc" className="sr-only">Form to add a new employee</p>
+          <div className="py-4">
             <EmployeeForm />
           </div>
-          <SheetFooter className="flex gap-2">
+          <DialogFooter className="flex gap-2 pt-4 border-t">
             <Button variant="outline" onClick={() => setShowAddSheet(false)}>Cancel</Button>
             <Button onClick={submitAdd} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white" data-testid="submit-add">
               Save Employee
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* Edit Employee Sheet */}
-      <Sheet open={showEditSheet} onOpenChange={setShowEditSheet}>
-        <SheetContent className="w-full sm:max-w-xl bg-[#fffdf7] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Edit Employee - {selectedEmployee?.emp_id}</SheetTitle>
-          </SheetHeader>
-          <div className="py-6">
+      {/* Edit Employee Dialog */}
+      <Dialog open={showEditSheet} onOpenChange={setShowEditSheet}>
+        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[85vh] overflow-y-auto" aria-describedby="edit-employee-desc">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Edit Employee - {selectedEmployee?.emp_id}</DialogTitle>
+          </DialogHeader>
+          <p id="edit-employee-desc" className="sr-only">Form to edit an employee</p>
+          <div className="py-4">
             <EmployeeForm isEdit />
           </div>
-          <SheetFooter className="flex gap-2">
+          <DialogFooter className="flex gap-2 pt-4 border-t">
             <Button variant="outline" onClick={() => setShowEditSheet(false)}>Cancel</Button>
             <Button onClick={submitEdit} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white" data-testid="submit-edit">
               Update Employee
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* View Employee Dialog */}
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
