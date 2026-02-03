@@ -11,12 +11,14 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
+  UserCog
 } from 'lucide-react';
 import { Button } from './ui/button';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/employees', label: 'Employees', icon: UserCog },
   { path: '/attendance', label: 'Attendance', icon: CalendarCheck },
   { path: '/leave', label: 'Leave', icon: CalendarDays },
   { path: '/star-reward', label: 'Star Reward', icon: Star },
