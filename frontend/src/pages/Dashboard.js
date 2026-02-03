@@ -52,8 +52,14 @@ const StatCard = ({ title, value, icon: Icon, color, bgColor, onClick }) => (
 const AttendanceStatCard = ({ title, value, icon: Icon, borderColor, isActive, onClick }) => (
   <div 
     onClick={onClick}
-    className={`bg-[#fffdf7] rounded-xl border-l-4 p-4 text-center cursor-pointer transition-all duration-300 hover:shadow-md ${isActive ? 'ring-2 ring-[#0b1f3b] shadow-lg' : ''}`} 
-    style={{ borderLeftColor: borderColor }}
+    className={`bg-[#fffdf7] rounded-xl border-l-4 p-4 text-center cursor-pointer transition-all duration-300 hover:shadow-md ${isActive ? 'shadow-lg' : ''}`} 
+    style={{ 
+      borderLeftColor: borderColor,
+      ...(isActive && { 
+        boxShadow: `0 0 0 2px ${borderColor}`,
+        transform: 'scale(1.02)'
+      })
+    }}
   >
     <p className="text-3xl font-bold transition-all duration-300" style={{ fontFamily: 'Outfit, sans-serif' }}>{value}</p>
     <p className="text-xs text-gray-500 mt-1">{title}</p>
