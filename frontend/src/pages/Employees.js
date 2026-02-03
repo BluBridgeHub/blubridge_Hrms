@@ -434,14 +434,14 @@ const Employees = () => {
             <Input
               type="date"
               value={form.date_of_joining}
-              onChange={(e) => setForm({ ...form, date_of_joining: e.target.value })}
+              onChange={(e) => setForm(prev => ({ ...prev, date_of_joining: e.target.value }))}
               className="mt-1 bg-white"
               data-testid="input-doj"
             />
           </div>
           <div>
             <Label className="text-sm font-medium">Employment Type</Label>
-            <Select value={form.employment_type} onValueChange={(v) => setForm({ ...form, employment_type: v })}>
+            <Select value={form.employment_type} onValueChange={(v) => setForm(prev => ({ ...prev, employment_type: v }))}>
               <SelectTrigger className="mt-1 bg-white" data-testid="select-employment-type">
                 <SelectValue />
               </SelectTrigger>
@@ -458,7 +458,7 @@ const Employees = () => {
             <Label className="text-sm font-medium">Designation <span className="text-red-500">*</span></Label>
             <Input
               value={form.designation}
-              onChange={(e) => setForm({ ...form, designation: e.target.value })}
+              onChange={(e) => setForm(prev => ({ ...prev, designation: e.target.value }))}
               placeholder="Enter designation"
               className="mt-1 bg-white"
               data-testid="input-designation"
@@ -466,7 +466,7 @@ const Employees = () => {
           </div>
           <div>
             <Label className="text-sm font-medium">Tier / Level</Label>
-            <Select value={form.tier_level} onValueChange={(v) => setForm({ ...form, tier_level: v })}>
+            <Select value={form.tier_level} onValueChange={(v) => setForm(prev => ({ ...prev, tier_level: v }))}>
               <SelectTrigger className="mt-1 bg-white" data-testid="select-tier">
                 <SelectValue />
               </SelectTrigger>
@@ -480,7 +480,7 @@ const Employees = () => {
         </div>
         <div>
           <Label className="text-sm font-medium">Reporting Manager</Label>
-          <Select value={form.reporting_manager_id || "none"} onValueChange={(v) => setForm({ ...form, reporting_manager_id: v === "none" ? "" : v })}>
+          <Select value={form.reporting_manager_id || "none"} onValueChange={(v) => setForm(prev => ({ ...prev, reporting_manager_id: v === "none" ? "" : v }))}>
             <SelectTrigger className="mt-1 bg-white" data-testid="select-manager">
               <SelectValue placeholder="Select manager" />
             </SelectTrigger>
