@@ -571,7 +571,7 @@ const Employees = () => {
       <TabsContent value="system" className="space-y-4">
         <div>
           <Label className="text-sm font-medium">User Role</Label>
-          <Select value={form.user_role} onValueChange={(v) => setForm({ ...form, user_role: v })}>
+          <Select value={form.user_role} onValueChange={(v) => setForm(prev => ({ ...prev, user_role: v }))}>
             <SelectTrigger className="mt-1 bg-white" data-testid="select-user-role">
               <SelectValue />
             </SelectTrigger>
@@ -589,7 +589,7 @@ const Employees = () => {
           </div>
           <Switch
             checked={form.login_enabled}
-            onCheckedChange={(v) => setForm({ ...form, login_enabled: v })}
+            onCheckedChange={(v) => setForm(prev => ({ ...prev, login_enabled: v }))}
             data-testid="switch-login"
           />
         </div>
@@ -600,7 +600,7 @@ const Employees = () => {
           </div>
           <Switch
             checked={form.attendance_tracking_enabled}
-            onCheckedChange={(v) => setForm({ ...form, attendance_tracking_enabled: v })}
+            onCheckedChange={(v) => setForm(prev => ({ ...prev, attendance_tracking_enabled: v }))}
             data-testid="switch-attendance"
           />
         </div>
