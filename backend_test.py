@@ -388,7 +388,15 @@ class BluBridgeHRMSTester:
             )
             all_success = all_success and success
         
-        return all_success
+    def test_audit_logs(self):
+        """Test audit logs (admin only)"""
+        success, _ = self.run_test(
+            "Get Audit Logs",
+            "GET",
+            "audit-logs",
+            200
+        )
+        return success
 
 def main():
     print("🚀 Starting BluBridge HRMS Backend Testing")
