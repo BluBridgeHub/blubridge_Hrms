@@ -119,6 +119,17 @@
     @apply bg-[#fffdf7] rounded-xl border border-black/5 overflow-hidden;
 }
 
+/* Global table header background */
+table thead,
+table thead tr,
+thead.bg-gray-50\/50 {
+    background-color: rgb(247, 245, 239) !important;
+}
+
+thead th {
+    background-color: rgb(247, 245, 239) !important;
+}
+
 /* Sidebar active state */
 .sidebar-item-active {
     @apply bg-[#004EEB] text-white;
