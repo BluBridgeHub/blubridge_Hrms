@@ -498,7 +498,7 @@ const Employees = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-sm font-medium">Department <span className="text-red-500">*</span></Label>
-            <Select value={form.department} onValueChange={(v) => setForm({ ...form, department: v, team: '' })}>
+            <Select value={form.department} onValueChange={(v) => setForm(prev => ({ ...prev, department: v, team: '' }))}>
               <SelectTrigger className="mt-1 bg-white" data-testid="select-department">
                 <SelectValue placeholder="Select department" />
               </SelectTrigger>
@@ -511,7 +511,7 @@ const Employees = () => {
           </div>
           <div>
             <Label className="text-sm font-medium">Team <span className="text-red-500">*</span></Label>
-            <Select value={form.team} onValueChange={(v) => setForm({ ...form, team: v })} disabled={!form.department}>
+            <Select value={form.team} onValueChange={(v) => setForm(prev => ({ ...prev, team: v }))} disabled={!form.department}>
               <SelectTrigger className="mt-1 bg-white" data-testid="select-team">
                 <SelectValue placeholder="Select team" />
               </SelectTrigger>
@@ -525,7 +525,7 @@ const Employees = () => {
         </div>
         <div>
           <Label className="text-sm font-medium">Work Location</Label>
-          <Select value={form.work_location} onValueChange={(v) => setForm({ ...form, work_location: v })}>
+          <Select value={form.work_location} onValueChange={(v) => setForm(prev => ({ ...prev, work_location: v }))}>
             <SelectTrigger className="mt-1 bg-white" data-testid="select-location">
               <SelectValue />
             </SelectTrigger>
@@ -539,7 +539,7 @@ const Employees = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-sm font-medium">Leave Policy</Label>
-            <Select value={form.leave_policy} onValueChange={(v) => setForm({ ...form, leave_policy: v })}>
+            <Select value={form.leave_policy} onValueChange={(v) => setForm(prev => ({ ...prev, leave_policy: v }))}>
               <SelectTrigger className="mt-1 bg-white">
                 <SelectValue />
               </SelectTrigger>
@@ -552,7 +552,7 @@ const Employees = () => {
           </div>
           <div>
             <Label className="text-sm font-medium">Shift Type</Label>
-            <Select value={form.shift_type} onValueChange={(v) => setForm({ ...form, shift_type: v })}>
+            <Select value={form.shift_type} onValueChange={(v) => setForm(prev => ({ ...prev, shift_type: v }))}>
               <SelectTrigger className="mt-1 bg-white">
                 <SelectValue />
               </SelectTrigger>
