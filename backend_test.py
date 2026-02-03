@@ -162,7 +162,7 @@ class BluBridgeHRMSTester:
                 "PUT",
                 f"employees/{emp_id}",
                 200,
-                data={"name": "Updated Test Employee"}
+                data={"full_name": "Updated Test Employee"}
             )
         
         return success1 and success2 and success3 and success4
