@@ -248,8 +248,8 @@ class BluBridgeHRMSTester:
             200
         )
         
-        if employees_success and employees:
-            emp_id = employees[0]['id']
+        if employees_success and employees.get('employees'):
+            emp_id = employees['employees'][0]['id']
             success2, new_leave = self.run_test(
                 "Create Leave Request",
                 "POST",
