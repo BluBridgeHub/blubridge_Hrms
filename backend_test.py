@@ -409,6 +409,7 @@ def main():
         ("Seed Database", tester.test_seed_database),
         ("Authentication", tester.test_login),
         ("User Info", tester.test_get_me),
+        ("Config Endpoints", tester.test_config_endpoints),
         ("Dashboard Stats", tester.test_dashboard_stats),
         ("Dashboard Leave List", tester.test_dashboard_leave_list),
         ("Employee Operations", tester.test_employees_crud),
