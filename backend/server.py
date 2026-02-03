@@ -1041,6 +1041,23 @@ async def add_star_reward(data: StarRewardCreate, current_user: dict = Depends(g
     await db.employees.update_one({"id": data.employee_id}, {"$set": {"stars": new_stars}})
     
     await log_audit(current_user["id"], "award_stars", "star_reward", reward.id)
+    
+    # Send email notification
+    if employee.get("official_email"):
+        awarder = await db.users.find_one({"id": current_user["id"]}, {"_id": 0})
+        awarder_name = awarder.get("name", "Admin") if awarder else "Admin"
+        email_html = get_star_reward_email(
+            employee["full_name"],
+            data.stars,
+            data.reason,
+            awarder_name
+        )
+        asyncio.create_task(send_email_notification(
+            employee["official_email"],
+            "Star Reward Notification - BluBridge HRMS",
+            email_html
+        ))
+    
     return {"message": "Stars awarded", "new_total": new_stars}
 
 @api_router.get("/star-rewards/history/{employee_id}")
