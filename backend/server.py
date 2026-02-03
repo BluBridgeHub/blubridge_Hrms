@@ -1861,6 +1861,23 @@ async def seed_database():
         doc['created_at'] = doc['created_at'].isoformat()
         await db.attendance.insert_one(doc.copy())
     
+    # Create employee user account (user/user)
+    first_emp = employees[0] if employees else None
+    if first_emp:
+        emp_user = User(
+            username="user",
+            email="user@blubridge.com",
+            password_hash=hash_password("user"),
+            name=first_emp.get("full_name", "Employee User"),
+            role=UserRole.EMPLOYEE,
+            employee_id=first_emp["id"],
+            department=first_emp.get("department"),
+            team=first_emp.get("team")
+        )
+        doc = emp_user.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        await db.users.insert_one(doc.copy())
+    
     return {"message": "Database seeded successfully"}
 
 # Include router
