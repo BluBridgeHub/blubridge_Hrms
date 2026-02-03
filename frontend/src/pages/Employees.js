@@ -487,12 +487,12 @@ const Employees = () => {
         </div>
         <div>
           <Label className="text-sm font-medium">Reporting Manager</Label>
-          <Select value={form.reporting_manager_id} onValueChange={(v) => setForm({ ...form, reporting_manager_id: v })}>
+          <Select value={form.reporting_manager_id || "none"} onValueChange={(v) => setForm({ ...form, reporting_manager_id: v === "none" ? "" : v })}>
             <SelectTrigger className="mt-1 bg-white" data-testid="select-manager">
               <SelectValue placeholder="Select manager" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               {allEmployees.filter(e => e.id !== selectedEmployee?.id).map(emp => (
                 <SelectItem key={emp.id} value={emp.id}>{emp.full_name} ({emp.emp_id})</SelectItem>
               ))}
