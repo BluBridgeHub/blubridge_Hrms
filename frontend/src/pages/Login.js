@@ -66,13 +66,12 @@ const Login = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-[#0b1f3b] flex items-center justify-center shadow-lg shadow-[#0b1f3b]/20">
-              <span className="text-white font-bold text-xl">B</span>
-            </div>
+            <img 
+              src="https://customer-assets.emergentagent.com/job_25d72bd1-2848-402d-8255-1f5e67431c0e/artifacts/o66msiwa_logo-main2.png" 
+              alt="BluBridge" 
+              className="h-12 w-auto"
+            />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            BLU<span className="text-[#0b1f3b]">BRIDGE</span>
-          </h1>
           <p className="text-gray-500 mt-2">Human Resource Management System</p>
         </div>
 

@@ -53,12 +53,11 @@ const Layout = ({ children }) => {
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b border-black/5">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#0b1f3b] flex items-center justify-center">
-              <span className="text-white font-bold text-sm">B</span>
-            </div>
-            <span className="text-xl font-bold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              BLU<span className="text-[#0b1f3b]">BRIDGE</span>
-            </span>
+            <img 
+              src="https://customer-assets.emergentagent.com/job_25d72bd1-2848-402d-8255-1f5e67431c0e/artifacts/o66msiwa_logo-main2.png" 
+              alt="BluBridge" 
+              className="h-8 w-auto"
+            />
           </div>
           <button 
             className="ml-auto lg:hidden p-1 hover:bg-black/5 rounded"
