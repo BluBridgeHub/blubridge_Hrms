@@ -153,9 +153,17 @@ const Login = () => {
           {/* Test credentials hint */}
           <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
             <p className="text-xs text-blue-700 font-medium mb-2">Test Credentials:</p>
-            <div className="text-xs text-blue-600 space-y-1">
-              <p><span className="font-medium">Username:</span> admin</p>
-              <p><span className="font-medium">Password:</span> admin</p>
+            <div className="text-xs text-blue-600 space-y-2">
+              <div className="pb-2 border-b border-blue-100">
+                <p className="font-semibold text-blue-800 mb-1">Admin Access:</p>
+                <p><span className="font-medium">Username:</span> admin</p>
+                <p><span className="font-medium">Password:</span> admin</p>
+              </div>
+              <div>
+                <p className="font-semibold text-blue-800 mb-1">Employee Access:</p>
+                <p><span className="font-medium">Username:</span> user</p>
+                <p><span className="font-medium">Password:</span> user</p>
+              </div>
             </div>
           </div>
         </div>
