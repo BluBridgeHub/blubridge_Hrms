@@ -164,8 +164,13 @@ button:active {
 }
 
 /* Hide Emergent badge */
-#emergent-badge {
+#emergent-badge,
+a[href*="emergent.sh"][style*="position: fixed"],
+a[href*="emergent.sh"][style*="bottom: 20px"] {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 @layer base {
