@@ -743,6 +743,42 @@ async def restore_employee(employee_id: str, current_user: dict = Depends(get_cu
     employee = await db.employees.find_one({"id": employee_id}, {"_id": 0})
     return serialize_doc(employee)
 
+class AvatarUpdate(BaseModel):
+    avatar_url: str
+    avatar_public_id: Optional[str] = None
+
+@api_router.put("/employees/{employee_id}/avatar")
+async def update_employee_avatar(employee_id: str, data: AvatarUpdate, current_user: dict = Depends(get_current_user)):
+    """Update employee avatar/photo"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+        raise HTTPException(status_code=403, detail="Permission denied")
+    
+    existing = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Delete old avatar from Cloudinary if exists
+    old_public_id = existing.get("avatar_public_id")
+    if old_public_id:
+        try:
+            await asyncio.to_thread(cloudinary.uploader.destroy, old_public_id, invalidate=True)
+        except Exception as e:
+            logger.warning(f"Failed to delete old avatar: {e}")
+    
+    await db.employees.update_one(
+        {"id": employee_id},
+        {"$set": {
+            "avatar": data.avatar_url,
+            "avatar_public_id": data.avatar_public_id,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    await log_audit(current_user["id"], "update_avatar", "employee", employee_id)
+    
+    employee = await db.employees.find_one({"id": employee_id}, {"_id": 0})
+    return serialize_doc(employee)
+
 # ============== ATTENDANCE ROUTES ==============
 
 @api_router.get("/attendance")
