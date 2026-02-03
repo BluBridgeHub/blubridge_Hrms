@@ -383,7 +383,7 @@ const Employees = () => {
             <Input
               type="email"
               value={form.official_email}
-              onChange={(e) => setForm({ ...form, official_email: e.target.value })}
+              onChange={(e) => setForm(prev => ({ ...prev, official_email: e.target.value }))}
               placeholder="Enter email"
               className="mt-1 bg-white"
               data-testid="input-email"
@@ -395,7 +395,7 @@ const Employees = () => {
             <Label className="text-sm font-medium">Phone Number</Label>
             <Input
               value={form.phone_number}
-              onChange={(e) => setForm({ ...form, phone_number: e.target.value })}
+              onChange={(e) => setForm(prev => ({ ...prev, phone_number: e.target.value }))}
               placeholder="Enter phone"
               className="mt-1 bg-white"
               data-testid="input-phone"
@@ -403,7 +403,7 @@ const Employees = () => {
           </div>
           <div>
             <Label className="text-sm font-medium">Gender</Label>
-            <Select value={form.gender} onValueChange={(v) => setForm({ ...form, gender: v })}>
+            <Select value={form.gender} onValueChange={(v) => setForm(prev => ({ ...prev, gender: v }))}>
               <SelectTrigger className="mt-1 bg-white" data-testid="select-gender">
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
@@ -420,7 +420,7 @@ const Employees = () => {
           <Input
             type="date"
             value={form.date_of_birth}
-            onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })}
+            onChange={(e) => setForm(prev => ({ ...prev, date_of_birth: e.target.value }))}
             className="mt-1 bg-white"
             data-testid="input-dob"
           />
