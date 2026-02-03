@@ -1327,7 +1327,40 @@ class EmployeeAttendanceRecord(BaseModel):
     total_hours: Optional[str] = None
     status: str  # Present, Late, Early Out, Absent, Leave, NA, Sunday
 
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str
+
 # ============== EMPLOYEE PORTAL ROUTES ==============
+
+@api_router.post("/employee/change-password")
+async def change_employee_password(data: PasswordChangeRequest, current_user: dict = Depends(get_current_user)):
+    """Change employee's own password"""
+    # Validate new password matches confirmation
+    if data.new_password != data.confirm_password:
+        raise HTTPException(status_code=400, detail="New passwords do not match")
+    
+    # Validate new password length
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters long")
+    
+    # Verify current password
+    current_hash = hash_password(data.current_password)
+    if current_user.get("password_hash") != current_hash:
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Update password in database
+    new_hash = hash_password(data.new_password)
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"password_hash": new_hash}}
+    )
+    
+    # Log the action
+    await log_audit(current_user["id"], "change_password", "user", current_user["id"])
+    
+    return {"message": "Password changed successfully"}
 
 @api_router.get("/employee/profile")
 async def get_employee_profile(current_user: dict = Depends(get_current_user)):
