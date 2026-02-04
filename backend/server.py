@@ -1827,7 +1827,12 @@ async def seed_database():
         {"id": str(uuid.uuid4()), "name": "Framework - Tensor & Ops", "department": "Research Unit", "member_count": 0},
         {"id": str(uuid.uuid4()), "name": "Framework - Quantz", "department": "Research Unit", "member_count": 0},
         {"id": str(uuid.uuid4()), "name": "Tokenizer", "department": "Research Unit", "member_count": 0},
-        {"id": str(uuid.uuid4()), "name": "Administration", "department": "Support Staff", "member_count": 0}
+        {"id": str(uuid.uuid4()), "name": "Administration", "department": "Support Staff", "member_count": 0},
+        {"id": str(uuid.uuid4()), "name": "Product Management", "department": "Business & Product", "member_count": 0},
+        {"id": str(uuid.uuid4()), "name": "Sales", "department": "Business & Product", "member_count": 0},
+        {"id": str(uuid.uuid4()), "name": "Marketing", "department": "Business & Product", "member_count": 0},
+        {"id": str(uuid.uuid4()), "name": "Business Development", "department": "Business & Product", "member_count": 0},
+        {"id": str(uuid.uuid4()), "name": "Customer Success", "department": "Business & Product", "member_count": 0}
     ]
     await db.teams.insert_many(teams)
     
