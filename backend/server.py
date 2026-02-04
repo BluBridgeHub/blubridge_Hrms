@@ -928,6 +928,14 @@ async def deactivate_employee(employee_id: str, current_user: dict = Depends(get
     # Update team member count
     await db.teams.update_one({"name": existing.get("team")}, {"$inc": {"member_count": -1}})
     
+    # Deactivate the user account as well
+    username = existing.get("official_email", "").split('@')[0]
+    if username:
+        await db.users.update_one(
+            {"username": username},
+            {"$set": {"is_active": False}}
+        )
+    
     await log_audit(current_user["id"], "deactivate", "employee", employee_id, f"Deactivated employee: {existing.get('full_name')}")
     return {"message": "Employee deactivated successfully"}
 
