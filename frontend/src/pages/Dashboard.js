@@ -126,7 +126,11 @@ const Dashboard = () => {
     setLoadingDetails(true);
     
     try {
+      // Use filtered date range if set, otherwise use today
       const today = new Date().toLocaleDateString('en-GB').split('/').join('-');
+      const fromDate = filters.fromDate ? formatDateForAPI(filters.fromDate) : today;
+      const toDate = filters.toDate ? formatDateForAPI(filters.toDate) : today;
+      
       let statusFilter = '';
       
       switch (statusType) {
@@ -151,7 +155,7 @@ const Dashboard = () => {
       
       const response = await axios.get(`${API}/attendance`, {
         headers: getAuthHeaders(),
-        params: { status: statusFilter, from_date: today, to_date: today }
+        params: { status: statusFilter, from_date: fromDate, to_date: toDate }
       });
       setAttendanceDetails(response.data);
     } catch (error) {
@@ -163,13 +167,37 @@ const Dashboard = () => {
   };
 
   const handleFilter = () => {
-    toast.success('Filters applied');
     fetchData();
+    // Refetch attendance details with new date range
+    if (activeAttendanceTab !== 'not_logged') {
+      fetchAttendanceByStatus(activeAttendanceTab);
+    }
+    toast.success('Filters applied');
   };
 
   const handleReset = () => {
     setFilters({ fromDate: '', toDate: '', leaveType: 'All' });
     toast.info('Filters reset');
+  };
+
+  // Navigation handlers for stat cards
+  const handleStatCardClick = (cardType) => {
+    switch (cardType) {
+      case 'research_unit':
+        navigate('/team', { state: { department: 'Research Unit' } });
+        break;
+      case 'support_staff':
+        navigate('/team', { state: { department: 'Support Staff' } });
+        break;
+      case 'upcoming_leaves':
+        navigate('/leave', { state: { tab: 'approved' } });
+        break;
+      case 'pending_approvals':
+        navigate('/leave', { state: { tab: 'pending' } });
+        break;
+      default:
+        break;
+    }
   };
 
   const handleViewEmployee = (employee) => {
