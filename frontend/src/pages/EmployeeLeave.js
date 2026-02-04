@@ -55,14 +55,27 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const LeaveCard = ({ leave, isPast }) => (
+const LeaveCard = ({ leave, isPast, onEdit }) => (
   <div className={`bg-white rounded-lg border border-gray-100 p-4 hover:shadow-md transition-all duration-200 ${isPast ? 'opacity-75' : ''}`}>
     <div className="flex items-start justify-between mb-3">
       <div>
         <h4 className="font-semibold text-gray-900">{leave.leave_type} Leave</h4>
         <p className="text-sm text-gray-500 mt-1">{leave.display_date || leave.start_date}</p>
       </div>
-      <StatusBadge status={leave.status} />
+      <div className="flex items-center gap-2">
+        <StatusBadge status={leave.status} />
+        {/* Show Edit button only for pending requests that are not in the past */}
+        {leave.status === 'pending' && !isPast && onEdit && (
+          <button
+            onClick={() => onEdit(leave)}
+            className="p-1.5 text-gray-400 hover:text-[#0b1f3b] hover:bg-gray-100 rounded-lg transition-colors"
+            title="Edit Leave Request"
+            data-testid={`edit-leave-${leave.id}`}
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
     </div>
     <div className="space-y-2 text-sm">
       <div className="flex justify-between">
@@ -88,6 +101,7 @@ const EmployeeLeave = () => {
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [editingLeave, setEditingLeave] = useState(null);
   
   const [newLeave, setNewLeave] = useState({
     leave_type: '',
