@@ -262,6 +262,85 @@ const EmployeeLeave = () => {
     }
   };
 
+  // Handle edit leave
+  const handleEditLeave = (leave) => {
+    // Convert date format from YYYY-MM-DD to input format
+    let dateValue = '';
+    if (leave.start_date) {
+      dateValue = leave.start_date;
+    }
+    
+    setEditingLeave(leave);
+    setNewLeave({
+      leave_type: leave.leave_type || '',
+      leave_date: dateValue,
+      duration: leave.duration || '',
+      reason: leave.reason || '',
+      supporting_document_url: leave.supporting_document_url || '',
+      supporting_document_name: leave.supporting_document_name || ''
+    });
+    setShowApplyModal(true);
+  };
+
+  const handleSubmitLeave = async () => {
+    // Validation
+    if (!newLeave.leave_type) {
+      toast.error('Please select leave type');
+      return;
+    }
+    if (!newLeave.leave_date) {
+      toast.error('Please select leave date');
+      return;
+    }
+    if (!newLeave.duration) {
+      toast.error('Please select duration');
+      return;
+    }
+    if (!newLeave.reason || newLeave.reason.trim().length < 10) {
+      toast.error('Please provide a reason (at least 10 characters)');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      
+      const payload = {
+        leave_type: newLeave.leave_type,
+        leave_date: formatDateForAPI(newLeave.leave_date),
+        duration: newLeave.duration,
+        reason: newLeave.reason,
+        supporting_document_url: newLeave.supporting_document_url,
+        supporting_document_name: newLeave.supporting_document_name
+      };
+      
+      if (editingLeave) {
+        // Update existing leave
+        await axios.put(`${API}/employee/leaves/${editingLeave.id}`, payload, { headers: getAuthHeaders() });
+        toast.success('Leave request updated successfully');
+      } else {
+        // Create new leave
+        await axios.post(`${API}/employee/leaves/apply`, payload, { headers: getAuthHeaders() });
+        toast.success('Leave request submitted successfully');
+      }
+      
+      setShowApplyModal(false);
+      setEditingLeave(null);
+      setNewLeave({
+        leave_type: '',
+        leave_date: '',
+        duration: '',
+        reason: '',
+        supporting_document_url: '',
+        supporting_document_name: ''
+      });
+      fetchLeaves();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to submit leave request');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   // Get tomorrow's date for min date validation
   const getTomorrowDate = () => {
     const tomorrow = new Date();
