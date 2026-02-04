@@ -322,14 +322,14 @@ const StarReward = () => {
 
           <Button 
             onClick={handleApply}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-6"
+            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white px-6"
             data-testid="apply-btn"
           >
             Apply
           </Button>
           <Button 
             onClick={handleExportCSV}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-6"
+            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white px-6"
             data-testid="export-csv-btn"
           >
             Export CSV
@@ -338,7 +338,7 @@ const StarReward = () => {
       </div>
 
       {/* Content Section */}
-      <div className="bg-white rounded-lg border border-[#2563eb]/30 p-4">
+      <div className="bg-[#fffdf7] rounded-lg border border-black/5 p-4">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
@@ -347,7 +347,7 @@ const StarReward = () => {
           <Button
             variant="outline"
             onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
-            className="text-[#2563eb] border-[#2563eb] hover:bg-[#2563eb]/10"
+            className="text-[#0b1f3b] border-[#0b1f3b] hover:bg-[#0b1f3b]/10"
             data-testid="toggle-view-btn"
           >
             {viewMode === 'grid' ? 'Switch to Table View' : 'Switch to Grid View'}
@@ -356,7 +356,7 @@ const StarReward = () => {
 
         {/* Secondary Table Filters */}
         {viewMode === 'table' && (
-          <div className="bg-white rounded-lg border border-red-200 p-4 mb-4">
+          <div className="bg-[#fffdf7] rounded-lg border border-black/10 p-4 mb-4">
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">From</span>
