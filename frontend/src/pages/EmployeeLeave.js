@@ -349,7 +349,7 @@ const EmployeeLeave = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {leaveData.requests.map((leave, index) => (
-                <LeaveCard key={leave.id || index} leave={leave} isPast={false} />
+                <LeaveCard key={leave.id || index} leave={leave} isPast={false} onEdit={handleEditLeave} />
               ))}
             </div>
           )}
@@ -385,12 +385,18 @@ const EmployeeLeave = () => {
         </div>
       </div>
 
-      {/* Apply Leave Modal */}
-      <Dialog open={showApplyModal} onOpenChange={setShowApplyModal}>
+      {/* Apply/Edit Leave Modal */}
+      <Dialog open={showApplyModal} onOpenChange={(open) => { 
+        setShowApplyModal(open); 
+        if (!open) { 
+          setEditingLeave(null); 
+          setNewLeave({ leave_type: '', leave_date: '', duration: '', reason: '', supporting_document_url: '', supporting_document_name: '' }); 
+        } 
+      }}>
         <DialogContent className="sm:max-w-md bg-[#fffdf7]">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Apply Leave
+              {editingLeave ? 'Edit Leave Request' : 'Apply Leave'}
             </DialogTitle>
           </DialogHeader>
           
