@@ -241,13 +241,13 @@ const StarReward = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2563eb]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b1f3b]"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 animate-fade-in bg-[#e8f4fc] min-h-screen p-6" data-testid="star-reward-page">
+    <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="star-reward-page">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -264,7 +264,7 @@ const StarReward = () => {
           <Button
             variant="ghost"
             onClick={() => setActiveTab('employees')}
-            className={`rounded-none px-6 ${activeTab === 'employees' ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+            className={`rounded-none px-6 ${activeTab === 'employees' ? 'bg-[#0b1f3b] text-white hover:bg-[#162d4d]' : 'bg-[#fffdf7] text-gray-700 hover:bg-gray-100'}`}
             data-testid="tab-employees"
           >
             Employees
@@ -272,7 +272,7 @@ const StarReward = () => {
           <Button
             variant="ghost"
             onClick={() => setActiveTab('teams')}
-            className={`rounded-none px-6 ${activeTab === 'teams' ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+            className={`rounded-none px-6 ${activeTab === 'teams' ? 'bg-[#0b1f3b] text-white hover:bg-[#162d4d]' : 'bg-[#fffdf7] text-gray-700 hover:bg-gray-100'}`}
             data-testid="tab-teams"
           >
             Teams
@@ -281,7 +281,7 @@ const StarReward = () => {
       </div>
 
       {/* Main Filter Section */}
-      <div className="bg-white rounded-lg border border-[#2563eb]/30 p-4">
+      <div className="bg-[#fffdf7] rounded-lg border border-black/5 p-4">
         <div className="flex flex-wrap items-center justify-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">Team</span>
