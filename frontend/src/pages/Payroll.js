@@ -159,7 +159,7 @@ const Payroll = () => {
   return (
     <div className="space-y-6 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="payroll-page">
       {/* Page Header */}
-      <h1 className="text-2xl font-bold text-[#3b82f6]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+      <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
         Payroll Attendance ({formatMonthDisplay()})
       </h1>
 
