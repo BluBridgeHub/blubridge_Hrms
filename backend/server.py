@@ -1756,13 +1756,15 @@ async def get_employee_attendance(
             }, {"_id": 0})
             
             if leave:
+                # Show leave type instead of generic "Leave"
+                leave_type = leave.get("leave_type", "Leave")
                 record = {
                     "date": date_str,
                     "day": day_name,
                     "login": "-",
                     "logout": "-",
                     "total_hours": "-",
-                    "status": "Leave"
+                    "status": f"{leave_type} Leave"
                 }
             elif att:
                 # Determine display status
