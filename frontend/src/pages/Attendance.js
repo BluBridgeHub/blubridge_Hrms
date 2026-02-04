@@ -81,6 +81,7 @@ const Attendance = () => {
         params: {
           employee_name: filters.empName || undefined,
           team: filters.team !== 'All' ? filters.team : undefined,
+          department: filters.department !== 'All' ? filters.department : undefined,
           from_date: formatDateForApi(filters.fromDate),
           to_date: formatDateForApi(filters.toDate),
           status: filters.status !== 'All' ? filters.status : undefined
