@@ -2,35 +2,40 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { 
-  FileText, 
-  Download,
-  Filter,
-  RotateCcw,
-  CalendarCheck,
-  CalendarDays,
-  ClipboardList
-} from 'lucide-react';
+import { FileText, Download, RotateCcw } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const Reports = () => {
   const { getAuthHeaders } = useAuth();
-  const [activeReport, setActiveReport] = useState('attendance');
+  const [activeTab, setActiveTab] = useState('leave'); // 'leave' | 'attendance'
   const [teams, setTeams] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState([]);
-  const [filters, setFilters] = useState({
-    fromDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    toDate: new Date().toISOString().split('T')[0],
-    department: 'All',
-    team: 'All'
+  
+  // Leave Report Filters
+  const [leaveFilters, setLeaveFilters] = useState({
+    fromDate: '',
+    toDate: '',
+    empName: '',
+    team: 'All Team',
+    leaveType: 'All Types',
+    department: 'Department'
+  });
+
+  // Attendance Report Filters
+  const [attendanceFilters, setAttendanceFilters] = useState({
+    fromDate: '',
+    toDate: '',
+    empName: '',
+    team: 'All Team',
+    status: 'All Types',
+    department: 'Department'
   });
 
   useEffect(() => {
@@ -50,68 +55,96 @@ const Reports = () => {
     }
   };
 
-  const fetchReport = async () => {
+  const handleExport = async () => {
     try {
       setLoading(true);
-      const endpoint = activeReport === 'attendance' ? '/reports/attendance' : '/reports/leaves';
+      const filters = activeTab === 'leave' ? leaveFilters : attendanceFilters;
+      const endpoint = activeTab === 'leave' ? '/reports/leaves' : '/reports/attendance';
+      
+      const params = {
+        from_date: filters.fromDate || undefined,
+        to_date: filters.toDate || undefined,
+        employee_name: filters.empName || undefined,
+        team: filters.team !== 'All Team' ? filters.team : undefined,
+        department: filters.department !== 'Department' ? filters.department : undefined
+      };
+
+      if (activeTab === 'leave') {
+        params.leave_type = filters.leaveType !== 'All Types' ? filters.leaveType : undefined;
+      } else {
+        params.status = filters.status !== 'All Types' ? filters.status : undefined;
+      }
+
       const response = await axios.get(`${API}${endpoint}`, {
         headers: getAuthHeaders(),
-        params: {
-          from_date: filters.fromDate,
-          to_date: filters.toDate,
-          department: filters.department !== 'All' ? filters.department : undefined,
-          team: filters.team !== 'All' ? filters.team : undefined
-        }
+        params
       });
+      
       setReportData(response.data);
-      toast.success('Report generated');
+      
+      // Export to CSV
+      if (response.data.length > 0) {
+        let headers, rows;
+        if (activeTab === 'attendance') {
+          headers = ['Employee Name', 'Team', 'Department', 'Date', 'Check-In', 'Check-Out', 'Status'];
+          rows = response.data.map(r => [r.emp_name, r.team, r.department || '', r.date, r.check_in || '-', r.check_out || '-', r.status]);
+        } else {
+          headers = ['Employee Name', 'Team', 'Department', 'Leave Type', 'Start Date', 'End Date', 'Duration', 'Status'];
+          rows = response.data.map(r => [r.emp_name, r.team, r.department || '', r.leave_type, r.start_date, r.end_date, r.duration, r.status]);
+        }
+
+        const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${activeTab}-report-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        toast.success('Report exported successfully');
+      } else {
+        toast.info('No data found for the selected filters');
+      }
     } catch (error) {
-      toast.error('Failed to generate report');
+      toast.error('Failed to export report');
     } finally {
       setLoading(false);
     }
   };
 
   const handleReset = () => {
-    setFilters({
-      fromDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      toDate: new Date().toISOString().split('T')[0],
-      department: 'All',
-      team: 'All'
-    });
-    setReportData([]);
-  };
-
-  const handleExportCSV = () => {
-    if (reportData.length === 0) {
-      toast.error('No data to export');
-      return;
-    }
-
-    let headers, rows;
-    if (activeReport === 'attendance') {
-      headers = ['Employee Name', 'Team', 'Date', 'Check-In', 'Check-Out', 'Status'];
-      rows = reportData.map(r => [r.emp_name, r.team, r.date, r.check_in || '-', r.check_out || '-', r.status]);
+    if (activeTab === 'leave') {
+      setLeaveFilters({
+        fromDate: '',
+        toDate: '',
+        empName: '',
+        team: 'All Team',
+        leaveType: 'All Types',
+        department: 'Department'
+      });
     } else {
-      headers = ['Employee Name', 'Team', 'Leave Type', 'Start Date', 'End Date', 'Duration', 'Status'];
-      rows = reportData.map(r => [r.emp_name, r.team, r.leave_type, r.start_date, r.end_date, r.duration, r.status]);
+      setAttendanceFilters({
+        fromDate: '',
+        toDate: '',
+        empName: '',
+        team: 'All Team',
+        status: 'All Types',
+        department: 'Department'
+      });
     }
-
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${activeReport}-report-${filters.fromDate}-to-${filters.toDate}.csv`;
-    a.click();
-    toast.success('CSV exported');
+    setReportData([]);
+    toast.info('Filters reset');
   };
 
   const getStatusBadge = (status) => {
     const styles = {
       'Login': 'bg-emerald-100 text-emerald-700',
       'Completed': 'bg-blue-100 text-blue-700',
+      'Logout': 'bg-blue-100 text-blue-700',
       'Not Logged': 'bg-gray-100 text-gray-700',
+      'Late': 'bg-amber-100 text-amber-700',
+      'Late Login': 'bg-amber-100 text-amber-700',
+      'Early Out': 'bg-orange-100 text-orange-700',
+      'Leave': 'bg-purple-100 text-purple-700',
       'pending': 'bg-amber-100 text-amber-700',
       'approved': 'bg-emerald-100 text-emerald-700',
       'rejected': 'bg-red-100 text-red-700'
@@ -120,168 +153,257 @@ const Reports = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in" data-testid="reports-page">
+    <div className="space-y-6 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="reports-page">
       {/* Page Header */}
       <div className="flex items-center gap-3">
-        <FileText className="w-6 h-6 text-[#0b1f3b]" />
-        <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          Reports
+        <FileText className="w-6 h-6 text-[#3b82f6]" />
+        <h1 className="text-2xl font-bold text-[#3b82f6]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+          HRMS Reports
         </h1>
       </div>
 
-      {/* Report Type Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Tab Navigation */}
+      <div className="flex">
         <button
-          onClick={() => { setActiveReport('attendance'); setReportData([]); }}
-          className={`p-6 rounded-xl border transition-all duration-200 text-left ${
-            activeReport === 'attendance' 
-              ? 'bg-[#0b1f3b] text-white border-[#0b1f3b]' 
-              : 'bg-[#fffdf7] border-black/5 hover:border-[#0b1f3b]/30'
+          onClick={() => { setActiveTab('leave'); setReportData([]); }}
+          className={`px-6 py-3 font-medium transition-all duration-200 rounded-t-lg ${
+            activeTab === 'leave' 
+              ? 'bg-[#3b82f6] text-white' 
+              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
           }`}
-          data-testid="report-attendance-btn"
+          data-testid="tab-leave"
         >
-          <CalendarCheck className="w-8 h-8 mb-3" strokeWidth={1.5} />
-          <h3 className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif' }}>Attendance Report</h3>
-          <p className={`text-sm mt-1 ${activeReport === 'attendance' ? 'text-white/80' : 'text-gray-500'}`}>
-            Daily attendance records
-          </p>
+          Leave Report
         </button>
-
         <button
-          onClick={() => { setActiveReport('leaves'); setReportData([]); }}
-          className={`p-6 rounded-xl border transition-all duration-200 text-left ${
-            activeReport === 'leaves' 
-              ? 'bg-[#0b1f3b] text-white border-[#0b1f3b]' 
-              : 'bg-[#fffdf7] border-black/5 hover:border-[#0b1f3b]/30'
+          onClick={() => { setActiveTab('attendance'); setReportData([]); }}
+          className={`px-6 py-3 font-medium transition-all duration-200 rounded-t-lg ml-1 ${
+            activeTab === 'attendance' 
+              ? 'bg-[#3b82f6] text-white' 
+              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
           }`}
-          data-testid="report-leaves-btn"
+          data-testid="tab-attendance"
         >
-          <CalendarDays className="w-8 h-8 mb-3" strokeWidth={1.5} />
-          <h3 className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif' }}>Leave Report</h3>
-          <p className={`text-sm mt-1 ${activeReport === 'leaves' ? 'text-white/80' : 'text-gray-500'}`}>
-            Leave requests and history
-          </p>
-        </button>
-
-        <button
-          onClick={() => toast.info('Coming soon')}
-          className="p-6 rounded-xl border border-black/5 bg-[#fffdf7] hover:border-[#0b1f3b]/30 transition-all duration-200 text-left opacity-60"
-          data-testid="report-summary-btn"
-        >
-          <ClipboardList className="w-8 h-8 mb-3" strokeWidth={1.5} />
-          <h3 className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif' }}>Summary Report</h3>
-          <p className="text-sm mt-1 text-gray-500">
-            Monthly summary (Coming soon)
-          </p>
+          Attendance Report
         </button>
       </div>
 
       {/* Filter Section */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6">
-        <h3 className="font-semibold mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          Generate Report
+      <div className="bg-[#fffdf7] rounded-lg border border-black/5 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6 border-b pb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+          {activeTab === 'leave' ? 'Leave Report Filters' : 'Attendance Report Filters'}
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">From Date:</label>
-            <Input
-              type="date"
-              value={filters.fromDate}
-              onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
-              className="bg-white"
-              data-testid="filter-from"
-            />
-          </div>
+        
+        {/* Leave Report Filters */}
+        {activeTab === 'leave' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+            {/* Row 1 */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">From:</label>
+              <Input
+                type="date"
+                value={leaveFilters.fromDate}
+                onChange={(e) => setLeaveFilters({ ...leaveFilters, fromDate: e.target.value })}
+                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                data-testid="leave-filter-from"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Emp Name:</label>
+              <Input
+                type="text"
+                placeholder="Employee Name"
+                value={leaveFilters.empName}
+                onChange={(e) => setLeaveFilters({ ...leaveFilters, empName: e.target.value })}
+                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                data-testid="leave-filter-empname"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Leave Type:</label>
+              <Select value={leaveFilters.leaveType} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, leaveType: v })}>
+                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="leave-filter-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All Types">All Types</SelectItem>
+                  <SelectItem value="Sick">Sick</SelectItem>
+                  <SelectItem value="Preplanned">Preplanned</SelectItem>
+                  <SelectItem value="Emergency">Emergency</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">To Date:</label>
-            <Input
-              type="date"
-              value={filters.toDate}
-              onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
-              className="bg-white"
-              data-testid="filter-to"
-            />
-          </div>
+            {/* Row 2 */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">To:</label>
+              <Input
+                type="date"
+                value={leaveFilters.toDate}
+                onChange={(e) => setLeaveFilters({ ...leaveFilters, toDate: e.target.value })}
+                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                data-testid="leave-filter-to"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Team Name:</label>
+              <Select value={leaveFilters.team} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, team: v })}>
+                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="leave-filter-team">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All Team">All Team</SelectItem>
+                  {teams.map((team) => (
+                    <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Department:</label>
+              <Select value={leaveFilters.department} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, department: v })}>
+                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="leave-filter-dept">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Department">Department</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Department:</label>
-            <Select value={filters.department} onValueChange={(v) => setFilters({ ...filters, department: v })}>
-              <SelectTrigger className="bg-white" data-testid="filter-department">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Departments</SelectItem>
-                {departments.map((dept) => (
-                  <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Buttons */}
+            <div className="lg:col-span-3 flex justify-end gap-4 mt-4">
+              <Button 
+                onClick={handleExport}
+                disabled={loading}
+                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8"
+                data-testid="export-btn"
+              >
+                {loading ? 'Exporting...' : 'Export'}
+              </Button>
+              <Button 
+                onClick={handleReset}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-8"
+                data-testid="reset-btn"
+              >
+                Reset
+              </Button>
+            </div>
           </div>
+        )}
 
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Team:</label>
-            <Select value={filters.team} onValueChange={(v) => setFilters({ ...filters, team: v })}>
-              <SelectTrigger className="bg-white" data-testid="filter-team">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Teams</SelectItem>
-                {teams.map((team) => (
-                  <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* Attendance Report Filters */}
+        {activeTab === 'attendance' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+            {/* Row 1 */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">From:</label>
+              <Input
+                type="date"
+                value={attendanceFilters.fromDate}
+                onChange={(e) => setAttendanceFilters({ ...attendanceFilters, fromDate: e.target.value })}
+                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                data-testid="attendance-filter-from"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Emp Name:</label>
+              <Input
+                type="text"
+                placeholder="Employee Name"
+                value={attendanceFilters.empName}
+                onChange={(e) => setAttendanceFilters({ ...attendanceFilters, empName: e.target.value })}
+                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                data-testid="attendance-filter-empname"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Status:</label>
+              <Select value={attendanceFilters.status} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, status: v })}>
+                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="attendance-filter-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All Types">All Types</SelectItem>
+                  <SelectItem value="Login">Login</SelectItem>
+                  <SelectItem value="Logout">Logout</SelectItem>
+                  <SelectItem value="Late">Late</SelectItem>
+                  <SelectItem value="Leave">Leave</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Row 2 */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">To:</label>
+              <Input
+                type="date"
+                value={attendanceFilters.toDate}
+                onChange={(e) => setAttendanceFilters({ ...attendanceFilters, toDate: e.target.value })}
+                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                data-testid="attendance-filter-to"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Team Name:</label>
+              <Select value={attendanceFilters.team} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, team: v })}>
+                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="attendance-filter-team">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All Team">All Team</SelectItem>
+                  {teams.map((team) => (
+                    <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Department:</label>
+              <Select value={attendanceFilters.department} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, department: v })}>
+                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="attendance-filter-dept">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Department">Department</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Buttons */}
+            <div className="lg:col-span-3 flex justify-end gap-4 mt-4">
+              <Button 
+                onClick={handleExport}
+                disabled={loading}
+                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8"
+                data-testid="export-btn"
+              >
+                {loading ? 'Exporting...' : 'Export'}
+              </Button>
+              <Button 
+                onClick={handleReset}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-8"
+                data-testid="reset-btn"
+              >
+                Reset
+              </Button>
+            </div>
           </div>
-        </div>
-
-        <div className="flex gap-2 mt-4">
-          <Button 
-            onClick={fetchReport}
-            disabled={loading}
-            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
-            data-testid="generate-report-btn"
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Filter className="w-4 h-4 mr-2" />
-                Generate Report
-              </>
-            )}
-          </Button>
-          <Button 
-            variant="secondary"
-            onClick={handleReset}
-            className="bg-gray-500 hover:bg-gray-600 text-white"
-            data-testid="reset-btn"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Reset
-          </Button>
-          {reportData.length > 0 && (
-            <Button 
-              onClick={handleExportCSV}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white ml-auto"
-              data-testid="export-btn"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export CSV
-            </Button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Report Results */}
       {reportData.length > 0 && (
-        <div className="bg-[#fffdf7] rounded-xl border border-black/5 overflow-hidden">
+        <div className="bg-[#fffdf7] rounded-lg border border-black/5 overflow-hidden">
           <div className="p-4 border-b border-black/5 flex items-center justify-between">
             <h3 className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              {activeReport === 'attendance' ? 'Attendance' : 'Leave'} Report Results
+              {activeTab === 'leave' ? 'Leave' : 'Attendance'} Report Results
             </h3>
             <Badge className="bg-blue-100 text-blue-700">
               {reportData.length} records
@@ -290,7 +412,7 @@ const Reports = () => {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50/50">
-                {activeReport === 'attendance' ? (
+                {activeTab === 'attendance' ? (
                   <tr>
                     <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Employee</th>
                     <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Team</th>
@@ -312,7 +434,7 @@ const Reports = () => {
                 )}
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {activeReport === 'attendance' ? (
+                {activeTab === 'attendance' ? (
                   reportData.map((record, index) => (
                     <tr key={index} className="hover:bg-gray-50/50">
                       <td className="px-4 py-4 text-sm font-medium text-gray-900">{record.emp_name}</td>
@@ -343,13 +465,6 @@ const Reports = () => {
               </tbody>
             </table>
           </div>
-        </div>
-      )}
-
-      {reportData.length === 0 && !loading && (
-        <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-12 text-center">
-          <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">Select filters and click "Generate Report" to view data</p>
         </div>
       )}
     </div>
