@@ -197,33 +197,33 @@ const Reports = () => {
         
         {/* Leave Report Filters */}
         {activeTab === 'leave' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8">
             {/* Row 1 */}
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">From:</label>
+              <label className="text-sm text-gray-600 mb-2 block">From:</label>
               <Input
                 type="date"
                 value={leaveFilters.fromDate}
                 onChange={(e) => setLeaveFilters({ ...leaveFilters, fromDate: e.target.value })}
-                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
                 data-testid="leave-filter-from"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Emp Name:</label>
+              <label className="text-sm text-gray-600 mb-2 block">Emp Name:</label>
               <Input
                 type="text"
                 placeholder="Employee Name"
                 value={leaveFilters.empName}
                 onChange={(e) => setLeaveFilters({ ...leaveFilters, empName: e.target.value })}
-                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
                 data-testid="leave-filter-empname"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Leave Type:</label>
+              <label className="text-sm text-gray-600 mb-2 block">Leave Type:</label>
               <Select value={leaveFilters.leaveType} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, leaveType: v })}>
-                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="leave-filter-type">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="leave-filter-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -237,19 +237,19 @@ const Reports = () => {
 
             {/* Row 2 */}
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">To:</label>
+              <label className="text-sm text-gray-600 mb-2 block">To:</label>
               <Input
                 type="date"
                 value={leaveFilters.toDate}
                 onChange={(e) => setLeaveFilters({ ...leaveFilters, toDate: e.target.value })}
-                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
                 data-testid="leave-filter-to"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Team Name:</label>
+              <label className="text-sm text-gray-600 mb-2 block">Team Name:</label>
               <Select value={leaveFilters.team} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, team: v })}>
-                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="leave-filter-team">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="leave-filter-team">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -261,9 +261,9 @@ const Reports = () => {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Department:</label>
+              <label className="text-sm text-gray-600 mb-2 block">Department:</label>
               <Select value={leaveFilters.department} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, department: v })}>
-                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="leave-filter-dept">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="leave-filter-dept">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -276,18 +276,18 @@ const Reports = () => {
             </div>
 
             {/* Buttons */}
-            <div className="lg:col-span-3 flex justify-end gap-4 mt-4">
+            <div className="lg:col-span-3 flex justify-end gap-4 mt-6">
               <Button 
                 onClick={handleExport}
                 disabled={loading}
-                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8"
+                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 rounded-lg"
                 data-testid="export-btn"
               >
                 {loading ? 'Exporting...' : 'Export'}
               </Button>
               <Button 
                 onClick={handleReset}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-8"
+                className="bg-gray-500 hover:bg-gray-600 text-white px-8 rounded-lg"
                 data-testid="reset-btn"
               >
                 Reset
@@ -298,33 +298,33 @@ const Reports = () => {
 
         {/* Attendance Report Filters */}
         {activeTab === 'attendance' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8">
             {/* Row 1 */}
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">From:</label>
+              <label className="text-sm text-gray-600 mb-2 block">From:</label>
               <Input
                 type="date"
                 value={attendanceFilters.fromDate}
                 onChange={(e) => setAttendanceFilters({ ...attendanceFilters, fromDate: e.target.value })}
-                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
                 data-testid="attendance-filter-from"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Emp Name:</label>
+              <label className="text-sm text-gray-600 mb-2 block">Emp Name:</label>
               <Input
                 type="text"
                 placeholder="Employee Name"
                 value={attendanceFilters.empName}
                 onChange={(e) => setAttendanceFilters({ ...attendanceFilters, empName: e.target.value })}
-                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
                 data-testid="attendance-filter-empname"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Status:</label>
+              <label className="text-sm text-gray-600 mb-2 block">Status:</label>
               <Select value={attendanceFilters.status} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, status: v })}>
-                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="attendance-filter-status">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="attendance-filter-status">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -339,19 +339,19 @@ const Reports = () => {
 
             {/* Row 2 */}
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">To:</label>
+              <label className="text-sm text-gray-600 mb-2 block">To:</label>
               <Input
                 type="date"
                 value={attendanceFilters.toDate}
                 onChange={(e) => setAttendanceFilters({ ...attendanceFilters, toDate: e.target.value })}
-                className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none"
+                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
                 data-testid="attendance-filter-to"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Team Name:</label>
+              <label className="text-sm text-gray-600 mb-2 block">Team Name:</label>
               <Select value={attendanceFilters.team} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, team: v })}>
-                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="attendance-filter-team">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="attendance-filter-team">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -363,9 +363,9 @@ const Reports = () => {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Department:</label>
+              <label className="text-sm text-gray-600 mb-2 block">Department:</label>
               <Select value={attendanceFilters.department} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, department: v })}>
-                <SelectTrigger className="bg-white border-gray-300 border-b-2 border-b-[#3b82f6] rounded-none" data-testid="attendance-filter-dept">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="attendance-filter-dept">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -378,18 +378,18 @@ const Reports = () => {
             </div>
 
             {/* Buttons */}
-            <div className="lg:col-span-3 flex justify-end gap-4 mt-4">
+            <div className="lg:col-span-3 flex justify-end gap-4 mt-6">
               <Button 
                 onClick={handleExport}
                 disabled={loading}
-                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8"
+                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 rounded-lg"
                 data-testid="export-btn"
               >
                 {loading ? 'Exporting...' : 'Export'}
               </Button>
               <Button 
                 onClick={handleReset}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-8"
+                className="bg-gray-500 hover:bg-gray-600 text-white px-8 rounded-lg"
                 data-testid="reset-btn"
               >
                 Reset
