@@ -586,6 +586,122 @@ const StarReward = () => {
     );
   }
 
+  // RENDER TEAM DETAILS VIEW
+  if (showTeamDetails && selectedTeam) {
+    return (
+      <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="team-details-view">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Star Rating
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Department: Research Unit — Month: {filters.month}
+            </p>
+          </div>
+          
+          <div className="flex rounded-lg overflow-hidden border border-gray-200">
+            <Button
+              variant="ghost"
+              className="rounded-none px-6 bg-[#fffdf7] text-gray-700 hover:bg-gray-100"
+            >
+              Employees
+            </Button>
+            <Button
+              variant="ghost"
+              className="rounded-none px-6 bg-[#0b1f3b] text-white hover:bg-[#162d4d]"
+            >
+              Teams
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Filter Section (disabled) */}
+        <div className="bg-[#fffdf7] rounded-lg border border-black/5 p-4">
+          <div className="flex flex-wrap items-center justify-center gap-4 opacity-50 pointer-events-none">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Team</span>
+              <Select value="All" disabled>
+                <SelectTrigger className="w-32 bg-white border-gray-300">
+                  <SelectValue />
+                </SelectTrigger>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Month</span>
+              <Input type="month" value={filters.month} className="w-36 bg-white border-gray-300" disabled />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Search</span>
+              <Input placeholder="name, username or email" className="w-52 bg-white border-gray-300" disabled />
+            </div>
+            <Button className="bg-[#0b1f3b] text-white px-6" disabled>Apply</Button>
+            <Button className="bg-[#0b1f3b] text-white px-6" disabled>Export CSV</Button>
+          </div>
+        </div>
+
+        {/* Team Details Container */}
+        <div className="bg-[#fffdf7] rounded-lg border-2 border-[#0b1f3b]/30 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Team details
+            </h2>
+            <Button
+              variant="outline"
+              onClick={handleBackFromTeamDetails}
+              className="border-[#0b1f3b] text-[#0b1f3b]"
+              data-testid="back-from-team-btn"
+            >
+              Back
+            </Button>
+          </div>
+
+          {/* Team Name and Member Count */}
+          <h3 className="text-lg font-semibold text-gray-900 mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            {selectedTeam.name} — {selectedTeam.members} members
+          </h3>
+
+          {/* Member Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {selectedTeam.employees && selectedTeam.employees.length > 0 ? (
+              selectedTeam.employees.map((member) => (
+                <div key={member.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                  <h4 className="font-bold text-gray-900 text-lg">{member.name}</h4>
+                  <p className="text-sm text-gray-500 mt-1">{member.email}</p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Stars: {member.stars || 0} · Unsafe: {member.unsafe_count || 0}
+                  </p>
+                  <div className="flex gap-2 mt-4">
+                    <Button 
+                      size="sm" 
+                      onClick={() => handleViewEmployee(member)} 
+                      className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
+                    >
+                      View
+                    </Button>
+                    {canAddStars && (
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleAddStars(member)} 
+                        className="border-[#0b1f3b] text-[#0b1f3b]"
+                      >
+                        Add
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 col-span-full text-center py-8">No members in this team</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // RENDER MAIN LIST VIEW
   return (
     <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="star-reward-page">
