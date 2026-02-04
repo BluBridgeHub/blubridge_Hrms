@@ -57,10 +57,9 @@ const Payroll = () => {
       setLoading(true);
       const [year, month] = selectedMonth.split('-');
       
-      // Fetch employees
+      // Fetch all employees
       const employeesRes = await axios.get(`${API}/employees`, {
-        headers: getAuthHeaders(),
-        params: { department: 'Research Unit' }
+        headers: getAuthHeaders()
       });
       
       // Fetch attendance for the month
@@ -72,7 +71,9 @@ const Payroll = () => {
         params: { from_date: firstDay, to_date: lastDay }
       });
       
-      setEmployees(employeesRes.data.filter(e => e.department === 'Research Unit'));
+      // Filter to Research Unit employees only
+      const researchEmployees = employeesRes.data.filter(e => e.department === 'Research Unit');
+      setEmployees(researchEmployees);
       setAttendance(attendanceRes.data);
     } catch (error) {
       console.error('Payroll fetch error:', error);
