@@ -521,7 +521,7 @@ const EmployeeLeave = () => {
               Cancel
             </Button>
             <Button 
-              onClick={handleApplyLeave}
+              onClick={handleSubmitLeave}
               disabled={submitting}
               className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
               data-testid="submit-leave-btn"
@@ -529,10 +529,10 @@ const EmployeeLeave = () => {
               {submitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Applying...
+                  {editingLeave ? 'Updating...' : 'Applying...'}
                 </>
               ) : (
-                'Apply Leave'
+                editingLeave ? 'Update Leave' : 'Apply Leave'
               )}
             </Button>
           </DialogFooter>
