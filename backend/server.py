@@ -724,8 +724,63 @@ async def create_employee(data: EmployeeCreate, current_user: dict = Depends(get
     # Update team member count
     await db.teams.update_one({"name": data.team}, {"$inc": {"member_count": 1}})
     
+    # Create user account if login is enabled
+    temp_password = None
+    if data.login_enabled:
+        # Generate username from email (part before @)
+        username = data.official_email.split('@')[0]
+        # Generate temporary password: first 4 chars of name + last 4 digits of phone or random
+        name_part = data.full_name.replace(' ', '').lower()[:4]
+        if data.phone_number and len(data.phone_number) >= 4:
+            phone_part = data.phone_number[-4:]
+        else:
+            phone_part = str(uuid.uuid4())[:4]
+        temp_password = f"{name_part}@{phone_part}"
+        
+        # Check if user already exists
+        existing_user = await db.users.find_one({"username": username})
+        if not existing_user:
+            new_user = User(
+                username=username,
+                email=data.official_email,
+                password_hash=hash_password(temp_password),
+                name=data.full_name,
+                role=UserRole(data.user_role) if data.user_role else UserRole.EMPLOYEE,
+                employee_id=employee.id,
+                department=data.department,
+                team=data.team
+            )
+            user_doc = new_user.model_dump()
+            user_doc['created_at'] = user_doc['created_at'].isoformat()
+            await db.users.insert_one(user_doc.copy())
+            
+            # Send welcome email with credentials
+            # Get the login URL from the frontend
+            login_url = "https://blubridge.ai/login"  # Default URL
+            # Try to get from environment or use the request origin
+            frontend_url = os.environ.get('FRONTEND_URL', 'https://blubridge.ai')
+            login_url = f"{frontend_url}/login"
+            
+            # Send welcome email asynchronously (don't wait for it)
+            asyncio.create_task(
+                send_welcome_email(
+                    emp_name=data.full_name,
+                    emp_id=emp_id,
+                    email=data.official_email,
+                    username=username,
+                    password=temp_password,
+                    login_url=login_url
+                )
+            )
+    
     await log_audit(current_user["id"], "create", "employee", employee.id, f"Created employee: {data.full_name}")
-    return serialize_doc(doc)
+    
+    result = serialize_doc(doc)
+    if temp_password:
+        result['temp_password'] = temp_password
+        result['username'] = data.official_email.split('@')[0]
+    
+    return result
 
 @api_router.put("/employees/{employee_id}")
 async def update_employee(employee_id: str, data: EmployeeUpdate, current_user: dict = Depends(get_current_user)):
