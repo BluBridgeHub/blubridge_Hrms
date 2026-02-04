@@ -9,6 +9,7 @@ import Leave from "./pages/Leave";
 import StarReward from "./pages/StarReward";
 import Team from "./pages/Team";
 import Reports from "./pages/Reports";
+import Payroll from "./pages/Payroll";
 import Layout from "./components/Layout";
 import EmployeeLayout from "./components/EmployeeLayout";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
