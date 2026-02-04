@@ -630,7 +630,7 @@ const StarReward = () => {
 
       {/* Add Stars Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="bg-white">
+        <DialogContent className="bg-[#fffdf7]">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
               Award Stars to {selectedEmployee?.name}
@@ -691,7 +691,7 @@ const StarReward = () => {
 
       {/* View History Modal */}
       <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-        <DialogContent className="bg-white max-w-2xl">
+        <DialogContent className="bg-[#fffdf7] max-w-2xl">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
               Star History - {selectedEmployee?.name}
