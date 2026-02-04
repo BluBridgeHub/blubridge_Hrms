@@ -257,6 +257,7 @@ class StarReward(BaseModel):
     employee_id: str
     stars: int
     reason: str
+    type: str = "performance"  # performance, learning, innovation, unsafe
     awarded_by: str
     month: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -265,6 +266,7 @@ class StarRewardCreate(BaseModel):
     employee_id: str
     stars: int
     reason: str
+    type: str = "performance"
 
 class Team(BaseModel):
     model_config = ConfigDict(extra="ignore")
