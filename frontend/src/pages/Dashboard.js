@@ -69,6 +69,7 @@ const AttendanceStatCard = ({ title, value, icon: Icon, borderColor, isActive, o
 
 const Dashboard = () => {
   const { getAuthHeaders } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [leaveList, setLeaveList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -83,12 +84,28 @@ const Dashboard = () => {
     leaveType: 'All'
   });
 
+  // Format date for API (dd-mm-yyyy)
+  const formatDateForAPI = (dateStr) => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
+      
+      // Build params for filtered stats
+      const statsParams = {};
+      if (filters.fromDate) statsParams.from_date = formatDateForAPI(filters.fromDate);
+      if (filters.toDate) statsParams.to_date = formatDateForAPI(filters.toDate);
+      
       const [statsRes, leaveRes] = await Promise.all([
-        axios.get(`${API}/dashboard/stats`, { headers: getAuthHeaders() }),
-        axios.get(`${API}/dashboard/leave-list`, { headers: getAuthHeaders() })
+        axios.get(`${API}/dashboard/stats`, { headers: getAuthHeaders(), params: statsParams }),
+        axios.get(`${API}/dashboard/leave-list`, { headers: getAuthHeaders(), params: statsParams })
       ]);
       setStats(statsRes.data);
       setLeaveList(leaveRes.data);
@@ -98,7 +115,7 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [getAuthHeaders]);
+  }, [getAuthHeaders, filters.fromDate, filters.toDate]);
 
   useEffect(() => {
     fetchData();
