@@ -241,14 +241,14 @@ const Team = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0b1f3b] to-[#1e3a5f] flex items-center justify-center">
                           <span className="text-white font-medium text-sm">
-                            {member.name?.charAt(0)?.toUpperCase()}
+                            {member.full_name?.charAt(0)?.toUpperCase()}
                           </span>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">{member.name}</p>
+                          <p className="font-medium text-gray-900">{member.full_name}</p>
                           <div className="flex items-center gap-1 text-xs text-gray-500">
                             <Mail className="w-3 h-3" />
-                            <span>{member.email}</span>
+                            <span>{member.official_email}</span>
                           </div>
                         </div>
                       </div>
