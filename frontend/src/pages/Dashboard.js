@@ -333,7 +333,7 @@ const Dashboard = () => {
       {/* Attendance Stats Tabs */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          Today's Attendance Overview
+          Today&apos;s Attendance Overview
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {attendanceTabs.map((tab) => (
