@@ -63,8 +63,8 @@ const AttendanceStatCard = ({ title, value, icon: Icon, borderColor, isActive, o
       })
     }}
   >
-    <p className="text-3xl font-bold transition-all duration-300" style={{ fontFamily: 'Outfit, sans-serif' }}>{value}</p>
-    <p className="text-xs text-gray-500 mt-1">{title}</p>
+    <p className="text-2xl sm:text-3xl font-bold transition-all duration-300" style={{ fontFamily: 'Outfit, sans-serif' }}>{value}</p>
+    <p className="text-[10px] sm:text-xs text-gray-500 mt-1 truncate">{title}</p>
   </div>
 );
 
