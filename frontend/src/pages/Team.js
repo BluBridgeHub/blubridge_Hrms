@@ -17,33 +17,33 @@ import {
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const TeamCard = ({ team, onViewDetails }) => (
-  <div className="bg-[#f7f5ef] rounded-xl border border-gray-100 p-5 hover:shadow-lg hover:border-gray-200 transition-all duration-300 group">
-    <div className="flex items-start justify-between">
-      <div className="flex-1">
-        <h3 className="font-semibold text-gray-900 text-lg" style={{ fontFamily: 'Outfit, sans-serif' }}>
+  <div className="bg-[#f7f5ef] rounded-xl border border-gray-100 p-4 sm:p-5 hover:shadow-lg hover:border-gray-200 transition-all duration-300 group min-w-0">
+    <div className="flex items-start justify-between gap-2">
+      <div className="flex-1 min-w-0">
+        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate" style={{ fontFamily: 'Outfit, sans-serif' }}>
           {team.name}
         </h3>
-        <p className="text-sm text-gray-500 mt-1">{team.department}</p>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1 truncate">{team.department}</p>
       </div>
-      <div className="w-10 h-10 rounded-lg bg-[#0b1f3b]/5 flex items-center justify-center group-hover:bg-[#0b1f3b]/10 transition-colors">
-        <Users className="w-5 h-5 text-[#0b1f3b]" />
+      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#0b1f3b]/5 flex items-center justify-center group-hover:bg-[#0b1f3b]/10 transition-colors flex-shrink-0">
+        <Users className="w-4 h-4 sm:w-5 sm:h-5 text-[#0b1f3b]" />
       </div>
     </div>
     
-    <div className="mt-5 pt-4 border-t border-gray-100 flex items-end justify-between">
+    <div className="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-gray-100 flex items-end justify-between gap-2">
       <div>
-        <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Members</p>
-        <p className="text-3xl font-bold text-[#0b1f3b] mt-1" style={{ fontFamily: 'Outfit, sans-serif' }}>
+        <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide font-medium">Members</p>
+        <p className="text-2xl sm:text-3xl font-bold text-[#0b1f3b] mt-1" style={{ fontFamily: 'Outfit, sans-serif' }}>
           {team.member_count}
         </p>
       </div>
       <Button
         onClick={() => onViewDetails(team)}
         size="sm"
-        className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
+        className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white text-xs sm:text-sm"
         data-testid={`view-team-btn-${team.id}`}
       >
-        <Eye className="w-4 h-4 mr-1" />
+        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
         View
       </Button>
     </div>
