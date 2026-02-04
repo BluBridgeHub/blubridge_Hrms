@@ -687,11 +687,115 @@ async def create_employee(data: EmployeeCreate, current_user: dict = Depends(get
     if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
-    # Check for duplicate email
-    existing = await db.employees.find_one({"official_email": data.official_email, "is_deleted": {"$ne": True}})
-    if existing:
+    # Check for duplicate email among active employees
+    existing_active = await db.employees.find_one({"official_email": data.official_email, "is_deleted": {"$ne": True}})
+    if existing_active:
         raise HTTPException(status_code=400, detail="Employee with this email already exists")
     
+    # Check if there's a deleted employee with same email - reactivate instead
+    existing_deleted = await db.employees.find_one({"official_email": data.official_email, "is_deleted": True})
+    
+    username = data.official_email.split('@')[0]
+    name_part = data.full_name.replace(' ', '').lower()[:4]
+    if data.phone_number and len(data.phone_number) >= 4:
+        phone_part = data.phone_number[-4:]
+    else:
+        phone_part = str(uuid.uuid4())[:4]
+    temp_password = f"{name_part}@{phone_part}"
+    
+    frontend_url = os.environ.get('FRONTEND_URL', 'https://blubridge.ai')
+    login_url = f"{frontend_url}/login"
+    
+    if existing_deleted:
+        # Reactivate the deleted employee with updated info
+        emp_id = existing_deleted.get("emp_id")
+        employee_id = existing_deleted.get("id")
+        
+        update_data = {
+            "is_deleted": False,
+            "deleted_at": None,
+            "employee_status": EmployeeStatus.ACTIVE,
+            "full_name": data.full_name,
+            "phone_number": data.phone_number,
+            "gender": data.gender,
+            "date_of_birth": data.date_of_birth,
+            "date_of_joining": data.date_of_joining,
+            "employment_type": data.employment_type,
+            "designation": data.designation,
+            "tier_level": data.tier_level,
+            "reporting_manager_id": data.reporting_manager_id,
+            "department": data.department,
+            "team": data.team,
+            "work_location": data.work_location,
+            "leave_policy": data.leave_policy,
+            "shift_type": data.shift_type,
+            "attendance_tracking_enabled": data.attendance_tracking_enabled,
+            "user_role": data.user_role,
+            "login_enabled": data.login_enabled,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.employees.update_one({"id": employee_id}, {"$set": update_data})
+        
+        # Update team member count
+        await db.teams.update_one({"name": data.team}, {"$inc": {"member_count": 1}})
+        
+        # Update or create user account with new credentials
+        if data.login_enabled:
+            existing_user = await db.users.find_one({"username": username})
+            if existing_user:
+                # Update existing user with new password and reactivate
+                await db.users.update_one(
+                    {"username": username},
+                    {"$set": {
+                        "password_hash": hash_password(temp_password),
+                        "is_active": True,
+                        "name": data.full_name,
+                        "role": data.user_role if data.user_role else UserRole.EMPLOYEE,
+                        "department": data.department,
+                        "team": data.team
+                    }}
+                )
+            else:
+                # Create new user
+                new_user = User(
+                    username=username,
+                    email=data.official_email,
+                    password_hash=hash_password(temp_password),
+                    name=data.full_name,
+                    role=data.user_role if data.user_role else UserRole.EMPLOYEE,
+                    employee_id=employee_id,
+                    department=data.department,
+                    team=data.team
+                )
+                user_doc = new_user.model_dump()
+                user_doc['created_at'] = user_doc['created_at'].isoformat()
+                await db.users.insert_one(user_doc.copy())
+            
+            # Send welcome email with new credentials
+            asyncio.create_task(
+                send_welcome_email(
+                    emp_name=data.full_name,
+                    emp_id=emp_id,
+                    email=data.official_email,
+                    username=username,
+                    password=temp_password,
+                    login_url=login_url
+                )
+            )
+        
+        await log_audit(current_user["id"], "reactivate", "employee", employee_id, f"Reactivated employee: {data.full_name}")
+        
+        employee = await db.employees.find_one({"id": employee_id}, {"_id": 0})
+        result = serialize_doc(employee)
+        if data.login_enabled:
+            result['temp_password'] = temp_password
+            result['username'] = username
+            result['reactivated'] = True
+        
+        return result
+    
+    # Create new employee
     emp_id = await generate_emp_id()
     
     employee = Employee(
@@ -725,19 +829,8 @@ async def create_employee(data: EmployeeCreate, current_user: dict = Depends(get
     await db.teams.update_one({"name": data.team}, {"$inc": {"member_count": 1}})
     
     # Create user account if login is enabled
-    temp_password = None
     if data.login_enabled:
-        # Generate username from email (part before @)
-        username = data.official_email.split('@')[0]
-        # Generate temporary password: first 4 chars of name + last 4 digits of phone or random
-        name_part = data.full_name.replace(' ', '').lower()[:4]
-        if data.phone_number and len(data.phone_number) >= 4:
-            phone_part = data.phone_number[-4:]
-        else:
-            phone_part = str(uuid.uuid4())[:4]
-        temp_password = f"{name_part}@{phone_part}"
-        
-        # Check if user already exists
+        # Check if user already exists (unlikely for new employee, but check anyway)
         existing_user = await db.users.find_one({"username": username})
         if not existing_user:
             new_user = User(
@@ -753,32 +846,25 @@ async def create_employee(data: EmployeeCreate, current_user: dict = Depends(get
             user_doc = new_user.model_dump()
             user_doc['created_at'] = user_doc['created_at'].isoformat()
             await db.users.insert_one(user_doc.copy())
-            
-            # Send welcome email with credentials
-            # Get the login URL from the frontend
-            login_url = "https://blubridge.ai/login"  # Default URL
-            # Try to get from environment or use the request origin
-            frontend_url = os.environ.get('FRONTEND_URL', 'https://blubridge.ai')
-            login_url = f"{frontend_url}/login"
-            
-            # Send welcome email asynchronously (don't wait for it)
-            asyncio.create_task(
-                send_welcome_email(
-                    emp_name=data.full_name,
-                    emp_id=emp_id,
-                    email=data.official_email,
-                    username=username,
-                    password=temp_password,
-                    login_url=login_url
-                )
+        
+        # Send welcome email with credentials
+        asyncio.create_task(
+            send_welcome_email(
+                emp_name=data.full_name,
+                emp_id=emp_id,
+                email=data.official_email,
+                username=username,
+                password=temp_password,
+                login_url=login_url
             )
+        )
     
     await log_audit(current_user["id"], "create", "employee", employee.id, f"Created employee: {data.full_name}")
     
     result = serialize_doc(doc)
-    if temp_password:
+    if data.login_enabled:
         result['temp_password'] = temp_password
-        result['username'] = data.official_email.split('@')[0]
+        result['username'] = username
     
     return result
 
