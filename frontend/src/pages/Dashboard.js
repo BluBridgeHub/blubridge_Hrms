@@ -31,9 +31,10 @@ import {
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const StatCard = ({ title, value, icon: Icon, color, bgColor, onClick }) => (
+const StatCard = ({ title, value, icon: Icon, color, bgColor, onClick, 'data-testid': testId }) => (
   <div 
     onClick={onClick}
+    data-testid={testId}
     className={`bg-[#fffdf7] rounded-xl border border-black/5 p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer' : ''}`}
   >
     <div className="flex items-start justify-between">
