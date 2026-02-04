@@ -116,6 +116,7 @@ function App() {
           <Route path="/leave" element={<AdminRoute><Leave /></AdminRoute>} />
           <Route path="/star-reward" element={<AdminRoute><StarReward /></AdminRoute>} />
           <Route path="/team" element={<AdminRoute><Team /></AdminRoute>} />
+          <Route path="/payroll" element={<AdminRoute><Payroll /></AdminRoute>} />
           <Route path="/reports" element={<AdminRoute><Reports /></AdminRoute>} />
           
           {/* Employee Routes */}
