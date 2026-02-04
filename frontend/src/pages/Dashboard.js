@@ -35,17 +35,17 @@ const StatCard = ({ title, value, icon: Icon, color, bgColor, onClick, 'data-tes
   <div 
     onClick={onClick}
     data-testid={testId}
-    className={`bg-[#fffdf7] rounded-xl border border-black/5 p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer' : ''}`}
+    className={`bg-[#fffdf7] rounded-xl border border-black/5 p-4 sm:p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer' : ''} min-w-0`}
   >
-    <div className="flex items-start justify-between">
-      <div>
-        <p className="text-sm text-gray-500 font-medium">{title}</p>
-        <p className="text-3xl font-bold mt-2 transition-all duration-300" style={{ fontFamily: 'Outfit, sans-serif', color: '#0f172a' }}>
+    <div className="flex items-start justify-between gap-2">
+      <div className="min-w-0 flex-1">
+        <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">{title}</p>
+        <p className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2 transition-all duration-300" style={{ fontFamily: 'Outfit, sans-serif', color: '#0f172a' }}>
           {value}
         </p>
       </div>
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${bgColor} transition-transform duration-300 hover:scale-110`}>
-        <Icon className="w-6 h-6" style={{ color }} strokeWidth={1.5} />
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${bgColor} transition-transform duration-300 hover:scale-110 flex-shrink-0`}>
+        <Icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color }} strokeWidth={1.5} />
       </div>
     </div>
   </div>
