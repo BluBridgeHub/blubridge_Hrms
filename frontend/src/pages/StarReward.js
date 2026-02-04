@@ -981,7 +981,7 @@ const StarReward = () => {
                       variant="outline" 
                       size="sm" 
                       className="mt-4 border-[#0b1f3b] text-[#0b1f3b]"
-                      onClick={() => toggleTeamExpansion(team.id)}
+                      onClick={() => handleViewTeamMembers(team)}
                     >
                       View members
                     </Button>
