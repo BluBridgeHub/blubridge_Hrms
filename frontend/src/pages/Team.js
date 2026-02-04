@@ -16,7 +16,7 @@ import {
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const TeamCard = ({ team, onViewDetails }) => (
-  <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-lg hover:border-gray-200 transition-all duration-300 group">
+  <div className="bg-[#f7f5ef] rounded-xl border border-gray-100 p-5 hover:shadow-lg hover:border-gray-200 transition-all duration-300 group">
     <div className="flex items-start justify-between">
       <div className="flex-1">
         <h3 className="font-semibold text-gray-900 text-lg" style={{ fontFamily: 'Outfit, sans-serif' }}>
@@ -227,7 +227,7 @@ const Team = () => {
                 Team Members
               </h4>
               {teamMembers.length === 0 ? (
-                <div className="text-center py-8 bg-gray-50 rounded-xl">
+                <div className="text-center py-8 rounded-xl">
                   <User className="w-12 h-12 mx-auto mb-2 text-gray-300" />
                   <p className="text-gray-500">No members found</p>
                 </div>

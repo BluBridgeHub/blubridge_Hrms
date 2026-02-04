@@ -804,7 +804,7 @@ const Employees = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-[#f7f5ef] rounded-lg">
                   <div>
                     <Label className="text-sm font-medium">Login Enabled</Label>
                     <p className="text-xs text-gray-500">Allow employee to log into the system</p>
@@ -815,7 +815,7 @@ const Employees = () => {
                     data-testid="switch-login"
                   />
                 </div>
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-[#f7f5ef] rounded-lg">
                   <div>
                     <Label className="text-sm font-medium">Attendance Tracking</Label>
                     <p className="text-xs text-gray-500">Enable attendance tracking for this employee</p>
@@ -1064,7 +1064,7 @@ const Employees = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-[#f7f5ef] rounded-lg">
                   <div>
                     <Label className="text-sm font-medium">Login Enabled</Label>
                     <p className="text-xs text-gray-500">Allow employee to log into the system</p>
@@ -1074,7 +1074,7 @@ const Employees = () => {
                     onCheckedChange={(v) => handleFormChange('login_enabled', v)}
                   />
                 </div>
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-[#f7f5ef] rounded-lg">
                   <div>
                     <Label className="text-sm font-medium">Attendance Tracking</Label>
                     <p className="text-xs text-gray-500">Enable attendance tracking for this employee</p>
