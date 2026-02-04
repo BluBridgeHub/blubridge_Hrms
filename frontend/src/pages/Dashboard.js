@@ -372,19 +372,46 @@ const Dashboard = () => {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Emp Name</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Team</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {activeAttendanceTab === 'not_logged' ? 'Leave Type' : 'Check-In'}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {activeAttendanceTab === 'not_logged' ? 'Date' : 'Check-Out'}
-                  </th>
+                  {activeAttendanceTab === 'not_logged' ? (
+                    <>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Leave Type</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                    </>
+                  ) : activeAttendanceTab === 'logged_in' ? (
+                    <>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-In</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                    </>
+                  ) : activeAttendanceTab === 'logout' ? (
+                    <>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-In</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-Out</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total Hours</th>
+                    </>
+                  ) : activeAttendanceTab === 'early_out' ? (
+                    <>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-In</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-Out</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total Hours</th>
+                    </>
+                  ) : activeAttendanceTab === 'late_login' ? (
+                    <>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-In</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Late By</th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-In</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-Out</th>
+                    </>
+                  )}
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {(activeAttendanceTab === 'not_logged' ? leaveList : attendanceDetails).length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
                       No records found
                     </td>
                   </tr>
@@ -402,12 +429,39 @@ const Dashboard = () => {
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.emp_name}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{item.team}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {activeAttendanceTab === 'not_logged' ? item.leave_type : (item.check_in || '-')}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {activeAttendanceTab === 'not_logged' ? item.date : (item.check_out || '-')}
-                      </td>
+                      {activeAttendanceTab === 'not_logged' ? (
+                        <>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.leave_type || '-'}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.date}</td>
+                        </>
+                      ) : activeAttendanceTab === 'logged_in' ? (
+                        <>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.check_in || '-'}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.date}</td>
+                        </>
+                      ) : activeAttendanceTab === 'logout' ? (
+                        <>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.check_in || '-'}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.check_out || '-'}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.total_hours || '-'}</td>
+                        </>
+                      ) : activeAttendanceTab === 'early_out' ? (
+                        <>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.check_in || '-'}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.check_out || '-'}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.total_hours || '-'}</td>
+                        </>
+                      ) : activeAttendanceTab === 'late_login' ? (
+                        <>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.check_in || '-'}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.late_by || '-'}</td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.check_in || '-'}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{item.check_out || '-'}</td>
+                        </>
+                      )}
                       <td className="px-6 py-4">
                         <Badge 
                           className={`
