@@ -1013,7 +1013,7 @@ const StarReward = () => {
                               <div className="flex justify-center">
                                 <Button 
                                   size="sm" 
-                                  onClick={() => toggleTeamExpansion(team.id)}
+                                  onClick={() => handleViewTeamMembers(team)}
                                   className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
                                 >
                                   View members
@@ -1021,38 +1021,6 @@ const StarReward = () => {
                               </div>
                             </td>
                           </tr>
-                          {/* Expanded team members */}
-                          {expandedTeams[team.id] && team.employees.length > 0 && (
-                            <>
-                              <tr className="bg-gray-100">
-                                <td className="px-8 py-2 text-xs font-semibold text-gray-600">Name</td>
-                                <td className="px-4 py-2 text-xs font-semibold text-gray-600 text-center">Email</td>
-                                <td className="px-4 py-2 text-xs font-semibold text-gray-600 text-center">Stars</td>
-                                <td className="px-4 py-2 text-xs font-semibold text-gray-600 text-center">Unsafe</td>
-                                <td className="px-4 py-2 text-xs font-semibold text-gray-600 text-center">Actions</td>
-                              </tr>
-                              {team.employees.map((emp) => (
-                                <tr key={emp.id} className="bg-gray-50 hover:bg-gray-100">
-                                  <td className="px-8 py-2 text-sm text-gray-900">{emp.name}</td>
-                                  <td className="px-4 py-2 text-sm text-gray-600 text-center">{emp.email}</td>
-                                  <td className="px-4 py-2 text-sm text-center">{emp.stars || 0}</td>
-                                  <td className="px-4 py-2 text-sm text-center">{emp.unsafe_count || 0}</td>
-                                  <td className="px-4 py-2">
-                                    <div className="flex gap-2 justify-center">
-                                      <Button size="sm" onClick={() => handleViewEmployee(emp)} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white text-xs px-3">
-                                        View
-                                      </Button>
-                                      {canAddStars && (
-                                        <Button size="sm" variant="outline" onClick={() => handleAddStars(emp)} className="border-[#0b1f3b] text-[#0b1f3b] text-xs px-3">
-                                          Add
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
-                            </>
-                          )}
                         </React.Fragment>
                       ))}
                     </tbody>
