@@ -265,10 +265,8 @@ const Leave = () => {
               <SelectContent>
                 <SelectItem value="All">All</SelectItem>
                 <SelectItem value="Sick">Sick</SelectItem>
-                <SelectItem value="Casual">Casual</SelectItem>
-                <SelectItem value="Annual">Annual</SelectItem>
-                <SelectItem value="Maternity">Maternity</SelectItem>
-                <SelectItem value="Paternity">Paternity</SelectItem>
+                <SelectItem value="Emergency">Emergency</SelectItem>
+                <SelectItem value="Preplanned">Preplanned</SelectItem>
               </SelectContent>
             </Select>
           </div>
