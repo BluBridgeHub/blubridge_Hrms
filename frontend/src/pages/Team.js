@@ -115,7 +115,7 @@ const Team = () => {
           {departments.map((dept) => (
             <TabsContent key={dept.id} value={dept.name} className="mt-0 p-6">
               {/* Department Summary */}
-              <div className="flex items-center justify-between mb-6 p-4 bg-gray-50/50 rounded-lg">
+              <div className="flex items-center justify-between mb-6 p-4 bg-[#f7f5ef] rounded-lg">
                 <h2 className="text-lg font-semibold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
                   {dept.name}
                 </h2>
