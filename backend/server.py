@@ -1312,12 +1312,17 @@ async def add_star_reward(data: StarRewardCreate, current_user: dict = Depends(g
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     
+    # Restrict to Research Unit employees only
+    if employee.get("department") != "Research Unit":
+        raise HTTPException(status_code=400, detail="Star rewards can only be given to Research Unit employees")
+    
     current_month = datetime.now(timezone.utc).strftime("%Y-%m")
     
     reward = StarReward(
         employee_id=data.employee_id,
         stars=data.stars,
         reason=data.reason,
+        type=data.type,
         awarded_by=current_user["id"],
         month=current_month
     )
@@ -1325,8 +1330,16 @@ async def add_star_reward(data: StarRewardCreate, current_user: dict = Depends(g
     doc['created_at'] = doc['created_at'].isoformat()
     await db.star_rewards.insert_one(doc.copy())
     
+    # Update employee stars and unsafe count
     new_stars = employee.get("stars", 0) + data.stars
-    await db.employees.update_one({"id": data.employee_id}, {"$set": {"stars": new_stars}})
+    update_data = {"stars": new_stars}
+    
+    # If type is unsafe, increment unsafe count
+    if data.type == "unsafe":
+        new_unsafe = employee.get("unsafe_count", 0) + 1
+        update_data["unsafe_count"] = new_unsafe
+    
+    await db.employees.update_one({"id": data.employee_id}, {"$set": update_data})
     
     await log_audit(current_user["id"], "award_stars", "star_reward", reward.id)
     
