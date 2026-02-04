@@ -1899,6 +1899,61 @@ async def apply_employee_leave(data: EmployeeLeaveCreate, current_user: dict = D
     
     return {"message": "Leave request submitted successfully", "leave_id": leave.id}
 
+@api_router.put("/employee/leaves/{leave_id}")
+async def update_employee_leave(leave_id: str, data: EmployeeLeaveCreate, current_user: dict = Depends(get_current_user)):
+    """Update a pending leave request"""
+    if not current_user.get("employee_id"):
+        raise HTTPException(status_code=404, detail="No employee profile linked")
+    
+    employee_id = current_user["employee_id"]
+    
+    # Find the leave request
+    leave = await db.leaves.find_one({"id": leave_id, "employee_id": employee_id}, {"_id": 0})
+    if not leave:
+        raise HTTPException(status_code=404, detail="Leave request not found")
+    
+    # Can only edit pending requests
+    if leave.get("status") != "pending":
+        raise HTTPException(status_code=400, detail="Can only edit pending leave requests")
+    
+    # Validate reason length
+    if not data.reason or len(data.reason.strip()) < 10:
+        raise HTTPException(status_code=400, detail="Reason must be at least 10 characters")
+    
+    # Parse and validate leave date
+    try:
+        leave_dt = datetime.strptime(data.leave_date, "%d-%m-%Y")
+        start_date = leave_dt.strftime("%Y-%m-%d")
+        end_date = start_date
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use dd-mm-yyyy")
+    
+    # Validate not in past
+    if leave_dt.date() < datetime.now(timezone.utc).date():
+        raise HTTPException(status_code=400, detail="Cannot set leave date in the past")
+    
+    # Update the leave request
+    update_data = {
+        "leave_type": data.leave_type,
+        "start_date": start_date,
+        "end_date": end_date,
+        "duration": data.duration,
+        "reason": data.reason
+    }
+    
+    if data.supporting_document_url:
+        update_data["supporting_document_url"] = data.supporting_document_url
+        update_data["supporting_document_name"] = data.supporting_document_name
+    
+    await db.leaves.update_one(
+        {"id": leave_id},
+        {"$set": update_data}
+    )
+    
+    await log_audit(current_user["id"], "update_leave", "leave", leave_id)
+    
+    return {"message": "Leave request updated successfully"}
+
 # ============== SEED DATA ==============
 
 @api_router.post("/seed")
