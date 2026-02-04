@@ -20,12 +20,14 @@ const Attendance = () => {
   const { getAuthHeaders } = useAuth();
   const [attendance, setAttendance] = useState([]);
   const [teams, setTeams] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState('emp_name');
   const [sortOrder, setSortOrder] = useState('asc');
   const [filters, setFilters] = useState({
     empName: '',
     team: 'All',
+    department: 'All',
     fromDate: new Date().toISOString().split('T')[0],
     toDate: new Date().toISOString().split('T')[0],
     status: 'All'
@@ -38,7 +40,7 @@ const Attendance = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [attendanceRes, teamsRes] = await Promise.all([
+      const [attendanceRes, teamsRes, deptsRes] = await Promise.all([
         axios.get(`${API}/attendance`, {
           headers: getAuthHeaders(),
           params: {
@@ -46,10 +48,12 @@ const Attendance = () => {
             to_date: formatDateForApi(filters.toDate)
           }
         }),
-        axios.get(`${API}/teams`, { headers: getAuthHeaders() })
+        axios.get(`${API}/teams`, { headers: getAuthHeaders() }),
+        axios.get(`${API}/departments`, { headers: getAuthHeaders() })
       ]);
       setAttendance(attendanceRes.data);
       setTeams(teamsRes.data);
+      setDepartments(deptsRes.data);
     } catch (error) {
       console.error('Attendance fetch error:', error);
       toast.error('Failed to load attendance data');
