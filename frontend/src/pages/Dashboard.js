@@ -54,7 +54,7 @@ const StatCard = ({ title, value, icon: Icon, color, bgColor, onClick, 'data-tes
 const AttendanceStatCard = ({ title, value, icon: Icon, borderColor, isActive, onClick }) => (
   <div 
     onClick={onClick}
-    className={`bg-[#fffdf7] rounded-xl border-l-4 p-4 text-center cursor-pointer transition-all duration-300 hover:shadow-md ${isActive ? 'shadow-lg' : ''}`} 
+    className={`bg-[#fffdf7] rounded-xl border-l-4 p-3 sm:p-4 text-center cursor-pointer transition-all duration-300 hover:shadow-md min-w-0 ${isActive ? 'shadow-lg' : ''}`} 
     style={{ 
       borderLeftColor: borderColor,
       ...(isActive && { 
