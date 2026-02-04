@@ -268,6 +268,8 @@ const Dashboard = () => {
           icon={UserCheck}
           color="#f97316"
           bgColor="bg-orange-100"
+          onClick={() => handleStatCardClick('support_staff')}
+          data-testid="stat-support-staff"
         />
       </div>
 
