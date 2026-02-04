@@ -1312,8 +1312,16 @@ async def get_departments(current_user: dict = Depends(get_current_user)):
 # ============== DASHBOARD ROUTES ==============
 
 @api_router.get("/dashboard/stats")
-async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
+async def get_dashboard_stats(
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
     today = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+    
+    # Use provided dates or default to today
+    query_from = from_date if from_date else today
+    query_to = to_date if to_date else today
     
     # Get counts from employee master
     base_query = {"is_deleted": {"$ne": True}, "employee_status": EmployeeStatus.ACTIVE}
@@ -1326,7 +1334,13 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
         "start_date": {"$gte": datetime.now(timezone.utc).strftime("%Y-%m-%d")}
     })
     
-    attendance_stats = await get_attendance_stats(today, current_user)
+    # Get attendance stats with date range support
+    attendance_stats = await get_attendance_stats(
+        date=None, 
+        from_date=query_from, 
+        to_date=query_to, 
+        current_user=current_user
+    )
     employee_stats = await get_employee_stats(current_user)
     
     return {
@@ -1339,29 +1353,42 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     }
 
 @api_router.get("/dashboard/leave-list")
-async def get_dashboard_leave_list(current_user: dict = Depends(get_current_user)):
+async def get_dashboard_leave_list(
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
     today = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+    query_date = from_date if from_date else today
     
-    # Get employees not logged in today
+    # Get employees not logged in on the specified date
     all_employees = await db.employees.find({
         "employee_status": EmployeeStatus.ACTIVE,
         "is_deleted": {"$ne": True},
         "attendance_tracking_enabled": True
     }, {"_id": 0}).to_list(1000)
     
-    logged_today = await db.attendance.find({"date": today}, {"_id": 0}).to_list(1000)
-    logged_ids = {a["employee_id"] for a in logged_today}
+    # Build date query for attendance
+    if from_date and to_date:
+        logged_records = await db.attendance.find(
+            {"date": {"$gte": from_date, "$lte": to_date}}, 
+            {"_id": 0}
+        ).to_list(10000)
+    else:
+        logged_records = await db.attendance.find({"date": query_date}, {"_id": 0}).to_list(1000)
+    
+    logged_ids = {a["employee_id"] for a in logged_records}
     
     not_logged = [e for e in all_employees if e["id"] not in logged_ids]
     
     result = []
-    for emp in not_logged[:10]:
+    for emp in not_logged[:20]:  # Increased limit
         result.append({
             "emp_name": emp["full_name"],
             "team": emp["team"],
             "department": emp["department"],
             "leave_type": "-",
-            "date": today,
+            "date": query_date,
             "status": "Not Login"
         })
     
