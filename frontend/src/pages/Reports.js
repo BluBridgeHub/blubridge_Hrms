@@ -166,7 +166,7 @@ const Reports = () => {
       <div className="flex">
         <button
           onClick={() => { setActiveTab('leave'); setReportData([]); }}
-          className={`px-6 py-3 font-medium transition-all duration-200 rounded-t-lg ${
+          className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ${
             activeTab === 'leave' 
               ? 'bg-[#3b82f6] text-white' 
               : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
@@ -177,7 +177,7 @@ const Reports = () => {
         </button>
         <button
           onClick={() => { setActiveTab('attendance'); setReportData([]); }}
-          className={`px-6 py-3 font-medium transition-all duration-200 rounded-t-lg ml-1 ${
+          className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ml-2 ${
             activeTab === 'attendance' 
               ? 'bg-[#3b82f6] text-white' 
               : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
@@ -189,10 +189,11 @@ const Reports = () => {
       </div>
 
       {/* Filter Section */}
-      <div className="bg-[#fffdf7] rounded-lg border border-black/5 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6 border-b pb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+      <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
           {activeTab === 'leave' ? 'Leave Report Filters' : 'Attendance Report Filters'}
         </h3>
+        <div className="border-b border-amber-400 w-full mb-8"></div>
         
         {/* Leave Report Filters */}
         {activeTab === 'leave' && (
