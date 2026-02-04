@@ -58,8 +58,11 @@ const Payroll = () => {
       const [year, month] = selectedMonth.split('-');
       const headers = getAuthHeaders();
       
-      // Fetch all employees
-      const employeesRes = await axios.get(`${API}/employees`, { headers });
+      // Fetch all employees (increase limit)
+      const employeesRes = await axios.get(`${API}/employees`, { 
+        headers,
+        params: { limit: 1000 }
+      });
       
       // Fetch attendance for the month
       const firstDay = `01-${month}-${year}`;
