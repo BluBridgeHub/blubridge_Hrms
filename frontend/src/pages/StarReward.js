@@ -420,11 +420,11 @@ const StarReward = () => {
                       </div>
                     </div>
                     <div className="flex gap-2 mt-3">
-                      <Button size="sm" onClick={() => handleViewEmployee(employee)} className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white">
+                      <Button size="sm" onClick={() => handleViewEmployee(employee)} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white">
                         View
                       </Button>
                       {canAddStars && (
-                        <Button size="sm" variant="outline" onClick={() => handleAddStars(employee)} className="border-[#2563eb] text-[#2563eb]">
+                        <Button size="sm" variant="outline" onClick={() => handleAddStars(employee)} className="border-[#0b1f3b] text-[#0b1f3b]">
                           Add
                         </Button>
                       )}
@@ -456,11 +456,11 @@ const StarReward = () => {
                           <td className="px-4 py-3 text-sm text-center">{employee.unsafe_count || 0}</td>
                           <td className="px-4 py-3">
                             <div className="flex gap-2 justify-center">
-                              <Button size="sm" onClick={() => handleViewEmployee(employee)} className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white">
+                              <Button size="sm" onClick={() => handleViewEmployee(employee)} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white">
                                 View
                               </Button>
                               {canAddStars && (
-                                <Button size="sm" variant="outline" onClick={() => handleAddStars(employee)} className="border-[#2563eb] text-[#2563eb]">
+                                <Button size="sm" variant="outline" onClick={() => handleAddStars(employee)} className="border-[#0b1f3b] text-[#0b1f3b]">
                                   Add
                                 </Button>
                               )}
@@ -473,14 +473,14 @@ const StarReward = () => {
                 </div>
 
                 {/* Pagination */}
-                <div className="flex items-center gap-4 mt-4 pt-4 border-t text-sm text-[#2563eb]">
+                <div className="flex items-center gap-4 mt-4 pt-4 border-t text-sm text-[#0b1f3b]">
                   <span>Page {currentPage} of {totalPages || 1} ({filteredEmployees.length} rows)</span>
                   {currentPage < totalPages && (
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={() => setCurrentPage(p => p + 1)}
-                      className="border-[#2563eb] text-[#2563eb]"
+                      className="border-[#0b1f3b] text-[#0b1f3b]"
                     >
                       Next
                     </Button>
@@ -498,7 +498,7 @@ const StarReward = () => {
                     <Button 
                       size="sm" 
                       onClick={handleGoToPage}
-                      className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white"
+                      className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
                     >
                       Go
                     </Button>
@@ -523,7 +523,7 @@ const StarReward = () => {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="mt-4 border-[#2563eb] text-[#2563eb]"
+                      className="mt-4 border-[#0b1f3b] text-[#0b1f3b]"
                       onClick={() => toggleTeamExpansion(team.id)}
                     >
                       View members
@@ -557,7 +557,7 @@ const StarReward = () => {
                                 <Button 
                                   size="sm" 
                                   onClick={() => toggleTeamExpansion(team.id)}
-                                  className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white"
+                                  className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
                                 >
                                   View members
                                 </Button>
@@ -582,11 +582,11 @@ const StarReward = () => {
                                   <td className="px-4 py-2 text-sm text-center">{emp.unsafe_count || 0}</td>
                                   <td className="px-4 py-2">
                                     <div className="flex gap-2 justify-center">
-                                      <Button size="sm" onClick={() => handleViewEmployee(emp)} className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs px-3">
+                                      <Button size="sm" onClick={() => handleViewEmployee(emp)} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white text-xs px-3">
                                         View
                                       </Button>
                                       {canAddStars && (
-                                        <Button size="sm" variant="outline" onClick={() => handleAddStars(emp)} className="border-[#2563eb] text-[#2563eb] text-xs px-3">
+                                        <Button size="sm" variant="outline" onClick={() => handleAddStars(emp)} className="border-[#0b1f3b] text-[#0b1f3b] text-xs px-3">
                                           Add
                                         </Button>
                                       )}
@@ -603,7 +603,7 @@ const StarReward = () => {
                 </div>
 
                 {/* Teams Pagination */}
-                <div className="flex items-center gap-4 mt-4 pt-4 border-t text-sm text-[#2563eb]">
+                <div className="flex items-center gap-4 mt-4 pt-4 border-t text-sm text-[#0b1f3b]">
                   <span>Page 1 of 1 ({teamStats.length} teams)</span>
                   <div className="flex items-center gap-2">
                     <span>Go to page</span>
@@ -616,7 +616,7 @@ const StarReward = () => {
                     />
                     <Button 
                       size="sm" 
-                      className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white"
+                      className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
                     >
                       Go
                     </Button>
@@ -682,7 +682,7 @@ const StarReward = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddModal(false)}>Cancel</Button>
-            <Button onClick={submitAddStars} className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white" data-testid="submit-stars-btn">
+            <Button onClick={submitAddStars} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white" data-testid="submit-stars-btn">
               Award Stars
             </Button>
           </DialogFooter>
