@@ -993,8 +993,14 @@ async def check_out(employee_id: str, current_user: dict = Depends(get_current_u
     return serialize_doc(updated)
 
 @api_router.get("/attendance/stats")
-async def get_attendance_stats(date: Optional[str] = None, current_user: dict = Depends(get_current_user)):
-    if not date:
+async def get_attendance_stats(
+    date: Optional[str] = None, 
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    # Use single date or date range
+    if not date and not from_date:
         date = datetime.now(timezone.utc).strftime("%d-%m-%Y")
     
     # Only count active employees with attendance tracking enabled
@@ -1003,10 +1009,31 @@ async def get_attendance_stats(date: Optional[str] = None, current_user: dict = 
         "is_deleted": {"$ne": True},
         "attendance_tracking_enabled": True
     })
-    logged_in = await db.attendance.count_documents({"date": date, "status": {"$in": ["Login", "Completed"]}})
+    
+    # Build date query
+    if from_date and to_date:
+        date_query = {"date": {"$gte": from_date, "$lte": to_date}}
+    else:
+        date_query = {"date": date}
+    
+    # Count all logged in (including Late Login and Early Out since they also logged in)
+    logged_in = await db.attendance.count_documents({
+        **date_query, 
+        "status": {"$in": ["Login", "Completed", "Late Login", "Early Out"]}
+    })
     not_logged = total_employees - logged_in
-    early_out = await db.attendance.count_documents({"date": date, "status": "Early Out"})
-    late_login = await db.attendance.count_documents({"date": date, "status": "Late Login"})
+    
+    # Count early out (can overlap with late login)
+    early_out = await db.attendance.count_documents({**date_query, "status": "Early Out"})
+    
+    # Count late login (can overlap with early out)
+    late_login = await db.attendance.count_documents({**date_query, "status": "Late Login"})
+    
+    # Count completed (logged out)
+    logout = await db.attendance.count_documents({
+        **date_query, 
+        "status": {"$in": ["Completed", "Early Out"]}
+    })
     
     return {
         "total_employees": total_employees,
@@ -1014,7 +1041,7 @@ async def get_attendance_stats(date: Optional[str] = None, current_user: dict = 
         "not_logged": max(0, not_logged),
         "early_out": early_out,
         "late_login": late_login,
-        "logout": await db.attendance.count_documents({"date": date, "status": "Completed"})
+        "logout": logout
     }
 
 # ============== LEAVE ROUTES ==============
