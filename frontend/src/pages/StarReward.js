@@ -7,7 +7,8 @@ import {
   Plus,
   Eye,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ArrowLeft
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -25,6 +26,70 @@ import { Textarea } from '../components/ui/textarea';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Helper to calculate week ranges for a month
+const getWeeksForMonth = (monthStr) => {
+  const [year, month] = monthStr.split('-').map(Number);
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay = new Date(year, month, 0);
+  
+  const weeks = [];
+  let weekStart = new Date(firstDay);
+  let weekNum = 1;
+  
+  while (weekStart <= lastDay) {
+    let weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    
+    if (weekEnd > lastDay) {
+      weekEnd = new Date(lastDay);
+    }
+    
+    weeks.push({
+      week: weekNum,
+      startDate: weekStart.toISOString().split('T')[0],
+      endDate: weekEnd.toISOString().split('T')[0],
+      fromDate: weekStart.toISOString().split('T')[0],
+      toDate: weekEnd.toISOString().split('T')[0],
+      value: '',
+      reason: ''
+    });
+    
+    weekStart = new Date(weekEnd);
+    weekStart.setDate(weekStart.getDate() + 1);
+    weekNum++;
+    
+    if (weekNum > 5) break;
+  }
+  
+  // Ensure we always have 5 weeks
+  while (weeks.length < 5) {
+    const lastWeek = weeks[weeks.length - 1];
+    const newStart = new Date(lastWeek.endDate);
+    newStart.setDate(newStart.getDate() + 1);
+    const newEnd = new Date(newStart);
+    newEnd.setDate(newEnd.getDate() + 6);
+    
+    weeks.push({
+      week: weeks.length + 1,
+      startDate: newStart.toISOString().split('T')[0],
+      endDate: newEnd.toISOString().split('T')[0],
+      fromDate: newStart.toISOString().split('T')[0],
+      toDate: newEnd.toISOString().split('T')[0],
+      value: '',
+      reason: ''
+    });
+  }
+  
+  return weeks;
+};
+
+// Format date as dd/mm/yyyy
+const formatDateDisplay = (dateStr) => {
+  if (!dateStr) return '';
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 const StarReward = () => {
   const { getAuthHeaders, user } = useAuth();
   const [employees, setEmployees] = useState([]);
@@ -32,8 +97,20 @@ const StarReward = () => {
   const [loading, setLoading] = useState(true);
   
   // View modes
-  const [activeTab, setActiveTab] = useState('employees'); // 'employees' | 'teams'
-  const [viewMode, setViewMode] = useState('table'); // 'table' | 'grid'
+  const [activeTab, setActiveTab] = useState('employees');
+  const [viewMode, setViewMode] = useState('table');
+  
+  // Add/Edit Form View
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [addFormType, setAddFormType] = useState('performance');
+  const [addFormMonth, setAddFormMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [weeklyData, setWeeklyData] = useState([]);
+  const [simpleFormData, setSimpleFormData] = useState({ value: '', reason: '' });
+  
+  // View modal
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [starHistory, setStarHistory] = useState([]);
   
   // Filters
   const [filters, setFilters] = useState({
@@ -55,17 +132,17 @@ const StarReward = () => {
   
   // Expanded teams in table view
   const [expandedTeams, setExpandedTeams] = useState({});
-  
-  // Modals
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [starHistory, setStarHistory] = useState([]);
-  const [addForm, setAddForm] = useState({ stars: 1, reason: '', type: 'performance' });
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Initialize weekly data when month or type changes
+  useEffect(() => {
+    if (addFormType === 'performance' || addFormType === 'learning') {
+      setWeeklyData(getWeeksForMonth(addFormMonth));
+    }
+  }, [addFormMonth, addFormType]);
 
   const fetchData = async () => {
     try {
@@ -84,7 +161,6 @@ const StarReward = () => {
         })
       ]);
       setEmployees(employeesRes.data);
-      // Filter teams to only Research Unit teams
       const researchTeams = teamsRes.data.filter(t => t.department === 'Research Unit');
       setTeams(researchTeams);
     } catch (error) {
@@ -157,26 +233,69 @@ const StarReward = () => {
 
   const handleAddStars = (employee) => {
     setSelectedEmployee(employee);
-    setAddForm({ stars: 1, reason: '', type: 'performance' });
-    setShowAddModal(true);
+    setAddFormType('performance');
+    setAddFormMonth(filters.month);
+    setWeeklyData(getWeeksForMonth(filters.month));
+    setSimpleFormData({ value: '', reason: '' });
+    setShowAddForm(true);
   };
 
-  const submitAddStars = async () => {
-    if (!addForm.reason.trim()) {
-      toast.error('Please provide a reason');
-      return;
-    }
+  const handleBackFromForm = () => {
+    setShowAddForm(false);
+    setSelectedEmployee(null);
+  };
 
+  const updateWeekData = (weekIndex, field, value) => {
+    setWeeklyData(prev => {
+      const updated = [...prev];
+      updated[weekIndex] = { ...updated[weekIndex], [field]: value };
+      return updated;
+    });
+  };
+
+  const submitStars = async () => {
     try {
-      await axios.post(`${API}/star-rewards`, {
-        employee_id: selectedEmployee.id,
-        stars: addForm.stars,
-        reason: addForm.reason,
-        type: addForm.type
-      }, { headers: getAuthHeaders() });
+      if (addFormType === 'performance' || addFormType === 'learning') {
+        // Submit weekly data
+        const validWeeks = weeklyData.filter(w => w.value && w.reason);
+        if (validWeeks.length === 0) {
+          toast.error('Please fill at least one week with value and reason');
+          return;
+        }
+        
+        for (const week of validWeeks) {
+          await axios.post(`${API}/star-rewards`, {
+            employee_id: selectedEmployee.id,
+            stars: parseInt(week.value),
+            reason: week.reason,
+            type: addFormType,
+            week_number: week.week,
+            from_date: week.fromDate,
+            to_date: week.toDate
+          }, { headers: getAuthHeaders() });
+        }
+        
+        toast.success(`${addFormType === 'performance' ? 'Performance' : 'Learning'} stars awarded for ${validWeeks.length} week(s)`);
+      } else {
+        // Submit simple form (innovation or unsafe)
+        if (!simpleFormData.value || !simpleFormData.reason) {
+          toast.error('Please fill value and reason');
+          return;
+        }
+        
+        const stars = addFormType === 'unsafe' ? -Math.abs(parseInt(simpleFormData.value)) : parseInt(simpleFormData.value);
+        
+        await axios.post(`${API}/star-rewards`, {
+          employee_id: selectedEmployee.id,
+          stars: stars,
+          reason: simpleFormData.reason,
+          type: addFormType
+        }, { headers: getAuthHeaders() });
+        
+        toast.success(`${addFormType === 'innovation' ? 'Innovation' : 'Unsafe Conduct'} stars recorded`);
+      }
       
-      toast.success('Stars awarded successfully');
-      setShowAddModal(false);
+      setShowAddForm(false);
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to award stars');
@@ -222,7 +341,6 @@ const StarReward = () => {
     });
   }, [teams, filteredEmployees]);
 
-  // Toggle team expansion
   const toggleTeamExpansion = (teamId) => {
     setExpandedTeams(prev => ({
       ...prev,
@@ -230,7 +348,6 @@ const StarReward = () => {
     }));
   };
 
-  // Handle go to page
   const handleGoToPage = () => {
     const page = parseInt(goToPage);
     if (page >= 1 && page <= totalPages) {
@@ -246,6 +363,214 @@ const StarReward = () => {
     );
   }
 
+  // RENDER ADD/EDIT FORM VIEW
+  if (showAddForm && selectedEmployee) {
+    return (
+      <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="star-add-form">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Star Rating
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Department: Research Unit — Month: {addFormMonth}
+            </p>
+          </div>
+          
+          <div className="flex rounded-lg overflow-hidden border border-gray-200">
+            <Button
+              variant="ghost"
+              className="rounded-none px-6 bg-[#0b1f3b] text-white hover:bg-[#162d4d]"
+            >
+              Employees
+            </Button>
+            <Button
+              variant="ghost"
+              className="rounded-none px-6 bg-[#fffdf7] text-gray-700 hover:bg-gray-100"
+            >
+              Teams
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Filter Section (disabled during form) */}
+        <div className="bg-[#fffdf7] rounded-lg border border-black/5 p-4">
+          <div className="flex flex-wrap items-center justify-center gap-4 opacity-50 pointer-events-none">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Team</span>
+              <Select value="All" disabled>
+                <SelectTrigger className="w-32 bg-white border-gray-300">
+                  <SelectValue />
+                </SelectTrigger>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Month</span>
+              <Input type="month" value={addFormMonth} className="w-36 bg-white border-gray-300" disabled />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Search</span>
+              <Input placeholder="name, username or email" className="w-52 bg-white border-gray-300" disabled />
+            </div>
+            <Button className="bg-[#0b1f3b] text-white px-6" disabled>Apply</Button>
+            <Button className="bg-[#0b1f3b] text-white px-6" disabled>Export CSV</Button>
+          </div>
+        </div>
+
+        {/* Add/Edit Form Container */}
+        <div className="bg-[#fffdf7] rounded-lg border-2 border-[#0b1f3b]/30 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              {selectedEmployee.name} — Manual Add/Edit (Month: {addFormMonth})
+            </h2>
+            <Button
+              variant="outline"
+              onClick={handleBackFromForm}
+              className="border-[#0b1f3b] text-[#0b1f3b]"
+              data-testid="back-btn"
+            >
+              Back
+            </Button>
+          </div>
+
+          {/* Type Selector */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Type</span>
+              <Select value={addFormType} onValueChange={setAddFormType}>
+                <SelectTrigger className="w-48 bg-white border-gray-300" data-testid="form-type-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="performance">Performance</SelectItem>
+                  <SelectItem value="learning">Learning</SelectItem>
+                  <SelectItem value="innovation">Innovation</SelectItem>
+                  <SelectItem value="unsafe">Unsafe Conduct</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Weekly Form (Performance & Learning) */}
+          {(addFormType === 'performance' || addFormType === 'learning') && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {weeklyData.map((week, index) => (
+                <div key={index} className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div className="mb-3">
+                    <span className="text-[#0b1f3b] font-bold">Week {week.week}</span>
+                    <span className="text-gray-500 text-sm ml-2">
+                      {week.startDate} → {week.endDate}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-sm text-gray-600">From</span>
+                    <Input
+                      type="date"
+                      value={week.fromDate}
+                      onChange={(e) => updateWeekData(index, 'fromDate', e.target.value)}
+                      className="flex-1 bg-white border-gray-300 text-sm"
+                    />
+                    <span className="text-sm text-gray-600">To</span>
+                    <Input
+                      type="date"
+                      value={week.toDate}
+                      onChange={(e) => updateWeekData(index, 'toDate', e.target.value)}
+                      className="flex-1 bg-white border-gray-300 text-sm"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <Label className="text-sm text-gray-600">Value</Label>
+                    <Input
+                      type="number"
+                      value={week.value}
+                      onChange={(e) => updateWeekData(index, 'value', e.target.value)}
+                      className="bg-white border-gray-300 mt-1"
+                      placeholder="Enter star value"
+                      data-testid={`week-${index}-value`}
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm text-gray-600">Reason</Label>
+                    <Textarea
+                      value={week.reason}
+                      onChange={(e) => updateWeekData(index, 'reason', e.target.value)}
+                      className="bg-white border-gray-300 mt-1 min-h-[80px]"
+                      placeholder="Enter reason..."
+                      data-testid={`week-${index}-reason`}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Simple Form (Innovation & Unsafe Conduct) */}
+          {(addFormType === 'innovation' || addFormType === 'unsafe') && (
+            <div className="max-w-md space-y-4 mb-6">
+              <div>
+                <Label className="font-medium text-gray-700">Month</Label>
+                <Input
+                  type="month"
+                  value={addFormMonth}
+                  onChange={(e) => setAddFormMonth(e.target.value)}
+                  className="bg-white border-gray-300 mt-1"
+                  data-testid="simple-month"
+                />
+              </div>
+              
+              <div>
+                <Label className="font-medium text-gray-700">Value (stars)</Label>
+                <Input
+                  type="number"
+                  value={simpleFormData.value}
+                  onChange={(e) => setSimpleFormData(prev => ({ ...prev, value: e.target.value }))}
+                  className="bg-white border-gray-300 mt-1"
+                  placeholder={addFormType === 'unsafe' ? "Enter negative value" : "Enter star value"}
+                  data-testid="simple-value"
+                />
+              </div>
+
+              <div>
+                <Label className="font-medium text-gray-700">Reason</Label>
+                <Textarea
+                  value={simpleFormData.reason}
+                  onChange={(e) => setSimpleFormData(prev => ({ ...prev, reason: e.target.value }))}
+                  className="bg-white border-gray-300 mt-1 min-h-[120px]"
+                  placeholder="Enter reason..."
+                  data-testid="simple-reason"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Form Actions */}
+          <div className="flex gap-3">
+            <Button
+              onClick={submitStars}
+              className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white px-6"
+              data-testid="save-btn"
+            >
+              Save
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleBackFromForm}
+              className="border-[#0b1f3b] text-[#0b1f3b]"
+              data-testid="cancel-btn"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // RENDER MAIN LIST VIEW
   return (
     <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="star-reward-page">
       {/* Page Header */}
@@ -627,67 +952,6 @@ const StarReward = () => {
           </>
         )}
       </div>
-
-      {/* Add Stars Modal */}
-      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="bg-[#fffdf7]">
-          <DialogHeader>
-            <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Award Stars to {selectedEmployee?.name}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label>Star Type</Label>
-              <Select value={addForm.type} onValueChange={(v) => setAddForm({ ...addForm, type: v })}>
-                <SelectTrigger className="bg-white mt-1" data-testid="star-type-select">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="performance">Performance</SelectItem>
-                  <SelectItem value="learning">Learning</SelectItem>
-                  <SelectItem value="innovation">Innovation</SelectItem>
-                  <SelectItem value="unsafe">Unsafe Methods (Negative)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Number of Stars</Label>
-              <Select value={String(addForm.stars)} onValueChange={(v) => setAddForm({ ...addForm, stars: parseInt(v) })}>
-                <SelectTrigger className="bg-white mt-1" data-testid="stars-select">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {addForm.type === 'unsafe' 
-                    ? [-5, -4, -3, -2, -1].map((n) => (
-                        <SelectItem key={n} value={String(n)}>{n}</SelectItem>
-                      ))
-                    : [1, 2, 3, 4, 5].map((n) => (
-                        <SelectItem key={n} value={String(n)}>+{n}</SelectItem>
-                      ))
-                  }
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Reason</Label>
-              <Textarea
-                placeholder="Enter reason for award..."
-                value={addForm.reason}
-                onChange={(e) => setAddForm({ ...addForm, reason: e.target.value })}
-                className="bg-white mt-1"
-                data-testid="reason-input"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddModal(false)}>Cancel</Button>
-            <Button onClick={submitAddStars} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white" data-testid="submit-stars-btn">
-              Award Stars
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* View History Modal */}
       <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
