@@ -56,18 +56,17 @@ const Payroll = () => {
     try {
       setLoading(true);
       const [year, month] = selectedMonth.split('-');
+      const headers = getAuthHeaders();
       
       // Fetch all employees
-      const employeesRes = await axios.get(`${API}/employees`, {
-        headers: getAuthHeaders()
-      });
+      const employeesRes = await axios.get(`${API}/employees`, { headers });
       
       // Fetch attendance for the month
       const firstDay = `01-${month}-${year}`;
       const lastDay = `${new Date(parseInt(year), parseInt(month), 0).getDate()}-${month}-${year}`;
       
       const attendanceRes = await axios.get(`${API}/attendance`, {
-        headers: getAuthHeaders(),
+        headers,
         params: { from_date: firstDay, to_date: lastDay }
       });
       
