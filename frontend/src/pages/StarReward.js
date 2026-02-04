@@ -515,7 +515,7 @@ const StarReward = () => {
             {viewMode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {teamStats.map((team) => (
-                  <div key={team.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                  <div key={team.id} className="bg-[#fffdf7] rounded-lg border border-black/5 p-4 hover:shadow-md transition-shadow">
                     <h3 className="font-bold text-gray-900 text-lg">{team.name}</h3>
                     <p className="text-sm text-gray-600 mt-2">
                       Members: {team.members} Team stars: {team.totalStars.toFixed(2)} Avg: {team.avgStars.toFixed(2)}
