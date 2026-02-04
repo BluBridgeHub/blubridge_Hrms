@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  UserCog
+  UserCog,
+  Wallet
 } from 'lucide-react';
 import { Button } from './ui/button';
 
@@ -23,6 +24,7 @@ const navItems = [
   { path: '/leave', label: 'Leave', icon: CalendarDays },
   { path: '/star-reward', label: 'Star Reward', icon: Star },
   { path: '/team', label: 'Team', icon: Users },
+  { path: '/payroll', label: 'Payroll', icon: Wallet },
   { path: '/reports', label: 'Report', icon: FileText },
 ];
 
