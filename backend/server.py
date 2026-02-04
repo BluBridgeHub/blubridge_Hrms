@@ -1812,8 +1812,8 @@ async def seed_database():
     # Create departments
     departments = [
         {"id": str(uuid.uuid4()), "name": "Research Unit", "team_count": 8},
-        {"id": str(uuid.uuid4()), "name": "Support Staff", "team_count": 2},
-        {"id": str(uuid.uuid4()), "name": "Business & Product", "team_count": 3}
+        {"id": str(uuid.uuid4()), "name": "Support Staff", "team_count": 1},
+        {"id": str(uuid.uuid4()), "name": "Business & Product", "team_count": 5}
     ]
     await db.departments.insert_many(departments)
     
