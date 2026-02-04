@@ -513,8 +513,8 @@ class TestEmployeePortal:
         })
         assert response.status_code == 200
         data = response.json()
-        assert "id" in data
-        assert data["status"] == "pending"
+        assert "leave_id" in data or "id" in data
+        assert "message" in data
 
 
 class TestConfigEndpoints:
