@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -38,6 +39,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const Leave = () => {
   const { getAuthHeaders, user } = useAuth();
+  const location = useLocation();
   const [leaves, setLeaves] = useState([]);
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +59,19 @@ const Leave = () => {
     leaveType: 'All',
     status: 'All'
   });
+
+  // Handle navigation state from Dashboard
+  useEffect(() => {
+    if (location.state?.tab) {
+      if (location.state.tab === 'approved') {
+        setFilters(prev => ({ ...prev, status: 'approved' }));
+        setActiveTab('history');
+      } else if (location.state.tab === 'pending') {
+        setFilters(prev => ({ ...prev, status: 'pending' }));
+        setActiveTab('requests');
+      }
+    }
+  }, [location.state]);
 
   const fetchData = useCallback(async () => {
     try {
