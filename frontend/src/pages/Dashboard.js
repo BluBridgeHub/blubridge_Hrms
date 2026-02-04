@@ -241,6 +241,8 @@ const Dashboard = () => {
           icon={Users}
           color="#0b1f3b"
           bgColor="bg-blue-100"
+          onClick={() => handleStatCardClick('research_unit')}
+          data-testid="stat-research-unit"
         />
         <StatCard 
           title="Upcoming Leaves" 
@@ -248,6 +250,8 @@ const Dashboard = () => {
           icon={CalendarDays}
           color="#10b981"
           bgColor="bg-emerald-100"
+          onClick={() => handleStatCardClick('upcoming_leaves')}
+          data-testid="stat-upcoming-leaves"
         />
         <StatCard 
           title="Pending Approvals" 
@@ -255,6 +259,8 @@ const Dashboard = () => {
           icon={Clock}
           color="#8b5cf6"
           bgColor="bg-purple-100"
+          onClick={() => handleStatCardClick('pending_approvals')}
+          data-testid="stat-pending-approvals"
         />
         <StatCard 
           title="Total Support Staff" 
