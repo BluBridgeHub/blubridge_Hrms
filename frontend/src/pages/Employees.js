@@ -291,8 +291,19 @@ const Employees = () => {
     if (!validateForm()) return;
     
     try {
-      await axios.post(`${API}/employees`, form, { headers: getAuthHeaders() });
-      toast.success('Employee added successfully');
+      const response = await axios.post(`${API}/employees`, form, { headers: getAuthHeaders() });
+      const newEmployee = response.data;
+      
+      // Show success message with credential info if login is enabled
+      if (form.login_enabled && newEmployee.temp_password) {
+        toast.success(
+          `Employee added successfully! Welcome email with login credentials sent to ${form.official_email}`,
+          { duration: 5000 }
+        );
+      } else {
+        toast.success('Employee added successfully');
+      }
+      
       setShowAddSheet(false);
       fetchData();
     } catch (error) {
