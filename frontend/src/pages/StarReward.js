@@ -546,8 +546,8 @@ const StarReward = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {teamStats.map((team) => (
-                        <>
-                          <tr key={team.id} className="hover:bg-gray-50">
+                        <React.Fragment key={team.id}>
+                          <tr className="hover:bg-gray-50">
                             <td className="px-4 py-3 text-sm text-gray-900">{team.name}</td>
                             <td className="px-4 py-3 text-sm text-center">{team.members} members</td>
                             <td className="px-4 py-3 text-sm text-center">{team.totalStars.toFixed(2)}</td>
