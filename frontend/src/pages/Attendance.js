@@ -144,7 +144,7 @@ const Attendance = () => {
 
       {/* Filter Section */}
       <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div>
             <label className="text-sm text-gray-600 mb-1 block">Emp Name:</label>
             <div className="relative">
@@ -160,6 +160,21 @@ const Attendance = () => {
           </div>
           
           <div>
+            <label className="text-sm text-gray-600 mb-1 block">Department:</label>
+            <Select value={filters.department} onValueChange={(v) => setFilters({ ...filters, department: v })}>
+              <SelectTrigger className="bg-white" data-testid="filter-department">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
             <label className="text-sm text-gray-600 mb-1 block">Team:</label>
             <Select value={filters.team} onValueChange={(v) => setFilters({ ...filters, team: v })}>
               <SelectTrigger className="bg-white" data-testid="filter-team">
@@ -174,6 +189,25 @@ const Attendance = () => {
             </Select>
           </div>
 
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Status:</label>
+            <Select value={filters.status} onValueChange={(v) => setFilters({ ...filters, status: v })}>
+              <SelectTrigger className="bg-white" data-testid="filter-status">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All</SelectItem>
+                <SelectItem value="Login">Login</SelectItem>
+                <SelectItem value="Completed">Completed</SelectItem>
+                <SelectItem value="Early Out">Early Out</SelectItem>
+                <SelectItem value="Late Login">Late Login</SelectItem>
+                <SelectItem value="Not Logged">Not Logged</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="text-sm text-gray-600 mb-1 block">From:</label>
             <Input
@@ -196,28 +230,32 @@ const Attendance = () => {
             />
           </div>
 
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Status:</label>
-            <div className="flex gap-2">
-              <Select value={filters.status} onValueChange={(v) => setFilters({ ...filters, status: v })}>
-                <SelectTrigger className="bg-white flex-1" data-testid="filter-status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All">All</SelectItem>
-                  <SelectItem value="Login">Login</SelectItem>
-                  <SelectItem value="Not Logged">Not Logged</SelectItem>
-                  <SelectItem value="Completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button 
-                onClick={handleFilter}
-                className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
-                data-testid="apply-filter-btn"
-              >
-                Filter
-              </Button>
-            </div>
+          <div className="flex items-end gap-2 lg:col-span-2">
+            <Button 
+              onClick={handleFilter}
+              className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
+              data-testid="apply-filter-btn"
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              Filter
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setFilters({
+                  empName: '',
+                  team: 'All',
+                  department: 'All',
+                  fromDate: new Date().toISOString().split('T')[0],
+                  toDate: new Date().toISOString().split('T')[0],
+                  status: 'All'
+                });
+                fetchData();
+              }}
+              data-testid="reset-filter-btn"
+            >
+              Reset
+            </Button>
           </div>
         </div>
       </div>
