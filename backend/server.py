@@ -1588,23 +1588,61 @@ async def get_employee_dashboard(current_user: dict = Depends(get_current_user))
     }, {"_id": 0}).to_list(31)
     
     # Calculate summary stats
+    # According to requirements: if "Early Out" has late login time, count in both Late AND Early Out
     active_days = 0
     inactive_days = 0
     late_arrivals = 0
     early_outs = 0
     
+    # Define late threshold (10:00 AM)
+    late_threshold_hour = 10
+    late_threshold_minute = 0
+    
     for record in attendance_records:
         status = record.get("status", "")
+        check_in = record.get("check_in", "")
+        
+        # Check if login was late (after 10 AM)
+        is_late_login = False
+        if check_in:
+            try:
+                # Parse check-in time (format: "10:30 AM" or "09:15 AM")
+                time_parts = check_in.upper().replace('.', ':').strip()
+                if 'AM' in time_parts or 'PM' in time_parts:
+                    is_pm = 'PM' in time_parts
+                    time_str = time_parts.replace('AM', '').replace('PM', '').strip()
+                    parts = time_str.split(':')
+                    hour = int(parts[0])
+                    minute = int(parts[1]) if len(parts) > 1 else 0
+                    
+                    # Convert to 24-hour format
+                    if is_pm and hour != 12:
+                        hour += 12
+                    elif not is_pm and hour == 12:
+                        hour = 0
+                    
+                    # Check if late (after 10 AM)
+                    if hour > late_threshold_hour or (hour == late_threshold_hour and minute > late_threshold_minute):
+                        is_late_login = True
+            except:
+                pass
+        
+        # Count based on status
         if status in ["Login", "Completed", "Present"]:
             active_days += 1
+            if is_late_login:
+                late_arrivals += 1
         elif status in ["Absent", "NA", "Not Logged"]:
             inactive_days += 1
-        if status == "Late Login" or status == "Late":
+        elif status == "Late Login" or status == "Late":
             late_arrivals += 1
             active_days += 1
-        if status == "Early Out":
+        elif status == "Early Out":
             early_outs += 1
             active_days += 1
+            # If early out AND also late login, count in late as well
+            if is_late_login:
+                late_arrivals += 1
     
     # Get today's attendance
     today_attendance = await db.attendance.find_one({
