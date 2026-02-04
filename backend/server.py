@@ -415,6 +415,80 @@ def get_star_reward_email(emp_name: str, stars: int, reason: str, awarded_by: st
     </div>
     """
 
+def get_welcome_email(emp_name: str, emp_id: str, username: str, password: str, login_url: str):
+    """Generate HTML email for new employee welcome with credentials"""
+    return f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #0b1f3b 0%, #1e3a5f 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">Welcome to BluBridge!</h1>
+            <p style="color: rgba(255,255,255,0.8); margin: 10px 0 0 0; font-size: 14px;">Your Employee Account Has Been Created</p>
+        </div>
+        <div style="background: #fffdf7; padding: 35px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 12px 12px;">
+            <p style="color: #333; font-size: 16px; margin-top: 0;">Dear <strong>{emp_name}</strong>,</p>
+            <p style="color: #666; line-height: 1.6;">Welcome to the BluBridge team! Your employee account has been successfully created. Below are your login credentials to access the BluBridge HRMS portal.</p>
+            
+            <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 25px; border-radius: 10px; margin: 25px 0; border-left: 4px solid #0b1f3b;">
+                <h3 style="color: #0b1f3b; margin: 0 0 15px 0; font-size: 16px;">🔐 Your Login Credentials</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px 0; color: #666; width: 120px;">Employee ID:</td>
+                        <td style="padding: 8px 0; color: #333; font-weight: 600;">{emp_id}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #666;">Username:</td>
+                        <td style="padding: 8px 0; color: #333; font-weight: 600;">{username}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #666;">Password:</td>
+                        <td style="padding: 8px 0; color: #333; font-weight: 600; font-family: monospace; background: #fff; padding: 5px 10px; border-radius: 4px;">{password}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{login_url}" style="display: inline-block; background: #0b1f3b; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px;">Login to HRMS Portal</a>
+            </div>
+            
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
+                <p style="color: #856404; margin: 0; font-size: 13px;">⚠️ <strong>Security Reminder:</strong> Please change your password after your first login for security purposes.</p>
+            </div>
+            
+            <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 25px 0;">
+            
+            <p style="color: #999; font-size: 12px; margin-bottom: 5px;">If you have any questions, please contact HR at hrms@blubridge.ai</p>
+            <p style="color: #999; font-size: 12px; margin: 0;">This is an automated notification from BluBridge HRMS.</p>
+        </div>
+    </div>
+    """
+
+async def send_welcome_email(emp_name: str, emp_id: str, email: str, username: str, password: str, login_url: str):
+    """Send welcome email with credentials to new employee"""
+    resend_api_key = os.environ.get('RESEND_API_KEY')
+    sender_email = os.environ.get('SENDER_EMAIL', 'hrms@blubridge.ai')
+    
+    if not resend_api_key:
+        logger.warning("RESEND_API_KEY not configured - skipping welcome email")
+        return None
+    
+    resend.api_key = resend_api_key
+    
+    html_content = get_welcome_email(emp_name, emp_id, username, password, login_url)
+    
+    params = {
+        "from": sender_email,
+        "to": [email],
+        "subject": f"Welcome to BluBridge - Your Login Credentials ({emp_id})",
+        "html": html_content
+    }
+    
+    try:
+        email_result = await asyncio.to_thread(resend.Emails.send, params)
+        logger.info(f"Welcome email sent to {email}")
+        return email_result
+    except Exception as e:
+        logger.error(f"Failed to send welcome email to {email}: {str(e)}")
+        return None
+
 # ============== CLOUDINARY ROUTES ==============
 
 @api_router.get("/cloudinary/signature")
