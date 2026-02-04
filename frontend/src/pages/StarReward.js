@@ -352,6 +352,18 @@ const StarReward = () => {
     }));
   };
 
+  // Handle View Members click - opens Team Details view
+  const handleViewTeamMembers = (team) => {
+    setSelectedTeam(team);
+    setShowTeamDetails(true);
+  };
+
+  // Handle back from Team Details view
+  const handleBackFromTeamDetails = () => {
+    setShowTeamDetails(false);
+    setSelectedTeam(null);
+  };
+
   const handleGoToPage = () => {
     const page = parseInt(goToPage);
     if (page >= 1 && page <= totalPages) {
