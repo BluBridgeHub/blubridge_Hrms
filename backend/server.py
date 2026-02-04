@@ -577,7 +577,7 @@ async def get_employees(
     search: Optional[str] = None,
     include_deleted: bool = False,
     page: int = Query(1, ge=1),
-    limit: int = Query(50, ge=1, le=100),
+    limit: int = Query(50, ge=1, le=500),
     current_user: dict = Depends(get_current_user)
 ):
     query = {}
