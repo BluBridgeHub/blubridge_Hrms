@@ -52,6 +52,7 @@ const TeamCard = ({ team, onViewDetails }) => (
 
 const Team = () => {
   const { getAuthHeaders } = useAuth();
+  const location = useLocation();
   const [teams, setTeams] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,16 @@ const Team = () => {
     fetchData();
   }, []);
 
+  // Handle navigation state from Dashboard
+  useEffect(() => {
+    if (location.state?.department && departments.length > 0) {
+      const deptExists = departments.find(d => d.name === location.state.department);
+      if (deptExists) {
+        setActiveDept(location.state.department);
+      }
+    }
+  }, [location.state, departments]);
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -73,9 +84,16 @@ const Team = () => {
       ]);
       setTeams(teamsRes.data);
       setDepartments(deptsRes.data);
-      // Set first department as active
-      if (deptsRes.data.length > 0 && !activeDept) {
+      // Set first department as active (only if not coming from navigation)
+      if (deptsRes.data.length > 0 && !activeDept && !location.state?.department) {
         setActiveDept(deptsRes.data[0].name);
+      } else if (location.state?.department) {
+        const deptExists = deptsRes.data.find(d => d.name === location.state.department);
+        if (deptExists) {
+          setActiveDept(location.state.department);
+        } else if (deptsRes.data.length > 0) {
+          setActiveDept(deptsRes.data[0].name);
+        }
       }
     } catch (error) {
       console.error('Team fetch error:', error);
