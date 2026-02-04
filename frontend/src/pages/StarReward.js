@@ -100,6 +100,10 @@ const StarReward = () => {
   const [activeTab, setActiveTab] = useState('employees');
   const [viewMode, setViewMode] = useState('table');
   
+  // Team Details View
+  const [showTeamDetails, setShowTeamDetails] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  
   // Add/Edit Form View
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
