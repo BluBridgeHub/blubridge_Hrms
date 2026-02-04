@@ -596,7 +596,7 @@ const StarReward = () => {
                               ))}
                             </>
                           )}
-                        </>
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>
