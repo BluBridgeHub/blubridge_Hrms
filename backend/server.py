@@ -388,7 +388,7 @@ class AuditLog(BaseModel):
     resource: str
     resource_id: Optional[str] = None
     details: Optional[str] = None
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: get_ist_now())
 
 # ============== PAYROLL MODEL ==============
 
