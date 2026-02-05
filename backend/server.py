@@ -1727,7 +1727,7 @@ async def create_leave(data: LeaveRequestCreate, current_user: dict = Depends(ge
 
 @api_router.put("/leaves/{leave_id}/approve")
 async def approve_leave(leave_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     leave = await db.leaves.find_one({"id": leave_id}, {"_id": 0})
@@ -1761,7 +1761,7 @@ async def approve_leave(leave_id: str, current_user: dict = Depends(get_current_
 
 @api_router.put("/leaves/{leave_id}/reject")
 async def reject_leave(leave_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     leave = await db.leaves.find_one({"id": leave_id}, {"_id": 0})
@@ -1827,7 +1827,7 @@ async def get_star_rewards(
 
 @api_router.post("/star-rewards")
 async def add_star_reward(data: StarRewardCreate, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     employee = await db.employees.find_one({"id": data.employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
