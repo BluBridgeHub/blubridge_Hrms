@@ -248,11 +248,14 @@ const Dashboard = () => {
           const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
           const dayName = days[dateObj.getDay()];
           
-          if (record.status === 'Completed' || record.status === 'Present') {
+          // Count as present: Login, Completed, Early Out, Present
+          if (record.status === 'Completed' || record.status === 'Present' || record.status === 'Login' || record.status === 'Early Out') {
             dayMap[dayName].present++;
           } else if (record.status === 'Late Login') {
+            // Late login counts as both present (working) and late
+            dayMap[dayName].present++;
             dayMap[dayName].late++;
-          } else if (record.status === 'Not Logged' || record.is_lop) {
+          } else if (record.status === 'Not Logged' || record.status === 'Not Login' || record.is_lop) {
             dayMap[dayName].absent++;
           }
         }
