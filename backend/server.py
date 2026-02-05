@@ -2513,7 +2513,7 @@ async def employee_clock_in(current_user: dict = Depends(get_current_user)):
     if not employee.get("attendance_tracking_enabled", True):
         raise HTTPException(status_code=400, detail="Attendance tracking disabled")
     
-    now = datetime.now(timezone.utc)
+    now = get_ist_now()
     today_str = now.strftime("%d-%m-%Y")
     check_in_time = now.strftime("%I:%M %p")
     
