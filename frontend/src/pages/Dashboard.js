@@ -355,7 +355,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="card-premium p-6">
+          <div className="card-premium" style={{ padding:'2rem 1.5rem'}}>
             <h4 className="text-sm font-semibold text-slate-900 mb-4" style={{ fontFamily: 'Outfit' }}>
               Attendance Distribution
             </h4>
