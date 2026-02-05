@@ -671,9 +671,9 @@ async def calculate_payroll_for_employee(employee_id: str, month: str) -> dict:
     for record in attendance_records:
         attendance_map[record["date"]] = record
     
-    # Calculate days
+    # Calculate days (lop_days is float to support 0.5 day calculations)
     present_days = 0
-    lop_days = 0
+    lop_days = 0.0  # Float to support half-day LOP
     leave_days = 0
     absent_days = 0
     attendance_details = []
