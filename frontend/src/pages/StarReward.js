@@ -1072,7 +1072,11 @@ const StarReward = () => {
               </div>
             </div>
             
-            {starHistory.length === 0 ? (
+            {loadingHistory ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0b1f3b]"></div>
+              </div>
+            ) : starHistory.length === 0 ? (
               <p className="text-center text-gray-500 py-8">No history records found</p>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto">
