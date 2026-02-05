@@ -114,7 +114,7 @@ const Attendance = () => {
     return bVal.localeCompare(aVal);
   });
 
-  const SortIcon = ({ field }) => {
+  const getSortIcon = (field) => {
     if (sortField !== field) return null;
     return sortOrder === 'asc' ? 
       <ChevronUp className="w-4 h-4 inline ml-1" /> : 
