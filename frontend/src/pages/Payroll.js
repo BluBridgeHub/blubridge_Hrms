@@ -179,11 +179,6 @@ const Payroll = () => {
             className="w-40"
             data-testid="month-select"
           />
-              {getMonthOptions().map(opt => (
-                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Button 
             onClick={handleExportCSV}
             className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
