@@ -2042,6 +2042,194 @@ async def get_employee_report(
     records = await db.employees.find(query, {"_id": 0}).to_list(10000)
     return [serialize_doc(r) for r in records]
 
+# ============== PAYROLL ROUTES ==============
+
+@api_router.get("/payroll")
+async def get_payroll_data(
+    month: str,  # Format: "YYYY-MM"
+    department: Optional[str] = None,
+    team: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get payroll data for all employees for a given month"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+        raise HTTPException(status_code=403, detail="Permission denied")
+    
+    query = {"is_deleted": {"$ne": True}, "employee_status": EmployeeStatus.ACTIVE}
+    if department and department != "All":
+        query["department"] = department
+    if team and team != "All":
+        query["team"] = team
+    
+    employees = await db.employees.find(query, {"_id": 0}).to_list(1000)
+    
+    payroll_data = []
+    for emp in employees:
+        payroll = await calculate_payroll_for_employee(emp["id"], month)
+        if payroll:
+            payroll_data.append(payroll)
+    
+    return payroll_data
+
+@api_router.get("/payroll/{employee_id}")
+async def get_employee_payroll(
+    employee_id: str,
+    month: str,  # Format: "YYYY-MM"
+    current_user: dict = Depends(get_current_user)
+):
+    """Get detailed payroll for a specific employee"""
+    payroll = await calculate_payroll_for_employee(employee_id, month)
+    if not payroll:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    return payroll
+
+@api_router.get("/payroll/summary/{month}")
+async def get_payroll_summary(
+    month: str,  # Format: "YYYY-MM"
+    department: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get payroll summary for a month"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+        raise HTTPException(status_code=403, detail="Permission denied")
+    
+    query = {"is_deleted": {"$ne": True}, "employee_status": EmployeeStatus.ACTIVE}
+    if department and department != "All":
+        query["department"] = department
+    
+    employees = await db.employees.find(query, {"_id": 0}).to_list(1000)
+    
+    total_employees = len(employees)
+    total_salary = 0.0
+    total_deductions = 0.0
+    total_net_salary = 0.0
+    total_lop_days = 0
+    total_present_days = 0
+    
+    for emp in employees:
+        payroll = await calculate_payroll_for_employee(emp["id"], month)
+        if payroll:
+            total_salary += payroll.get("monthly_salary", 0)
+            total_deductions += payroll.get("lop_deduction", 0)
+            total_net_salary += payroll.get("net_salary", 0)
+            total_lop_days += payroll.get("lop_days", 0)
+            total_present_days += payroll.get("present_days", 0)
+    
+    return {
+        "month": month,
+        "total_employees": total_employees,
+        "total_salary": round(total_salary, 2),
+        "total_deductions": round(total_deductions, 2),
+        "total_net_salary": round(total_net_salary, 2),
+        "total_lop_days": total_lop_days,
+        "total_present_days": total_present_days
+    }
+
+# ============== SHIFT CONFIGURATION ROUTES ==============
+
+@api_router.get("/config/shifts")
+async def get_shift_configurations(current_user: dict = Depends(get_current_user)):
+    """Get all available shift configurations"""
+    shifts = []
+    for shift_type, config in SHIFT_DEFINITIONS.items():
+        shifts.append({
+            "type": shift_type,
+            "login_time": config.get("login_time"),
+            "logout_time": config.get("logout_time"),
+            "total_hours": config.get("total_hours"),
+            "description": config.get("description")
+        })
+    return shifts
+
+@api_router.get("/config/shift/{shift_type}")
+async def get_shift_details(shift_type: str, current_user: dict = Depends(get_current_user)):
+    """Get details for a specific shift type"""
+    if shift_type not in SHIFT_DEFINITIONS:
+        raise HTTPException(status_code=404, detail="Shift type not found")
+    
+    config = SHIFT_DEFINITIONS[shift_type]
+    return {
+        "type": shift_type,
+        "login_time": config.get("login_time"),
+        "logout_time": config.get("logout_time"),
+        "total_hours": config.get("total_hours"),
+        "description": config.get("description")
+    }
+
+@api_router.put("/employees/{employee_id}/shift")
+async def update_employee_shift(
+    employee_id: str,
+    shift_data: ShiftConfigCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update employee's shift configuration"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+        raise HTTPException(status_code=403, detail="Permission denied")
+    
+    employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    update_data = {"shift_type": shift_data.shift_type}
+    
+    if shift_data.shift_type == "Custom":
+        if not shift_data.login_time or not shift_data.logout_time:
+            raise HTTPException(status_code=400, detail="Custom shift requires login_time and logout_time")
+        
+        update_data["custom_login_time"] = shift_data.login_time
+        update_data["custom_logout_time"] = shift_data.logout_time
+        
+        # Calculate total hours
+        login_mins = parse_time_24h_to_minutes(shift_data.login_time)
+        logout_mins = parse_time_24h_to_minutes(shift_data.logout_time)
+        
+        if logout_mins < login_mins:
+            total_hours = (24 * 60 - login_mins + logout_mins) / 60
+        else:
+            total_hours = (logout_mins - login_mins) / 60
+        
+        update_data["custom_total_hours"] = total_hours
+    else:
+        # Clear custom fields for predefined shifts
+        update_data["custom_login_time"] = None
+        update_data["custom_logout_time"] = None
+        update_data["custom_total_hours"] = None
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.employees.update_one({"id": employee_id}, {"$set": update_data})
+    
+    await log_audit(current_user["id"], "update_shift", "employee", employee_id, f"Updated shift to: {shift_data.shift_type}")
+    
+    employee = await db.employees.find_one({"id": employee_id}, {"_id": 0})
+    return serialize_doc(employee)
+
+@api_router.put("/employees/{employee_id}/salary")
+async def update_employee_salary(
+    employee_id: str,
+    monthly_salary: float = Query(..., ge=0),
+    current_user: dict = Depends(get_current_user)
+):
+    """Update employee's monthly salary"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+        raise HTTPException(status_code=403, detail="Permission denied")
+    
+    employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    update_data = {
+        "monthly_salary": monthly_salary,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.employees.update_one({"id": employee_id}, {"$set": update_data})
+    
+    await log_audit(current_user["id"], "update_salary", "employee", employee_id, f"Updated salary to: {monthly_salary}")
+    
+    employee = await db.employees.find_one({"id": employee_id}, {"_id": 0})
+    return serialize_doc(employee)
+
 # ============== AUDIT LOGS ==============
 
 @api_router.get("/audit-logs")
