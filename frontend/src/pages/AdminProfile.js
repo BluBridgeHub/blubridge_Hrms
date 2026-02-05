@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { User, Mail, Shield, Calendar, Building, Save } from 'lucide-react';
+import { User, Mail, Shield, Calendar, Building, Save, Phone } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -14,25 +14,14 @@ const AdminProfile = () => {
   const { user, getAuthHeaders } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [profile, setProfile] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    role: '',
-    department: '',
-    joined_date: ''
-  });
+  const [profile, setProfile] = useState({ name: '', email: '', phone: '', role: '', department: '', joined_date: '' });
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  useEffect(() => { fetchProfile(); }, []);
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const headers = getAuthHeaders();
-      const response = await axios.get(`${API}/auth/me`, { headers });
-      
+      const response = await axios.get(`${API}/auth/me`, { headers: getAuthHeaders() });
       setProfile({
         name: response.data.name || user?.name || '',
         email: response.data.email || '',
@@ -42,16 +31,7 @@ const AdminProfile = () => {
         joined_date: response.data.created_at || ''
       });
     } catch (error) {
-      console.error('Error fetching profile:', error);
-      // Use local user data if API fails
-      setProfile({
-        name: user?.name || 'System Admin',
-        email: user?.email || 'admin@blubridge.ai',
-        phone: '',
-        role: user?.role || 'admin',
-        department: 'Administration',
-        joined_date: ''
-      });
+      setProfile({ name: user?.name || 'System Admin', email: user?.email || 'admin@blubridge.ai', phone: '', role: user?.role || 'admin', department: 'Administration', joined_date: '' });
     } finally {
       setLoading(false);
     }
@@ -60,16 +40,9 @@ const AdminProfile = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const headers = getAuthHeaders();
-      await axios.put(`${API}/auth/update-profile`, {
-        name: profile.name,
-        email: profile.email,
-        phone: profile.phone
-      }, { headers });
-      
+      await axios.put(`${API}/auth/update-profile`, { name: profile.name, email: profile.email, phone: profile.phone }, { headers: getAuthHeaders() });
       toast.success('Profile updated successfully');
     } catch (error) {
-      console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
     } finally {
       setSaving(false);
@@ -78,39 +51,41 @@ const AdminProfile = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 bg-[#efede5]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b1f3b]"></div>
+      <div className="flex items-center justify-center h-[60vh]">
+        <div className="w-12 h-12 border-3 border-[#004EEB] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="admin-profile-page">
-      {/* Page Header */}
+    <div className="space-y-6 animate-fade-in" data-testid="admin-profile-page">
+      {/* Header */}
       <div className="flex items-center gap-3">
-        <User className="w-6 h-6 text-[#0b1f3b]" />
-        <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          Admin Profile
-        </h1>
+        <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+          <User className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>Admin Profile</h1>
+          <p className="text-sm text-slate-500">Manage your account settings</p>
+        </div>
       </div>
 
       {/* Profile Card */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 overflow-hidden">
-        {/* Profile Header */}
-        <div className="bg-[#0b1f3b] p-8">
-          <div className="flex items-center gap-6">
-            <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center border-4 border-white/20">
-              <span className="text-4xl font-bold text-white">
-                {profile.name?.charAt(0)?.toUpperCase()}
-              </span>
+      <div className="card-premium overflow-hidden">
+        {/* Header Banner */}
+        <div className="bg-gradient-to-r from-[#004EEB] to-[#0066ff] p-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="relative z-10 flex items-center gap-6">
+            <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center border-2 border-white/20 shadow-xl">
+              <span className="text-4xl font-bold text-white">{profile.name?.charAt(0)?.toUpperCase()}</span>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">{profile.name}</h2>
-              <p className="text-white/70 flex items-center gap-2 mt-1">
+              <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Outfit' }}>{profile.name}</h2>
+              <p className="text-white/80 flex items-center gap-2 mt-1">
                 <Mail className="w-4 h-4" />
                 {profile.email || 'admin@blubridge.ai'}
               </p>
-              <Badge className="mt-2 bg-white/20 text-white hover:bg-white/30">
+              <Badge className="mt-3 bg-white/20 text-white border-0 hover:bg-white/30">
                 <Shield className="w-3 h-3 mr-1" />
                 {profile.role?.replace('_', ' ').toUpperCase()}
               </Badge>
@@ -118,79 +93,41 @@ const AdminProfile = () => {
           </div>
         </div>
 
-        {/* Profile Form */}
+        {/* Form */}
         <div className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label className="text-sm font-medium text-gray-700">Full Name</Label>
-              <Input
-                value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                className="mt-1 bg-white"
-                placeholder="Enter full name"
-              />
+              <Label className="text-sm font-medium text-slate-700">Full Name</Label>
+              <Input value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} className="mt-1.5 rounded-lg bg-white" placeholder="Enter full name" />
             </div>
-            
             <div>
-              <Label className="text-sm font-medium text-gray-700">Email Address</Label>
-              <Input
-                type="email"
-                value={profile.email}
-                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                className="mt-1 bg-white"
-                placeholder="Enter email"
-              />
+              <Label className="text-sm font-medium text-slate-700">Email Address</Label>
+              <Input type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} className="mt-1.5 rounded-lg bg-white" placeholder="Enter email" />
             </div>
-            
             <div>
-              <Label className="text-sm font-medium text-gray-700">Phone Number</Label>
-              <Input
-                value={profile.phone}
-                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                className="mt-1 bg-white"
-                placeholder="Enter phone number"
-              />
+              <Label className="text-sm font-medium text-slate-700">Phone Number</Label>
+              <Input value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} className="mt-1.5 rounded-lg bg-white" placeholder="Enter phone number" />
             </div>
-            
             <div>
-              <Label className="text-sm font-medium text-gray-700">Role</Label>
-              <Input
-                value={profile.role?.replace('_', ' ').toUpperCase()}
-                className="mt-1 bg-gray-100"
-                disabled
-              />
+              <Label className="text-sm font-medium text-slate-700">Role</Label>
+              <Input value={profile.role?.replace('_', ' ').toUpperCase()} className="mt-1.5 rounded-lg bg-slate-50" disabled />
             </div>
-            
             <div>
-              <Label className="text-sm font-medium text-gray-700">Department</Label>
-              <Input
-                value={profile.department}
-                className="mt-1 bg-gray-100"
-                disabled
-              />
+              <Label className="text-sm font-medium text-slate-700">Department</Label>
+              <Input value={profile.department} className="mt-1.5 rounded-lg bg-slate-50" disabled />
             </div>
-            
             <div>
-              <Label className="text-sm font-medium text-gray-700">Account Created</Label>
-              <div className="mt-1 flex items-center gap-2 p-3 bg-gray-100 rounded-md text-gray-600">
+              <Label className="text-sm font-medium text-slate-700">Account Created</Label>
+              <div className="mt-1.5 flex items-center gap-2 p-3 bg-slate-50 rounded-lg text-slate-600 text-sm">
                 <Calendar className="w-4 h-4" />
-                {profile.joined_date ? new Date(profile.joined_date).toLocaleDateString('en-IN', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric'
-                }) : 'N/A'}
+                {profile.joined_date ? new Date(profile.joined_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
               </div>
             </div>
           </div>
 
-          <div className="mt-8 flex justify-end">
-            <Button 
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white px-8"
-              data-testid="save-profile-btn"
-            >
-              <Save className="w-4 h-4 mr-2" />
+          <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
+            <Button onClick={handleSave} disabled={saving} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg px-8 shadow-lg shadow-[#004EEB]/20" data-testid="save-profile-btn">
+              {saving ? <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
