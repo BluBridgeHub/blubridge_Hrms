@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { FileText, Download, RotateCcw } from 'lucide-react';
+import { FileText, Download, RotateCcw, FileBarChart, FileSpreadsheet } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
@@ -13,35 +13,16 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const Reports = () => {
   const { getAuthHeaders } = useAuth();
-  const [activeTab, setActiveTab] = useState('leave'); // 'leave' | 'attendance'
+  const [activeTab, setActiveTab] = useState('leave');
   const [teams, setTeams] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState([]);
   
-  // Leave Report Filters
-  const [leaveFilters, setLeaveFilters] = useState({
-    fromDate: '',
-    toDate: '',
-    empName: '',
-    team: 'All Team',
-    leaveType: 'All Types',
-    department: 'Department'
-  });
+  const [leaveFilters, setLeaveFilters] = useState({ fromDate: '', toDate: '', empName: '', team: 'All', leaveType: 'All', department: 'All' });
+  const [attendanceFilters, setAttendanceFilters] = useState({ fromDate: '', toDate: '', empName: '', team: 'All', status: 'All', department: 'All' });
 
-  // Attendance Report Filters
-  const [attendanceFilters, setAttendanceFilters] = useState({
-    fromDate: '',
-    toDate: '',
-    empName: '',
-    team: 'All Team',
-    status: 'All Types',
-    department: 'Department'
-  });
-
-  useEffect(() => {
-    fetchTeamsAndDepts();
-  }, []);
+  useEffect(() => { fetchTeamsAndDepts(); }, []);
 
   const fetchTeamsAndDepts = async () => {
     try {
@@ -66,44 +47,34 @@ const Reports = () => {
         from_date: filters.fromDate || undefined,
         to_date: filters.toDate || undefined,
         employee_name: filters.empName || undefined,
-        team: filters.team !== 'All Team' ? filters.team : undefined,
-        department: filters.department !== 'Department' ? filters.department : undefined
+        team: filters.team !== 'All' ? filters.team : undefined,
+        department: filters.department !== 'All' ? filters.department : undefined
       };
 
-      if (activeTab === 'leave') {
-        params.leave_type = filters.leaveType !== 'All Types' ? filters.leaveType : undefined;
-      } else {
-        params.status = filters.status !== 'All Types' ? filters.status : undefined;
-      }
+      if (activeTab === 'leave') params.leave_type = filters.leaveType !== 'All' ? filters.leaveType : undefined;
+      else params.status = filters.status !== 'All' ? filters.status : undefined;
 
-      const response = await axios.get(`${API}${endpoint}`, {
-        headers: getAuthHeaders(),
-        params
-      });
-      
+      const response = await axios.get(`${API}${endpoint}`, { headers: getAuthHeaders(), params });
       setReportData(response.data);
       
-      // Export to CSV
       if (response.data.length > 0) {
         let headers, rows;
         if (activeTab === 'attendance') {
-          headers = ['Employee Name', 'Team', 'Department', 'Date', 'Check-In', 'Check-Out', 'Status'];
+          headers = ['Employee', 'Team', 'Department', 'Date', 'Check-In', 'Check-Out', 'Status'];
           rows = response.data.map(r => [r.emp_name, r.team, r.department || '', r.date, r.check_in || '-', r.check_out || '-', r.status]);
         } else {
-          headers = ['Employee Name', 'Team', 'Department', 'Leave Type', 'Start Date', 'End Date', 'Duration', 'Status'];
+          headers = ['Employee', 'Team', 'Department', 'Type', 'Start', 'End', 'Duration', 'Status'];
           rows = response.data.map(r => [r.emp_name, r.team, r.department || '', r.leave_type, r.start_date, r.end_date, r.duration, r.status]);
         }
-
         const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
         const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
+        a.href = window.URL.createObjectURL(blob);
         a.download = `${activeTab}-report-${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         toast.success('Report exported successfully');
       } else {
-        toast.info('No data found for the selected filters');
+        toast.info('No data found for selected filters');
       }
     } catch (error) {
       toast.error('Failed to export report');
@@ -113,225 +84,122 @@ const Reports = () => {
   };
 
   const handleReset = () => {
-    if (activeTab === 'leave') {
-      setLeaveFilters({
-        fromDate: '',
-        toDate: '',
-        empName: '',
-        team: 'All Team',
-        leaveType: 'All Types',
-        department: 'Department'
-      });
-    } else {
-      setAttendanceFilters({
-        fromDate: '',
-        toDate: '',
-        empName: '',
-        team: 'All Team',
-        status: 'All Types',
-        department: 'Department'
-      });
-    }
+    if (activeTab === 'leave') setLeaveFilters({ fromDate: '', toDate: '', empName: '', team: 'All', leaveType: 'All', department: 'All' });
+    else setAttendanceFilters({ fromDate: '', toDate: '', empName: '', team: 'All', status: 'All', department: 'All' });
     setReportData([]);
     toast.info('Filters reset');
   };
 
   const getStatusBadge = (status) => {
     const styles = {
-      'Login': 'bg-emerald-100 text-emerald-700',
-      'Completed': 'bg-[#0b1f3b]/10 text-[#0b1f3b]',
-      'Logout': 'bg-[#0b1f3b]/10 text-[#0b1f3b]',
-      'Present': 'bg-emerald-100 text-emerald-700',
-      'Not Logged': 'bg-gray-100 text-gray-700',
-      'Late': 'bg-amber-100 text-amber-700',
-      'Late Login': 'bg-amber-100 text-amber-700',
-      'Early Out': 'bg-orange-100 text-orange-700',
-      'Loss of Pay': 'bg-red-100 text-red-700 font-bold',
-      'Leave': 'bg-purple-100 text-purple-700',
-      'pending': 'bg-amber-100 text-amber-700',
-      'approved': 'bg-emerald-100 text-emerald-700',
-      'rejected': 'bg-red-100 text-red-700'
+      'Login': 'badge-success', 'Completed': 'badge-info', 'Present': 'badge-success',
+      'Not Logged': 'badge-neutral', 'Late Login': 'badge-warning', 'Early Out': 'badge-error',
+      'Loss of Pay': 'badge-error', 'Leave': 'bg-purple-50 text-purple-700 border border-purple-200/50',
+      'pending': 'badge-warning', 'approved': 'badge-success', 'rejected': 'badge-error'
     };
-    return styles[status] || 'bg-gray-100 text-gray-700';
+    return styles[status] || 'badge-neutral';
   };
 
   return (
-    <div className="space-y-6 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="reports-page">
-      {/* Page Header */}
+    <div className="space-y-6 animate-fade-in" data-testid="reports-page">
+      {/* Header */}
       <div className="flex items-center gap-3">
-        <FileText className="w-6 h-6 text-[#0b1f3b]" />
-        <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          HRMS Reports
-        </h1>
+        <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+          <FileText className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>HRMS Reports</h1>
+          <p className="text-sm text-slate-500">Generate and export reports</p>
+        </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex">
-        <button
+      {/* Tab Buttons */}
+      <div className="flex gap-2">
+        <Button
           onClick={() => { setActiveTab('leave'); setReportData([]); }}
-          className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ${
-            activeTab === 'leave' 
-              ? 'bg-[#0b1f3b] text-white' 
-              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-          }`}
+          className={`rounded-xl px-6 ${activeTab === 'leave' ? 'bg-[#004EEB] text-white shadow-lg shadow-[#004EEB]/20' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
           data-testid="tab-leave"
         >
-          Leave Report
-        </button>
-        <button
+          <FileSpreadsheet className="w-4 h-4 mr-2" /> Leave Report
+        </Button>
+        <Button
           onClick={() => { setActiveTab('attendance'); setReportData([]); }}
-          className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ml-2 ${
-            activeTab === 'attendance' 
-              ? 'bg-[#0b1f3b] text-white' 
-              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-          }`}
+          className={`rounded-xl px-6 ${activeTab === 'attendance' ? 'bg-[#004EEB] text-white shadow-lg shadow-[#004EEB]/20' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
           data-testid="tab-attendance"
         >
-          Attendance Report
-        </button>
+          <FileBarChart className="w-4 h-4 mr-2" /> Attendance Report
+        </Button>
       </div>
 
-      {/* Filter Section */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-8">
-        <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+      {/* Filters */}
+      <div className="card-premium p-8">
+        <h3 className="text-lg font-semibold text-slate-900 mb-6" style={{ fontFamily: 'Outfit' }}>
           {activeTab === 'leave' ? 'Leave Report Filters' : 'Attendance Report Filters'}
         </h3>
-        <div className="border-b border-[#dfddd7] w-full mb-8"></div>
         
-        {/* Leave Report Filters */}
-        {activeTab === 'leave' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8">
-            {/* Row 1 */}
+        {activeTab === 'leave' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">From:</label>
-              <DatePicker
-                value={leaveFilters.fromDate}
-                onChange={(val) => setLeaveFilters({ ...leaveFilters, fromDate: val })}
-                placeholder="Select date"
-                className="w-full border-0 border-b-2 border-b-[#0b1f3b] rounded-none"
-                data-testid="leave-filter-from"
-              />
+              <label className="text-sm text-slate-600 mb-2 block font-medium">From Date</label>
+              <DatePicker value={leaveFilters.fromDate} onChange={(val) => setLeaveFilters({ ...leaveFilters, fromDate: val })} placeholder="Select date" data-testid="leave-filter-from" />
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">Emp Name:</label>
-              <Input
-                type="text"
-                placeholder="Employee Name"
-                value={leaveFilters.empName}
-                onChange={(e) => setLeaveFilters({ ...leaveFilters, empName: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
-                data-testid="leave-filter-empname"
-              />
+              <label className="text-sm text-slate-600 mb-2 block font-medium">Employee Name</label>
+              <Input placeholder="Enter name" value={leaveFilters.empName} onChange={(e) => setLeaveFilters({ ...leaveFilters, empName: e.target.value })} className="rounded-lg" data-testid="leave-filter-empname" />
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">Leave Type:</label>
+              <label className="text-sm text-slate-600 mb-2 block font-medium">Leave Type</label>
               <Select value={leaveFilters.leaveType} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, leaveType: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="leave-filter-type">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger className="rounded-lg" data-testid="leave-filter-type"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All Types">All Types</SelectItem>
+                  <SelectItem value="All">All Types</SelectItem>
                   <SelectItem value="Sick">Sick</SelectItem>
                   <SelectItem value="Preplanned">Preplanned</SelectItem>
                   <SelectItem value="Emergency">Emergency</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Row 2 */}
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">To:</label>
-              <DatePicker
-                value={leaveFilters.toDate}
-                onChange={(val) => setLeaveFilters({ ...leaveFilters, toDate: val })}
-                placeholder="Select date"
-                className="w-full border-0 border-b-2 border-b-[#0b1f3b] rounded-none"
-                data-testid="leave-filter-to"
-              />
+              <label className="text-sm text-slate-600 mb-2 block font-medium">To Date</label>
+              <DatePicker value={leaveFilters.toDate} onChange={(val) => setLeaveFilters({ ...leaveFilters, toDate: val })} placeholder="Select date" data-testid="leave-filter-to" />
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">Team Name:</label>
+              <label className="text-sm text-slate-600 mb-2 block font-medium">Team</label>
               <Select value={leaveFilters.team} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, team: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="leave-filter-team">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger className="rounded-lg" data-testid="leave-filter-team"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All Team">All Team</SelectItem>
-                  {teams.map((team) => (
-                    <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
-                  ))}
+                  <SelectItem value="All">All Teams</SelectItem>
+                  {teams.map((team) => <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">Department:</label>
+              <label className="text-sm text-slate-600 mb-2 block font-medium">Department</label>
               <Select value={leaveFilters.department} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, department: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="leave-filter-dept">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger className="rounded-lg" data-testid="leave-filter-dept"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Department">Department</SelectItem>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
-                  ))}
+                  <SelectItem value="All">All Departments</SelectItem>
+                  {departments.map((dept) => <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>)}
                 </SelectContent>
               </Select>
-            </div>
-
-            {/* Buttons */}
-            <div className="lg:col-span-3 flex justify-end gap-4 mt-6">
-              <Button 
-                onClick={handleExport}
-                disabled={loading}
-                className="bg-[#0b1f3b] hover:bg-[#2563eb] text-white px-8 rounded-lg"
-                data-testid="export-btn"
-              >
-                {loading ? 'Exporting...' : 'Export'}
-              </Button>
-              <Button 
-                onClick={handleReset}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-8 rounded-lg"
-                data-testid="reset-btn"
-              >
-                Reset
-              </Button>
             </div>
           </div>
-        )}
-
-        {/* Attendance Report Filters */}
-        {activeTab === 'attendance' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8">
-            {/* Row 1 */}
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">From:</label>
-              <DatePicker
-                value={attendanceFilters.fromDate}
-                onChange={(val) => setAttendanceFilters({ ...attendanceFilters, fromDate: val })}
-                placeholder="Select date"
-                className="w-full border-0 border-b-2 border-b-[#0b1f3b] rounded-none"
-                data-testid="attendance-filter-from"
-              />
+              <label className="text-sm text-slate-600 mb-2 block font-medium">From Date</label>
+              <DatePicker value={attendanceFilters.fromDate} onChange={(val) => setAttendanceFilters({ ...attendanceFilters, fromDate: val })} placeholder="Select date" data-testid="attendance-filter-from" />
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">Emp Name:</label>
-              <Input
-                type="text"
-                placeholder="Employee Name"
-                value={attendanceFilters.empName}
-                onChange={(e) => setAttendanceFilters({ ...attendanceFilters, empName: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
-                data-testid="attendance-filter-empname"
-              />
+              <label className="text-sm text-slate-600 mb-2 block font-medium">Employee Name</label>
+              <Input placeholder="Enter name" value={attendanceFilters.empName} onChange={(e) => setAttendanceFilters({ ...attendanceFilters, empName: e.target.value })} className="rounded-lg" data-testid="attendance-filter-empname" />
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">Status:</label>
+              <label className="text-sm text-slate-600 mb-2 block font-medium">Status</label>
               <Select value={attendanceFilters.status} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, status: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="attendance-filter-status">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger className="rounded-lg" data-testid="attendance-filter-status"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All Types">All Types</SelectItem>
+                  <SelectItem value="All">All Status</SelectItem>
                   <SelectItem value="Login">Login</SelectItem>
                   <SelectItem value="Logout">Logout</SelectItem>
                   <SelectItem value="Late">Late</SelectItem>
@@ -339,130 +207,99 @@ const Reports = () => {
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Row 2 */}
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">To:</label>
-              <DatePicker
-                value={attendanceFilters.toDate}
-                onChange={(val) => setAttendanceFilters({ ...attendanceFilters, toDate: val })}
-                placeholder="Select date"
-                className="w-full border-0 border-b-2 border-b-[#0b1f3b] rounded-none"
-                data-testid="attendance-filter-to"
-              />
+              <label className="text-sm text-slate-600 mb-2 block font-medium">To Date</label>
+              <DatePicker value={attendanceFilters.toDate} onChange={(val) => setAttendanceFilters({ ...attendanceFilters, toDate: val })} placeholder="Select date" data-testid="attendance-filter-to" />
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">Team Name:</label>
+              <label className="text-sm text-slate-600 mb-2 block font-medium">Team</label>
               <Select value={attendanceFilters.team} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, team: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="attendance-filter-team">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger className="rounded-lg" data-testid="attendance-filter-team"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All Team">All Team</SelectItem>
-                  {teams.map((team) => (
-                    <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
-                  ))}
+                  <SelectItem value="All">All Teams</SelectItem>
+                  {teams.map((team) => <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-2 block">Department:</label>
+              <label className="text-sm text-slate-600 mb-2 block font-medium">Department</label>
               <Select value={attendanceFilters.department} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, department: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="attendance-filter-dept">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger className="rounded-lg" data-testid="attendance-filter-dept"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Department">Department</SelectItem>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
-                  ))}
+                  <SelectItem value="All">All Departments</SelectItem>
+                  {departments.map((dept) => <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>)}
                 </SelectContent>
               </Select>
-            </div>
-
-            {/* Buttons */}
-            <div className="lg:col-span-3 flex justify-end gap-4 mt-6">
-              <Button 
-                onClick={handleExport}
-                disabled={loading}
-                className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white px-8 rounded-lg"
-                data-testid="export-btn"
-              >
-                {loading ? 'Exporting...' : 'Export'}
-              </Button>
-              <Button 
-                onClick={handleReset}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-8 rounded-lg"
-                data-testid="reset-btn"
-              >
-                Reset
-              </Button>
             </div>
           </div>
         )}
+
+        <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-slate-100">
+          <Button onClick={handleReset} variant="outline" className="rounded-lg px-6" data-testid="reset-btn">
+            <RotateCcw className="w-4 h-4 mr-2" /> Reset
+          </Button>
+          <Button onClick={handleExport} disabled={loading} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg px-6 shadow-lg shadow-[#004EEB]/20" data-testid="export-btn">
+            {loading ? <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+            {loading ? 'Exporting...' : 'Export'}
+          </Button>
+        </div>
       </div>
 
-      {/* Report Results */}
+      {/* Results */}
       {reportData.length > 0 && (
-        <div className="bg-[#fffdf7] rounded-lg border border-black/5 overflow-hidden">
-          <div className="p-4 border-b border-black/5 flex items-center justify-between">
-            <h3 className="font-semibold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+        <div className="card-premium overflow-hidden">
+          <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+            <h3 className="font-semibold text-slate-900" style={{ fontFamily: 'Outfit' }}>
               {activeTab === 'leave' ? 'Leave' : 'Attendance'} Report Results
             </h3>
-            <Badge className="bg-[#0b1f3b]/10 text-[#0b1f3b]">
-              {reportData.length} records
-            </Badge>
+            <Badge className="bg-[#004EEB]/10 text-[#004EEB] border-0 px-3 py-1">{reportData.length} records</Badge>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50/50">
+            <table className="table-premium">
+              <thead>
                 {activeTab === 'attendance' ? (
                   <tr>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Employee</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Team</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Check-In</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Check-Out</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                    <th>Employee</th>
+                    <th>Team</th>
+                    <th>Date</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Status</th>
                   </tr>
                 ) : (
                   <tr>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Employee</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Team</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Type</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Start Date</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">End Date</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Duration</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                    <th>Employee</th>
+                    <th>Team</th>
+                    <th>Type</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Duration</th>
+                    <th>Status</th>
                   </tr>
                 )}
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody>
                 {activeTab === 'attendance' ? (
                   reportData.map((record, index) => (
-                    <tr key={index} className="hover:bg-gray-50/50">
-                      <td className="px-4 py-4 text-sm font-medium text-gray-900">{record.emp_name}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{record.team}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{record.date}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{record.check_in || '-'}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{record.check_out || '-'}</td>
-                      <td className="px-4 py-4">
-                        <Badge className={getStatusBadge(record.status)}>{record.status}</Badge>
-                      </td>
+                    <tr key={index}>
+                      <td className="font-medium text-slate-900">{record.emp_name}</td>
+                      <td className="text-slate-600">{record.team}</td>
+                      <td className="text-slate-600">{record.date}</td>
+                      <td className="text-slate-600">{record.check_in || '-'}</td>
+                      <td className="text-slate-600">{record.check_out || '-'}</td>
+                      <td><Badge className={getStatusBadge(record.status)}>{record.status}</Badge></td>
                     </tr>
                   ))
                 ) : (
                   reportData.map((record, index) => (
-                    <tr key={index} className="hover:bg-gray-50/50">
-                      <td className="px-4 py-4 text-sm font-medium text-gray-900">{record.emp_name}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{record.team}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{record.leave_type}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{record.start_date}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{record.end_date}</td>
-                      <td className="px-4 py-4 text-sm text-gray-600">{record.duration}</td>
-                      <td className="px-4 py-4">
-                        <Badge className={getStatusBadge(record.status)}>{record.status}</Badge>
-                      </td>
+                    <tr key={index}>
+                      <td className="font-medium text-slate-900">{record.emp_name}</td>
+                      <td className="text-slate-600">{record.team}</td>
+                      <td className="text-slate-600">{record.leave_type}</td>
+                      <td className="text-slate-600">{record.start_date}</td>
+                      <td className="text-slate-600">{record.end_date}</td>
+                      <td className="text-slate-600">{record.duration}</td>
+                      <td><Badge className={getStatusBadge(record.status)}>{record.status}</Badge></td>
                     </tr>
                   ))
                 )}
