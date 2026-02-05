@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { MonthPicker } from '../components/ui/month-picker';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
