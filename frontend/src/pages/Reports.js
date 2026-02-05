@@ -305,11 +305,11 @@ const Reports = () => {
             {/* Row 1 */}
             <div>
               <label className="text-sm text-gray-600 mb-2 block">From:</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={attendanceFilters.fromDate}
-                onChange={(e) => setAttendanceFilters({ ...attendanceFilters, fromDate: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
+                onChange={(val) => setAttendanceFilters({ ...attendanceFilters, fromDate: val })}
+                placeholder="Select date"
+                className="w-full border-0 border-b-2 border-b-[#0b1f3b] rounded-none"
                 data-testid="attendance-filter-from"
               />
             </div>
@@ -343,11 +343,11 @@ const Reports = () => {
             {/* Row 2 */}
             <div>
               <label className="text-sm text-gray-600 mb-2 block">To:</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={attendanceFilters.toDate}
-                onChange={(e) => setAttendanceFilters({ ...attendanceFilters, toDate: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
+                onChange={(val) => setAttendanceFilters({ ...attendanceFilters, toDate: val })}
+                placeholder="Select date"
+                className="w-full border-0 border-b-2 border-b-[#0b1f3b] rounded-none"
                 data-testid="attendance-filter-to"
               />
             </div>
