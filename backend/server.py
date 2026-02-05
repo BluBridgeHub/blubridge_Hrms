@@ -83,6 +83,59 @@ class WorkLocation:
     OFFICE = "Office"
     HYBRID = "Hybrid"
 
+# ============== SHIFT CONFIGURATION ==============
+
+# Predefined shift timings (24-hour format for calculations)
+SHIFT_DEFINITIONS = {
+    "General": {
+        "login_time": "10:00",  # 10:00 AM
+        "logout_time": "21:00",  # 9:00 PM
+        "total_hours": 11,
+        "description": "Standard shift (10:00 AM - 9:00 PM)"
+    },
+    "Morning": {
+        "login_time": "06:00",  # 6:00 AM
+        "logout_time": "14:00",  # 2:00 PM
+        "total_hours": 8,
+        "description": "Morning shift (6:00 AM - 2:00 PM)"
+    },
+    "Evening": {
+        "login_time": "14:00",  # 2:00 PM
+        "logout_time": "22:00",  # 10:00 PM
+        "total_hours": 8,
+        "description": "Evening shift (2:00 PM - 10:00 PM)"
+    },
+    "Night": {
+        "login_time": "22:00",  # 10:00 PM
+        "logout_time": "06:00",  # 6:00 AM (next day)
+        "total_hours": 8,
+        "description": "Night shift (10:00 PM - 6:00 AM)"
+    },
+    "Flexible": {
+        "login_time": None,  # No fixed time
+        "logout_time": None,
+        "total_hours": 8,
+        "description": "Flexible shift (8 hours required, no fixed time)"
+    },
+    "Custom": {
+        "login_time": None,  # Set by admin per employee
+        "logout_time": None,
+        "total_hours": None,  # Auto-calculated
+        "description": "Custom shift (admin-defined timings)"
+    }
+}
+
+class AttendanceStatus:
+    PRESENT = "Present"
+    LATE_LOGIN = "Late Login"
+    EARLY_OUT = "Early Out"
+    LOSS_OF_PAY = "Loss of Pay"
+    LEAVE = "Leave"
+    ABSENT = "Absent"
+    NOT_LOGGED = "Not Logged"
+    LOGIN = "Login"
+    COMPLETED = "Completed"
+
 # ============== MODELS ==============
 
 class User(BaseModel):
