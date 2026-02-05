@@ -404,29 +404,89 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Weekly Attendance Chart */}
         <div className="lg:col-span-8 card-premium p-6">
-          <div className="flex items-center justify-between mb-6">
+          {/* Chart Header with Filters */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
             <div>
               <h3 className="text-lg font-semibold text-slate-900" style={{ fontFamily: 'Outfit' }}>
-                Weekly Attendance Overview
+                Attendance Overview
               </h3>
-              <p className="text-sm text-slate-500 mt-1">Employee attendance trends this week</p>
+              <p className="text-sm text-slate-500 mt-1">Employee attendance trends</p>
             </div>
-            <div className="flex items-center gap-4 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#004EEB]" />
-                <span className="text-slate-600">Present</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                <span className="text-slate-600">Late</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <span className="text-slate-600">Absent</span>
-              </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Team Filter */}
+              <Select value={chartFilters.team} onValueChange={(v) => setChartFilters(prev => ({ ...prev, team: v }))}>
+                <SelectTrigger className="w-[140px] h-9 rounded-lg bg-white text-sm" data-testid="chart-team-filter">
+                  <SelectValue placeholder="All Teams" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Teams</SelectItem>
+                  {teams.map((team) => (
+                    <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              {/* Date Range Filter */}
+              <Select value={chartFilters.dateRange} onValueChange={(v) => setChartFilters(prev => ({ ...prev, dateRange: v }))}>
+                <SelectTrigger className="w-[140px] h-9 rounded-lg bg-white text-sm" data-testid="chart-date-filter">
+                  <SelectValue placeholder="This Week" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="today">Today</SelectItem>
+                  <SelectItem value="this_week">This Week</SelectItem>
+                  <SelectItem value="last_week">Last Week</SelectItem>
+                  <SelectItem value="this_month">This Month</SelectItem>
+                  <SelectItem value="last_month">Last Month</SelectItem>
+                  <SelectItem value="custom">Custom</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          <div className="h-[280px]">
+          
+          {/* Custom Date Range */}
+          {chartFilters.dateRange === 'custom' && (
+            <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded-xl">
+              <Input 
+                type="date" 
+                value={chartFilters.customFrom} 
+                onChange={(e) => setChartFilters(prev => ({ ...prev, customFrom: e.target.value }))}
+                className="w-[140px] h-9 rounded-lg text-sm"
+                data-testid="chart-custom-from"
+              />
+              <span className="text-slate-400 text-sm">to</span>
+              <Input 
+                type="date" 
+                value={chartFilters.customTo} 
+                onChange={(e) => setChartFilters(prev => ({ ...prev, customTo: e.target.value }))}
+                className="w-[140px] h-9 rounded-lg text-sm"
+                data-testid="chart-custom-to"
+              />
+            </div>
+          )}
+          
+          {/* Legend */}
+          <div className="flex items-center gap-4 text-xs mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#004EEB]" />
+              <span className="text-slate-600">Present</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-amber-500" />
+              <span className="text-slate-600">Late</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-400" />
+              <span className="text-slate-600">Absent</span>
+            </div>
+          </div>
+          
+          {/* Chart */}
+          <div className="h-[250px] relative">
+            {chartLoading && (
+              <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-10 rounded-xl">
+                <div className="w-8 h-8 border-2 border-[#063c88] border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
