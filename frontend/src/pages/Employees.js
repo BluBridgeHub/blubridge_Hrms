@@ -14,10 +14,13 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
-  X,
   UserCheck,
   UserX,
-  Briefcase
+  Briefcase,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -31,19 +34,23 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '../components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const StatCard = ({ title, value, icon: Icon, color }) => (
-  <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-4 flex items-center gap-4">
-    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>
-      <Icon className="w-6 h-6 text-white" strokeWidth={1.5} />
-    </div>
-    <div>
-      <p className="text-2xl font-bold" style={{ fontFamily: 'Outfit, sans-serif' }}>{value}</p>
-      <p className="text-sm text-gray-500">{title}</p>
+// Premium Stat Card
+const StatCard = ({ title, value, icon: Icon, color, bgColor }) => (
+  <div className="stat-card">
+    <div className="flex items-center gap-4">
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${bgColor}`}>
+        <Icon className="w-6 h-6" style={{ color }} strokeWidth={1.5} />
+      </div>
+      <div>
+        <p className="text-2xl font-bold text-slate-900 number-display">{value}</p>
+        <p className="text-sm text-slate-500">{title}</p>
+      </div>
     </div>
   </div>
 );
@@ -58,7 +65,6 @@ const Employees = () => {
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, pages: 0 });
   
-  // Filter state
   const [filters, setFilters] = useState({
     search: '',
     department: 'All',
@@ -69,45 +75,22 @@ const Employees = () => {
     work_location: 'All'
   });
   
-  // Modal states
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [showEditSheet, setShowEditSheet] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   
-  // Form state
   const [form, setForm] = useState({
-    full_name: '',
-    official_email: '',
-    phone_number: '',
-    gender: '',
-    date_of_birth: '',
-    date_of_joining: '',
-    employment_type: 'Full-time',
-    designation: '',
-    tier_level: 'Mid',
-    reporting_manager_id: '',
-    department: '',
-    team: '',
-    work_location: 'Office',
-    leave_policy: 'Standard',
-    shift_type: 'General',
-    custom_login_time: '',
-    custom_logout_time: '',
-    monthly_salary: 0,
-    attendance_tracking_enabled: true,
-    user_role: 'employee',
-    login_enabled: true
+    full_name: '', official_email: '', phone_number: '', gender: '', date_of_birth: '',
+    date_of_joining: '', employment_type: 'Full-time', designation: '', tier_level: 'Mid',
+    reporting_manager_id: '', department: '', team: '', work_location: 'Office',
+    leave_policy: 'Standard', shift_type: 'General', custom_login_time: '', custom_logout_time: '',
+    monthly_salary: 0, attendance_tracking_enabled: true, user_role: 'employee', login_enabled: true
   });
   
-  // Config options
   const [config, setConfig] = useState({
-    employmentTypes: [],
-    employeeStatuses: [],
-    tierLevels: [],
-    workLocations: [],
-    userRoles: []
+    employmentTypes: [], employeeStatuses: [], tierLevels: [], workLocations: [], userRoles: []
   });
 
   const fetchConfig = useCallback(async () => {
@@ -120,11 +103,8 @@ const Employees = () => {
         axios.get(`${API}/config/user-roles`)
       ]);
       setConfig({
-        employmentTypes: types.data,
-        employeeStatuses: statuses.data,
-        tierLevels: tiers.data,
-        workLocations: locations.data,
-        userRoles: roles.data
+        employmentTypes: types.data, employeeStatuses: statuses.data,
+        tierLevels: tiers.data, workLocations: locations.data, userRoles: roles.data
       });
     } catch (error) {
       console.error('Config fetch error:', error);
@@ -135,8 +115,7 @@ const Employees = () => {
     try {
       setLoading(true);
       const params = {
-        page: pagination.page,
-        limit: pagination.limit,
+        page: pagination.page, limit: pagination.limit,
         ...(filters.search && { search: filters.search }),
         ...(filters.department !== 'All' && { department: filters.department }),
         ...(filters.team !== 'All' && { team: filters.team }),
@@ -155,12 +134,7 @@ const Employees = () => {
       ]);
       
       setEmployees(employeesRes.data.employees);
-      setPagination({
-        page: employeesRes.data.page,
-        limit: employeesRes.data.limit,
-        total: employeesRes.data.total,
-        pages: employeesRes.data.pages
-      });
+      setPagination({ page: employeesRes.data.page, limit: employeesRes.data.limit, total: employeesRes.data.total, pages: employeesRes.data.pages });
       setStats(statsRes.data);
       setTeams(teamsRes.data);
       setDepartments(deptsRes.data);
@@ -173,146 +147,67 @@ const Employees = () => {
     }
   }, [getAuthHeaders, pagination.page, pagination.limit, filters]);
 
-  useEffect(() => {
-    fetchConfig();
-  }, [fetchConfig]);
+  useEffect(() => { fetchConfig(); }, [fetchConfig]);
+  useEffect(() => { fetchData(); }, [pagination.page, filters.department, filters.team, filters.status]);
 
-  useEffect(() => {
-    fetchData();
-  }, [pagination.page, filters.department, filters.team, filters.status]);
-
-  const handleSearch = () => {
-    setPagination(prev => ({ ...prev, page: 1 }));
-    fetchData();
-  };
-
+  const handleSearch = () => { setPagination(prev => ({ ...prev, page: 1 })); fetchData(); };
   const handleReset = () => {
-    setFilters({
-      search: '',
-      department: 'All',
-      team: 'All',
-      status: 'All',
-      employment_type: 'All',
-      tier_level: 'All',
-      work_location: 'All'
-    });
+    setFilters({ search: '', department: 'All', team: 'All', status: 'All', employment_type: 'All', tier_level: 'All', work_location: 'All' });
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   const resetForm = () => {
     setForm({
-      full_name: '',
-      official_email: '',
-      phone_number: '',
-      gender: '',
-      date_of_birth: '',
-      date_of_joining: '',
-      employment_type: 'Full-time',
-      designation: '',
-      tier_level: 'Mid',
-      reporting_manager_id: '',
-      department: '',
-      team: '',
-      work_location: 'Office',
-      leave_policy: 'Standard',
-      shift_type: 'General',
-      custom_login_time: '',
-      custom_logout_time: '',
-      monthly_salary: 0,
-      attendance_tracking_enabled: true,
-      user_role: 'employee',
-      login_enabled: true
+      full_name: '', official_email: '', phone_number: '', gender: '', date_of_birth: '',
+      date_of_joining: '', employment_type: 'Full-time', designation: '', tier_level: 'Mid',
+      reporting_manager_id: '', department: '', team: '', work_location: 'Office',
+      leave_policy: 'Standard', shift_type: 'General', custom_login_time: '', custom_logout_time: '',
+      monthly_salary: 0, attendance_tracking_enabled: true, user_role: 'employee', login_enabled: true
     });
   };
 
-  const handleAdd = () => {
-    resetForm();
-    setShowAddSheet(true);
-  };
-
+  const handleAdd = () => { resetForm(); setShowAddSheet(true); };
+  
   const handleEdit = (employee) => {
     setSelectedEmployee(employee);
     setForm({
-      full_name: employee.full_name || '',
-      official_email: employee.official_email || '',
-      phone_number: employee.phone_number || '',
-      gender: employee.gender || '',
-      date_of_birth: employee.date_of_birth || '',
-      date_of_joining: employee.date_of_joining || '',
-      employment_type: employee.employment_type || 'Full-time',
-      designation: employee.designation || '',
-      tier_level: employee.tier_level || 'Mid',
-      reporting_manager_id: employee.reporting_manager_id || '',
-      department: employee.department || '',
-      team: employee.team || '',
-      work_location: employee.work_location || 'Office',
-      leave_policy: employee.leave_policy || 'Standard',
-      shift_type: employee.shift_type || 'General',
-      custom_login_time: employee.custom_login_time || '',
-      custom_logout_time: employee.custom_logout_time || '',
-      monthly_salary: employee.monthly_salary || 0,
+      full_name: employee.full_name || '', official_email: employee.official_email || '',
+      phone_number: employee.phone_number || '', gender: employee.gender || '',
+      date_of_birth: employee.date_of_birth || '', date_of_joining: employee.date_of_joining || '',
+      employment_type: employee.employment_type || 'Full-time', designation: employee.designation || '',
+      tier_level: employee.tier_level || 'Mid', reporting_manager_id: employee.reporting_manager_id || '',
+      department: employee.department || '', team: employee.team || '',
+      work_location: employee.work_location || 'Office', leave_policy: employee.leave_policy || 'Standard',
+      shift_type: employee.shift_type || 'General', custom_login_time: employee.custom_login_time || '',
+      custom_logout_time: employee.custom_logout_time || '', monthly_salary: employee.monthly_salary || 0,
       attendance_tracking_enabled: employee.attendance_tracking_enabled ?? true,
-      user_role: employee.user_role || 'employee',
-      login_enabled: employee.login_enabled ?? true
+      user_role: employee.user_role || 'employee', login_enabled: employee.login_enabled ?? true
     });
     setShowEditSheet(true);
   };
 
-  const handleView = (employee) => {
-    setSelectedEmployee(employee);
-    setShowViewDialog(true);
-  };
-
-  const handleDelete = (employee) => {
-    setSelectedEmployee(employee);
-    setShowDeleteDialog(true);
-  };
+  const handleView = (employee) => { setSelectedEmployee(employee); setShowViewDialog(true); };
+  const handleDelete = (employee) => { setSelectedEmployee(employee); setShowDeleteDialog(true); };
 
   const validateForm = () => {
-    if (!form.full_name.trim()) {
-      toast.error('Full name is required');
-      return false;
-    }
-    if (!form.official_email.trim()) {
-      toast.error('Email is required');
-      return false;
-    }
-    if (!form.date_of_joining) {
-      toast.error('Date of joining is required');
-      return false;
-    }
-    if (!form.department) {
-      toast.error('Department is required');
-      return false;
-    }
-    if (!form.team) {
-      toast.error('Team is required');
-      return false;
-    }
-    if (!form.designation.trim()) {
-      toast.error('Designation is required');
-      return false;
-    }
+    if (!form.full_name.trim()) { toast.error('Full name is required'); return false; }
+    if (!form.official_email.trim()) { toast.error('Email is required'); return false; }
+    if (!form.date_of_joining) { toast.error('Date of joining is required'); return false; }
+    if (!form.department) { toast.error('Department is required'); return false; }
+    if (!form.team) { toast.error('Team is required'); return false; }
+    if (!form.designation.trim()) { toast.error('Designation is required'); return false; }
     return true;
   };
 
   const submitAdd = async () => {
     if (!validateForm()) return;
-    
     try {
       const response = await axios.post(`${API}/employees`, form, { headers: getAuthHeaders() });
-      const newEmployee = response.data;
-      
-      // Show success message with credential info if login is enabled
-      if (form.login_enabled && newEmployee.temp_password) {
-        toast.success(
-          `Employee added successfully! Welcome email with login credentials sent to ${form.official_email}`,
-          { duration: 5000 }
-        );
+      if (form.login_enabled && response.data.temp_password) {
+        toast.success(`Employee added! Credentials sent to ${form.official_email}`, { duration: 5000 });
       } else {
         toast.success('Employee added successfully');
       }
-      
       setShowAddSheet(false);
       fetchData();
     } catch (error) {
@@ -322,7 +217,6 @@ const Employees = () => {
 
   const submitEdit = async () => {
     if (!validateForm()) return;
-    
     try {
       await axios.put(`${API}/employees/${selectedEmployee.id}`, form, { headers: getAuthHeaders() });
       toast.success('Employee updated successfully');
@@ -346,12 +240,8 @@ const Employees = () => {
 
   const handleExportCSV = () => {
     const headers = ['Emp ID', 'Name', 'Email', 'Department', 'Team', 'Designation', 'Status', 'Employment Type', 'Work Location'];
-    const rows = employees.map(e => [
-      e.emp_id, e.full_name, e.official_email, e.department, e.team, 
-      e.designation, e.employee_status, e.employment_type, e.work_location
-    ]);
+    const rows = employees.map(e => [e.emp_id, e.full_name, e.official_email, e.department, e.team, e.designation, e.employee_status, e.employment_type, e.work_location]);
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -362,192 +252,334 @@ const Employees = () => {
   };
 
   const getStatusBadge = (status) => {
-    const styles = {
-      'Active': 'bg-emerald-100 text-emerald-700',
-      'Inactive': 'bg-gray-100 text-gray-700',
-      'Resigned': 'bg-red-100 text-red-700'
-    };
-    return styles[status] || 'bg-gray-100 text-gray-700';
+    const styles = { 'Active': 'badge-success', 'Inactive': 'badge-neutral', 'Resigned': 'badge-error' };
+    return styles[status] || 'badge-neutral';
   };
 
   const canEdit = ['admin', 'hr_manager'].includes(user?.role);
+  const filteredTeams = form.department ? teams.filter(t => t.department === form.department) : teams;
+  const handleFormChange = (field, value) => { setForm(prev => ({ ...prev, [field]: value })); };
 
-  // Filter teams by selected department
-  const filteredTeams = form.department 
-    ? teams.filter(t => t.department === form.department)
-    : teams;
+  // Form Component for Add/Edit
+  const EmployeeForm = ({ isEdit = false }) => (
+    <Tabs defaultValue="personal" className="w-full">
+      <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-xl">
+        <TabsTrigger value="personal" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Personal</TabsTrigger>
+        <TabsTrigger value="employment" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Employment</TabsTrigger>
+        <TabsTrigger value="organization" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Organization</TabsTrigger>
+        <TabsTrigger value="system" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">System</TabsTrigger>
+      </TabsList>
 
-  // Form field change handler
-  const handleFormChange = (field, value) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-  };
+      <TabsContent value="personal" className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Full Name <span className="text-red-500">*</span></Label>
+            <Input value={form.full_name} onChange={(e) => handleFormChange('full_name', e.target.value)} placeholder="Enter full name" className="mt-1.5 rounded-lg" data-testid="input-full-name" />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Official Email <span className="text-red-500">*</span></Label>
+            <Input type="email" value={form.official_email} onChange={(e) => handleFormChange('official_email', e.target.value)} placeholder="Enter email" className="mt-1.5 rounded-lg" data-testid="input-email" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Phone Number</Label>
+            <Input value={form.phone_number} onChange={(e) => handleFormChange('phone_number', e.target.value)} placeholder="Enter phone" className="mt-1.5 rounded-lg" data-testid="input-phone" />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Gender</Label>
+            <Select value={form.gender} onValueChange={(v) => handleFormChange('gender', v)}>
+              <SelectTrigger className="mt-1.5 rounded-lg" data-testid="select-gender"><SelectValue placeholder="Select gender" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Male">Male</SelectItem>
+                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div>
+          <Label className="text-sm font-medium text-slate-700">Date of Birth</Label>
+          <Input type="date" value={form.date_of_birth} onChange={(e) => handleFormChange('date_of_birth', e.target.value)} className="mt-1.5 rounded-lg" data-testid="input-dob" />
+        </div>
+      </TabsContent>
+
+      <TabsContent value="employment" className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Date of Joining <span className="text-red-500">*</span></Label>
+            <Input type="date" value={form.date_of_joining} onChange={(e) => handleFormChange('date_of_joining', e.target.value)} className="mt-1.5 rounded-lg" data-testid="input-doj" />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Employment Type</Label>
+            <Select value={form.employment_type} onValueChange={(v) => handleFormChange('employment_type', v)}>
+              <SelectTrigger className="mt-1.5 rounded-lg" data-testid="select-employment-type"><SelectValue /></SelectTrigger>
+              <SelectContent>{config.employmentTypes.map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Designation <span className="text-red-500">*</span></Label>
+            <Input value={form.designation} onChange={(e) => handleFormChange('designation', e.target.value)} placeholder="Enter designation" className="mt-1.5 rounded-lg" data-testid="input-designation" />
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Tier / Level</Label>
+            <Select value={form.tier_level} onValueChange={(v) => handleFormChange('tier_level', v)}>
+              <SelectTrigger className="mt-1.5 rounded-lg" data-testid="select-tier"><SelectValue /></SelectTrigger>
+              <SelectContent>{config.tierLevels.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div>
+          <Label className="text-sm font-medium text-slate-700">Reporting Manager</Label>
+          <Select value={form.reporting_manager_id || "none"} onValueChange={(v) => handleFormChange('reporting_manager_id', v === "none" ? "" : v)}>
+            <SelectTrigger className="mt-1.5 rounded-lg" data-testid="select-manager"><SelectValue placeholder="Select manager" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              {allEmployees.filter(e => e.id !== selectedEmployee?.id).map(emp => <SelectItem key={emp.id} value={emp.id}>{emp.full_name} ({emp.emp_id})</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="organization" className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Department <span className="text-red-500">*</span></Label>
+            <Select value={form.department} onValueChange={(v) => { handleFormChange('department', v); handleFormChange('team', ''); }}>
+              <SelectTrigger className="mt-1.5 rounded-lg" data-testid="select-department"><SelectValue placeholder="Select department" /></SelectTrigger>
+              <SelectContent>{departments.map(dept => <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Team <span className="text-red-500">*</span></Label>
+            <Select value={form.team} onValueChange={(v) => handleFormChange('team', v)} disabled={!form.department}>
+              <SelectTrigger className="mt-1.5 rounded-lg" data-testid="select-team"><SelectValue placeholder="Select team" /></SelectTrigger>
+              <SelectContent>{filteredTeams.map(team => <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div>
+          <Label className="text-sm font-medium text-slate-700">Work Location</Label>
+          <Select value={form.work_location} onValueChange={(v) => handleFormChange('work_location', v)}>
+            <SelectTrigger className="mt-1.5 rounded-lg" data-testid="select-location"><SelectValue /></SelectTrigger>
+            <SelectContent>{config.workLocations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Leave Policy</Label>
+            <Select value={form.leave_policy} onValueChange={(v) => handleFormChange('leave_policy', v)}>
+              <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Standard">Standard</SelectItem>
+                <SelectItem value="Extended">Extended</SelectItem>
+                <SelectItem value="Probation">Probation</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Shift Type</Label>
+            <Select value={form.shift_type} onValueChange={(v) => handleFormChange('shift_type', v)}>
+              <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="General">General (10:00 AM - 9:00 PM)</SelectItem>
+                <SelectItem value="Morning">Morning (6:00 AM - 2:00 PM)</SelectItem>
+                <SelectItem value="Evening">Evening (2:00 PM - 10:00 PM)</SelectItem>
+                <SelectItem value="Night">Night (10:00 PM - 6:00 AM)</SelectItem>
+                <SelectItem value="Flexible">Flexible (8 hrs required)</SelectItem>
+                <SelectItem value="Custom">Custom</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        {form.shift_type === 'Custom' && (
+          <div className="grid grid-cols-2 gap-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+            <div>
+              <Label className="text-sm font-medium text-slate-700">Login Time *</Label>
+              <Input type="time" value={form.custom_login_time} onChange={(e) => handleFormChange('custom_login_time', e.target.value)} className="mt-1.5 rounded-lg" />
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-slate-700">Logout Time *</Label>
+              <Input type="time" value={form.custom_logout_time} onChange={(e) => handleFormChange('custom_logout_time', e.target.value)} className="mt-1.5 rounded-lg" />
+            </div>
+          </div>
+        )}
+        <div>
+          <Label className="text-sm font-medium text-slate-700">Monthly Salary (₹)</Label>
+          <Input type="number" min="0" step="1000" value={form.monthly_salary} onChange={(e) => handleFormChange('monthly_salary', parseFloat(e.target.value) || 0)} className="mt-1.5 rounded-lg" placeholder="Enter monthly salary" />
+        </div>
+      </TabsContent>
+
+      <TabsContent value="system" className="space-y-4">
+        <div>
+          <Label className="text-sm font-medium text-slate-700">User Role</Label>
+          <Select value={form.user_role} onValueChange={(v) => handleFormChange('user_role', v)}>
+            <SelectTrigger className="mt-1.5 rounded-lg" data-testid="select-user-role"><SelectValue /></SelectTrigger>
+            <SelectContent>{config.userRoles.map(role => <SelectItem key={role} value={role}>{role.replace('_', ' ').toUpperCase()}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Login Enabled</Label>
+            <p className="text-xs text-slate-500 mt-1">Allow employee to log into the system</p>
+          </div>
+          <Switch checked={form.login_enabled} onCheckedChange={(v) => handleFormChange('login_enabled', v)} data-testid="switch-login" />
+        </div>
+        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Attendance Tracking</Label>
+            <p className="text-xs text-slate-500 mt-1">Enable attendance tracking for this employee</p>
+          </div>
+          <Switch checked={form.attendance_tracking_enabled} onCheckedChange={(v) => handleFormChange('attendance_tracking_enabled', v)} data-testid="switch-attendance" />
+        </div>
+      </TabsContent>
+    </Tabs>
+  );
 
   return (
     <div className="space-y-6 animate-fade-in" data-testid="employees-page">
-      {/* Page Header */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Users className="w-6 h-6 text-[#0b1f3b]" />
-          <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Employee Management
-          </h1>
+          <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+            <Users className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>Employee Management</h1>
+            <p className="text-sm text-slate-500">Manage your workforce efficiently</p>
+          </div>
         </div>
         {canEdit && (
-          <Button 
-            onClick={handleAdd}
-            className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
-            data-testid="add-employee-btn"
-          >
+          <Button onClick={handleAdd} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-xl shadow-lg shadow-[#004EEB]/20" data-testid="add-employee-btn">
             <Plus className="w-4 h-4 mr-2" />
             Add Employee
           </Button>
         )}
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard title="Total Employees" value={stats.total} icon={Users} color="bg-[#0b1f3b]" />
-          <StatCard title="Active" value={stats.active} icon={UserCheck} color="bg-emerald-500" />
-          <StatCard title="Inactive" value={stats.inactive} icon={UserX} color="bg-gray-500" />
-          <StatCard title="Resigned" value={stats.resigned} icon={Briefcase} color="bg-red-500" />
+          <StatCard title="Total Employees" value={stats.total} icon={Users} color="#004EEB" bgColor="bg-blue-100" />
+          <StatCard title="Active" value={stats.active} icon={UserCheck} color="#10b981" bgColor="bg-emerald-100" />
+          <StatCard title="Inactive" value={stats.inactive} icon={UserX} color="#64748b" bgColor="bg-slate-100" />
+          <StatCard title="Resigned" value={stats.resigned} icon={Briefcase} color="#ef4444" bgColor="bg-red-100" />
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6">
+      <div className="card-flat p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4">
           <div className="lg:col-span-2">
-            <Label className="text-sm text-gray-600 mb-1 block">Search</Label>
+            <Label className="text-sm text-slate-600 mb-1.5 block">Search</Label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Name, email, ID..."
-                value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-9 bg-white"
-                data-testid="filter-search"
-              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input placeholder="Name, email, ID..." value={filters.search} onChange={(e) => setFilters({ ...filters, search: e.target.value })} onKeyPress={(e) => e.key === 'Enter' && handleSearch()} className="pl-10 rounded-lg" data-testid="filter-search" />
             </div>
           </div>
-          
           <div>
-            <Label className="text-sm text-gray-600 mb-1 block">Department</Label>
+            <Label className="text-sm text-slate-600 mb-1.5 block">Department</Label>
             <Select value={filters.department} onValueChange={(v) => setFilters({ ...filters, department: v })}>
-              <SelectTrigger className="bg-white" data-testid="filter-department">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="rounded-lg" data-testid="filter-department"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All</SelectItem>
-                {departments.map(dept => (
-                  <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
-                ))}
+                {departments.map(dept => <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-
           <div>
-            <Label className="text-sm text-gray-600 mb-1 block">Team</Label>
+            <Label className="text-sm text-slate-600 mb-1.5 block">Team</Label>
             <Select value={filters.team} onValueChange={(v) => setFilters({ ...filters, team: v })}>
-              <SelectTrigger className="bg-white" data-testid="filter-team">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="rounded-lg" data-testid="filter-team"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All</SelectItem>
-                {teams.map(team => (
-                  <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
-                ))}
+                {teams.map(team => <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-
           <div>
-            <Label className="text-sm text-gray-600 mb-1 block">Status</Label>
+            <Label className="text-sm text-slate-600 mb-1.5 block">Status</Label>
             <Select value={filters.status} onValueChange={(v) => setFilters({ ...filters, status: v })}>
-              <SelectTrigger className="bg-white" data-testid="filter-status">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="rounded-lg" data-testid="filter-status"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All</SelectItem>
-                {config.employeeStatuses.map(s => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
+                {config.employeeStatuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-
           <div className="flex items-end gap-2">
-            <Button onClick={handleSearch} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white" data-testid="search-btn">
+            <Button onClick={handleSearch} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg" data-testid="search-btn">
               <Filter className="w-4 h-4 mr-1" /> Filter
             </Button>
-            <Button variant="outline" onClick={handleReset} data-testid="reset-btn">
+            <Button variant="outline" onClick={handleReset} className="rounded-lg" data-testid="reset-btn">
               <RotateCcw className="w-4 h-4" />
             </Button>
           </div>
-
           <div className="flex items-end">
-            <Button variant="outline" onClick={handleExportCSV} data-testid="export-btn">
+            <Button variant="outline" onClick={handleExportCSV} className="rounded-lg" data-testid="export-btn">
               <Download className="w-4 h-4 mr-1" /> Export
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Employee Table */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 overflow-hidden">
+      {/* Table */}
+      <div className="card-premium overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b1f3b]"></div>
+            <div className="w-10 h-10 border-2 border-[#004EEB] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50/50">
+              <table className="table-premium">
+                <thead>
                   <tr>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Emp ID</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Department</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Team</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Designation</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Actions</th>
+                    <th>Emp ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Team</th>
+                    <th>Designation</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody>
                   {employees.length === 0 ? (
                     <tr>
-                      <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
-                        No employees found
-                      </td>
+                      <td colSpan="8" className="text-center py-12 text-slate-500">No employees found</td>
                     </tr>
                   ) : (
                     employees.map((emp) => (
-                      <tr key={emp.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-4 py-4 text-sm font-medium text-[#0b1f3b]">{emp.emp_id}</td>
-                        <td className="px-4 py-4 text-sm font-medium text-gray-900">{emp.full_name}</td>
-                        <td className="px-4 py-4 text-sm text-gray-600">{emp.official_email}</td>
-                        <td className="px-4 py-4 text-sm text-gray-600">{emp.department}</td>
-                        <td className="px-4 py-4 text-sm text-gray-600">{emp.team}</td>
-                        <td className="px-4 py-4 text-sm text-gray-600">{emp.designation}</td>
-                        <td className="px-4 py-4">
-                          <Badge className={getStatusBadge(emp.employee_status)}>
-                            {emp.employee_status}
-                          </Badge>
+                      <tr key={emp.id}>
+                        <td className="font-semibold text-[#004EEB]">{emp.emp_id}</td>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center">
+                              <span className="text-white text-xs font-medium">{emp.full_name?.charAt(0)}</span>
+                            </div>
+                            <span className="font-medium text-slate-900">{emp.full_name}</span>
+                          </div>
                         </td>
-                        <td className="px-4 py-4">
+                        <td className="text-slate-600">{emp.official_email}</td>
+                        <td className="text-slate-600">{emp.department}</td>
+                        <td className="text-slate-600">{emp.team}</td>
+                        <td className="text-slate-600">{emp.designation}</td>
+                        <td><Badge className={getStatusBadge(emp.employee_status)}>{emp.employee_status}</Badge></td>
+                        <td>
                           <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" onClick={() => handleView(emp)} data-testid={`view-${emp.id}`}>
-                              <Eye className="w-4 h-4 text-gray-500" />
+                            <Button size="sm" variant="ghost" onClick={() => handleView(emp)} className="h-8 w-8 p-0 rounded-lg" data-testid={`view-${emp.id}`}>
+                              <Eye className="w-4 h-4 text-slate-500" />
                             </Button>
                             {canEdit && (
                               <>
-                                <Button size="sm" variant="ghost" onClick={() => handleEdit(emp)} data-testid={`edit-${emp.id}`}>
+                                <Button size="sm" variant="ghost" onClick={() => handleEdit(emp)} className="h-8 w-8 p-0 rounded-lg" data-testid={`edit-${emp.id}`}>
                                   <Edit className="w-4 h-4 text-blue-500" />
                                 </Button>
-                                <Button size="sm" variant="ghost" onClick={() => handleDelete(emp)} data-testid={`delete-${emp.id}`}>
+                                <Button size="sm" variant="ghost" onClick={() => handleDelete(emp)} className="h-8 w-8 p-0 rounded-lg" data-testid={`delete-${emp.id}`}>
                                   <Trash2 className="w-4 h-4 text-red-500" />
                                 </Button>
                               </>
@@ -562,28 +594,16 @@ const Employees = () => {
             </div>
             
             {/* Pagination */}
-            <div className="px-6 py-4 border-t border-black/5 flex items-center justify-between">
-              <p className="text-sm text-gray-500">
-                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} employees
+            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <p className="text-sm text-slate-500">
+                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
               </p>
               <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={pagination.page <= 1}
-                  onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-                  data-testid="prev-page"
-                >
+                <Button size="sm" variant="outline" disabled={pagination.page <= 1} onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))} className="rounded-lg" data-testid="prev-page">
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
-                <span className="text-sm text-gray-600">Page {pagination.page} of {pagination.pages}</span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={pagination.page >= pagination.pages}
-                  onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-                  data-testid="next-page"
-                >
+                <span className="text-sm text-slate-600 px-3">Page {pagination.page} of {pagination.pages}</span>
+                <Button size="sm" variant="outline" disabled={pagination.page >= pagination.pages} onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))} className="rounded-lg" data-testid="next-page">
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
@@ -592,746 +612,95 @@ const Employees = () => {
         )}
       </div>
 
-      {/* Add Employee Dialog */}
+      {/* Add Dialog */}
       <Dialog open={showAddSheet} onOpenChange={setShowAddSheet}>
-        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[85vh] overflow-y-auto" aria-describedby="add-employee-desc">
+        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
-            <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Add New Employee</DialogTitle>
+            <DialogTitle style={{ fontFamily: 'Outfit' }}>Add New Employee</DialogTitle>
+            <DialogDescription>Fill in the details to add a new team member</DialogDescription>
           </DialogHeader>
-          <p id="add-employee-desc" className="sr-only">Form to add a new employee</p>
-          <div className="py-4">
-            <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6">
-                <TabsTrigger value="personal" className="data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white">Personal</TabsTrigger>
-                <TabsTrigger value="employment" className="data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white">Employment</TabsTrigger>
-                <TabsTrigger value="organization" className="data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white">Organization</TabsTrigger>
-                <TabsTrigger value="system" className="data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white">System</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="personal" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Full Name <span className="text-red-500">*</span></Label>
-                    <Input
-                      value={form.full_name}
-                      onChange={(e) => handleFormChange('full_name', e.target.value)}
-                      placeholder="Enter full name"
-                      className="mt-1 bg-white"
-                      data-testid="input-full-name"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Official Email <span className="text-red-500">*</span></Label>
-                    <Input
-                      type="email"
-                      value={form.official_email}
-                      onChange={(e) => handleFormChange('official_email', e.target.value)}
-                      placeholder="Enter email"
-                      className="mt-1 bg-white"
-                      data-testid="input-email"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Phone Number</Label>
-                    <Input
-                      value={form.phone_number}
-                      onChange={(e) => handleFormChange('phone_number', e.target.value)}
-                      placeholder="Enter phone"
-                      className="mt-1 bg-white"
-                      data-testid="input-phone"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Gender</Label>
-                    <Select value={form.gender} onValueChange={(v) => handleFormChange('gender', v)}>
-                      <SelectTrigger className="mt-1 bg-white" data-testid="select-gender">
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Male">Male</SelectItem>
-                        <SelectItem value="Female">Female</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Date of Birth</Label>
-                  <Input
-                    type="date"
-                    value={form.date_of_birth}
-                    onChange={(e) => handleFormChange('date_of_birth', e.target.value)}
-                    className="mt-1 bg-white"
-                    data-testid="input-dob"
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="employment" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Date of Joining <span className="text-red-500">*</span></Label>
-                    <Input
-                      type="date"
-                      value={form.date_of_joining}
-                      onChange={(e) => handleFormChange('date_of_joining', e.target.value)}
-                      className="mt-1 bg-white"
-                      data-testid="input-doj"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Employment Type</Label>
-                    <Select value={form.employment_type} onValueChange={(v) => handleFormChange('employment_type', v)}>
-                      <SelectTrigger className="mt-1 bg-white" data-testid="select-employment-type">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {config.employmentTypes.map(type => (
-                          <SelectItem key={type} value={type}>{type}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Designation <span className="text-red-500">*</span></Label>
-                    <Input
-                      value={form.designation}
-                      onChange={(e) => handleFormChange('designation', e.target.value)}
-                      placeholder="Enter designation"
-                      className="mt-1 bg-white"
-                      data-testid="input-designation"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Tier / Level</Label>
-                    <Select value={form.tier_level} onValueChange={(v) => handleFormChange('tier_level', v)}>
-                      <SelectTrigger className="mt-1 bg-white" data-testid="select-tier">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {config.tierLevels.map(level => (
-                          <SelectItem key={level} value={level}>{level}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Reporting Manager</Label>
-                  <Select value={form.reporting_manager_id || "none"} onValueChange={(v) => handleFormChange('reporting_manager_id', v === "none" ? "" : v)}>
-                    <SelectTrigger className="mt-1 bg-white" data-testid="select-manager">
-                      <SelectValue placeholder="Select manager" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {allEmployees.filter(e => e.id !== selectedEmployee?.id).map(emp => (
-                        <SelectItem key={emp.id} value={emp.id}>{emp.full_name} ({emp.emp_id})</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="organization" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Department <span className="text-red-500">*</span></Label>
-                    <Select value={form.department} onValueChange={(v) => { handleFormChange('department', v); handleFormChange('team', ''); }}>
-                      <SelectTrigger className="mt-1 bg-white" data-testid="select-department">
-                        <SelectValue placeholder="Select department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map(dept => (
-                          <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Team <span className="text-red-500">*</span></Label>
-                    <Select value={form.team} onValueChange={(v) => handleFormChange('team', v)} disabled={!form.department}>
-                      <SelectTrigger className="mt-1 bg-white" data-testid="select-team">
-                        <SelectValue placeholder="Select team" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filteredTeams.map(team => (
-                          <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Work Location</Label>
-                  <Select value={form.work_location} onValueChange={(v) => handleFormChange('work_location', v)}>
-                    <SelectTrigger className="mt-1 bg-white" data-testid="select-location">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {config.workLocations.map(loc => (
-                        <SelectItem key={loc} value={loc}>{loc}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Leave Policy</Label>
-                    <Select value={form.leave_policy} onValueChange={(v) => handleFormChange('leave_policy', v)}>
-                      <SelectTrigger className="mt-1 bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Standard">Standard</SelectItem>
-                        <SelectItem value="Extended">Extended</SelectItem>
-                        <SelectItem value="Probation">Probation</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Shift Type</Label>
-                    <Select value={form.shift_type} onValueChange={(v) => handleFormChange('shift_type', v)}>
-                      <SelectTrigger className="mt-1 bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="General">General (10:00 AM - 9:00 PM)</SelectItem>
-                        <SelectItem value="Morning">Morning (6:00 AM - 2:00 PM)</SelectItem>
-                        <SelectItem value="Evening">Evening (2:00 PM - 10:00 PM)</SelectItem>
-                        <SelectItem value="Night">Night (10:00 PM - 6:00 AM)</SelectItem>
-                        <SelectItem value="Flexible">Flexible (8 hrs required)</SelectItem>
-                        <SelectItem value="Custom">Custom</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                {/* Custom Shift Time Inputs */}
-                {form.shift_type === 'Custom' && (
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                    <div>
-                      <Label className="text-sm font-medium">Login Time *</Label>
-                      <Input
-                        type="time"
-                        value={form.custom_login_time}
-                        onChange={(e) => handleFormChange('custom_login_time', e.target.value)}
-                        className="mt-1 bg-white"
-                        required
-                      />
-                      <p className="text-xs text-gray-500 mt-1">e.g., 09:00 for 9:00 AM</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Logout Time *</Label>
-                      <Input
-                        type="time"
-                        value={form.custom_logout_time}
-                        onChange={(e) => handleFormChange('custom_logout_time', e.target.value)}
-                        className="mt-1 bg-white"
-                        required
-                      />
-                      <p className="text-xs text-gray-500 mt-1">e.g., 18:00 for 6:00 PM</p>
-                    </div>
-                    {form.custom_login_time && form.custom_logout_time && (
-                      <div className="col-span-2">
-                        <p className="text-sm text-amber-700">
-                          Total Hours: {(() => {
-                            const [loginH, loginM] = form.custom_login_time.split(':').map(Number);
-                            const [logoutH, logoutM] = form.custom_logout_time.split(':').map(Number);
-                            const loginMins = loginH * 60 + loginM;
-                            const logoutMins = logoutH * 60 + logoutM;
-                            const totalMins = logoutMins < loginMins 
-                              ? (24 * 60 - loginMins + logoutMins) 
-                              : (logoutMins - loginMins);
-                            return `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
-                          })()}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* Monthly Salary */}
-                <div>
-                  <Label className="text-sm font-medium">Monthly Salary (₹)</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="1000"
-                    value={form.monthly_salary}
-                    onChange={(e) => handleFormChange('monthly_salary', parseFloat(e.target.value) || 0)}
-                    className="mt-1 bg-white"
-                    placeholder="Enter monthly salary"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Used for payroll & LOP calculations</p>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="system" className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium">User Role</Label>
-                  <Select value={form.user_role} onValueChange={(v) => handleFormChange('user_role', v)}>
-                    <SelectTrigger className="mt-1 bg-white" data-testid="select-user-role">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {config.userRoles.map(role => (
-                        <SelectItem key={role} value={role}>{role.replace('_', ' ').toUpperCase()}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-[#f7f5ef] rounded-lg">
-                  <div>
-                    <Label className="text-sm font-medium">Login Enabled</Label>
-                    <p className="text-xs text-gray-500">Allow employee to log into the system</p>
-                  </div>
-                  <Switch
-                    checked={form.login_enabled}
-                    onCheckedChange={(v) => handleFormChange('login_enabled', v)}
-                    data-testid="switch-login"
-                  />
-                </div>
-                <div className="flex items-center justify-between p-4 bg-[#f7f5ef] rounded-lg">
-                  <div>
-                    <Label className="text-sm font-medium">Attendance Tracking</Label>
-                    <p className="text-xs text-gray-500">Enable attendance tracking for this employee</p>
-                  </div>
-                  <Switch
-                    checked={form.attendance_tracking_enabled}
-                    onCheckedChange={(v) => handleFormChange('attendance_tracking_enabled', v)}
-                    data-testid="switch-attendance"
-                  />
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-          <DialogFooter className="flex gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setShowAddSheet(false)}>Cancel</Button>
-            <Button onClick={submitAdd} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white" data-testid="submit-add">
-              Save Employee
-            </Button>
+          <div className="py-4"><EmployeeForm /></div>
+          <DialogFooter className="flex gap-2 pt-4 border-t border-slate-100">
+            <Button variant="outline" onClick={() => setShowAddSheet(false)} className="rounded-lg">Cancel</Button>
+            <Button onClick={submitAdd} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg" data-testid="submit-add">Save Employee</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Employee Dialog */}
+      {/* Edit Dialog */}
       <Dialog open={showEditSheet} onOpenChange={setShowEditSheet}>
-        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[85vh] overflow-y-auto" aria-describedby="edit-employee-desc">
+        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
-            <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Edit Employee - {selectedEmployee?.emp_id}</DialogTitle>
+            <DialogTitle style={{ fontFamily: 'Outfit' }}>Edit Employee - {selectedEmployee?.emp_id}</DialogTitle>
+            <DialogDescription>Update employee information</DialogDescription>
           </DialogHeader>
-          <p id="edit-employee-desc" className="sr-only">Form to edit an employee</p>
-          <div className="py-4">
-            <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6">
-                <TabsTrigger value="personal" className="data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white">Personal</TabsTrigger>
-                <TabsTrigger value="employment" className="data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white">Employment</TabsTrigger>
-                <TabsTrigger value="organization" className="data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white">Organization</TabsTrigger>
-                <TabsTrigger value="system" className="data-[state=active]:bg-[#0b1f3b] data-[state=active]:text-white">System</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="personal" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Full Name <span className="text-red-500">*</span></Label>
-                    <Input
-                      value={form.full_name}
-                      onChange={(e) => handleFormChange('full_name', e.target.value)}
-                      placeholder="Enter full name"
-                      className="mt-1 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Official Email <span className="text-red-500">*</span></Label>
-                    <Input
-                      type="email"
-                      value={form.official_email}
-                      onChange={(e) => handleFormChange('official_email', e.target.value)}
-                      placeholder="Enter email"
-                      className="mt-1 bg-white"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Phone Number</Label>
-                    <Input
-                      value={form.phone_number}
-                      onChange={(e) => handleFormChange('phone_number', e.target.value)}
-                      placeholder="Enter phone"
-                      className="mt-1 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Gender</Label>
-                    <Select value={form.gender} onValueChange={(v) => handleFormChange('gender', v)}>
-                      <SelectTrigger className="mt-1 bg-white">
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Male">Male</SelectItem>
-                        <SelectItem value="Female">Female</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Date of Birth</Label>
-                  <Input
-                    type="date"
-                    value={form.date_of_birth}
-                    onChange={(e) => handleFormChange('date_of_birth', e.target.value)}
-                    className="mt-1 bg-white"
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="employment" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Date of Joining <span className="text-red-500">*</span></Label>
-                    <Input
-                      type="date"
-                      value={form.date_of_joining}
-                      onChange={(e) => handleFormChange('date_of_joining', e.target.value)}
-                      className="mt-1 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Employment Type</Label>
-                    <Select value={form.employment_type} onValueChange={(v) => handleFormChange('employment_type', v)}>
-                      <SelectTrigger className="mt-1 bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {config.employmentTypes.map(type => (
-                          <SelectItem key={type} value={type}>{type}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Designation <span className="text-red-500">*</span></Label>
-                    <Input
-                      value={form.designation}
-                      onChange={(e) => handleFormChange('designation', e.target.value)}
-                      placeholder="Enter designation"
-                      className="mt-1 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Tier / Level</Label>
-                    <Select value={form.tier_level} onValueChange={(v) => handleFormChange('tier_level', v)}>
-                      <SelectTrigger className="mt-1 bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {config.tierLevels.map(level => (
-                          <SelectItem key={level} value={level}>{level}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Reporting Manager</Label>
-                  <Select value={form.reporting_manager_id || "none"} onValueChange={(v) => handleFormChange('reporting_manager_id', v === "none" ? "" : v)}>
-                    <SelectTrigger className="mt-1 bg-white">
-                      <SelectValue placeholder="Select manager" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {allEmployees.filter(e => e.id !== selectedEmployee?.id).map(emp => (
-                        <SelectItem key={emp.id} value={emp.id}>{emp.full_name} ({emp.emp_id})</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="organization" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Department <span className="text-red-500">*</span></Label>
-                    <Select value={form.department} onValueChange={(v) => { handleFormChange('department', v); handleFormChange('team', ''); }}>
-                      <SelectTrigger className="mt-1 bg-white">
-                        <SelectValue placeholder="Select department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map(dept => (
-                          <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Team <span className="text-red-500">*</span></Label>
-                    <Select value={form.team} onValueChange={(v) => handleFormChange('team', v)} disabled={!form.department}>
-                      <SelectTrigger className="mt-1 bg-white">
-                        <SelectValue placeholder="Select team" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filteredTeams.map(team => (
-                          <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Work Location</Label>
-                  <Select value={form.work_location} onValueChange={(v) => handleFormChange('work_location', v)}>
-                    <SelectTrigger className="mt-1 bg-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {config.workLocations.map(loc => (
-                        <SelectItem key={loc} value={loc}>{loc}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Leave Policy</Label>
-                    <Select value={form.leave_policy} onValueChange={(v) => handleFormChange('leave_policy', v)}>
-                      <SelectTrigger className="mt-1 bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Standard">Standard</SelectItem>
-                        <SelectItem value="Extended">Extended</SelectItem>
-                        <SelectItem value="Probation">Probation</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Shift Type</Label>
-                    <Select value={form.shift_type} onValueChange={(v) => handleFormChange('shift_type', v)}>
-                      <SelectTrigger className="mt-1 bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="General">General (10:00 AM - 9:00 PM)</SelectItem>
-                        <SelectItem value="Morning">Morning (6:00 AM - 2:00 PM)</SelectItem>
-                        <SelectItem value="Evening">Evening (2:00 PM - 10:00 PM)</SelectItem>
-                        <SelectItem value="Night">Night (10:00 PM - 6:00 AM)</SelectItem>
-                        <SelectItem value="Flexible">Flexible (8 hrs required)</SelectItem>
-                        <SelectItem value="Custom">Custom</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                {/* Custom Shift Time Inputs */}
-                {form.shift_type === 'Custom' && (
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                    <div>
-                      <Label className="text-sm font-medium">Login Time *</Label>
-                      <Input
-                        type="time"
-                        value={form.custom_login_time}
-                        onChange={(e) => handleFormChange('custom_login_time', e.target.value)}
-                        className="mt-1 bg-white"
-                        required
-                      />
-                      <p className="text-xs text-gray-500 mt-1">e.g., 09:00 for 9:00 AM</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Logout Time *</Label>
-                      <Input
-                        type="time"
-                        value={form.custom_logout_time}
-                        onChange={(e) => handleFormChange('custom_logout_time', e.target.value)}
-                        className="mt-1 bg-white"
-                        required
-                      />
-                      <p className="text-xs text-gray-500 mt-1">e.g., 18:00 for 6:00 PM</p>
-                    </div>
-                    {form.custom_login_time && form.custom_logout_time && (
-                      <div className="col-span-2">
-                        <p className="text-sm text-amber-700">
-                          Total Hours: {(() => {
-                            const [loginH, loginM] = form.custom_login_time.split(':').map(Number);
-                            const [logoutH, logoutM] = form.custom_logout_time.split(':').map(Number);
-                            const loginMins = loginH * 60 + loginM;
-                            const logoutMins = logoutH * 60 + logoutM;
-                            const totalMins = logoutMins < loginMins 
-                              ? (24 * 60 - loginMins + logoutMins) 
-                              : (logoutMins - loginMins);
-                            return `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
-                          })()}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* Monthly Salary */}
-                <div>
-                  <Label className="text-sm font-medium">Monthly Salary (₹)</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="1000"
-                    value={form.monthly_salary}
-                    onChange={(e) => handleFormChange('monthly_salary', parseFloat(e.target.value) || 0)}
-                    className="mt-1 bg-white"
-                    placeholder="Enter monthly salary"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Used for payroll & LOP calculations</p>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="system" className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium">User Role</Label>
-                  <Select value={form.user_role} onValueChange={(v) => handleFormChange('user_role', v)}>
-                    <SelectTrigger className="mt-1 bg-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {config.userRoles.map(role => (
-                        <SelectItem key={role} value={role}>{role.replace('_', ' ').toUpperCase()}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-[#f7f5ef] rounded-lg">
-                  <div>
-                    <Label className="text-sm font-medium">Login Enabled</Label>
-                    <p className="text-xs text-gray-500">Allow employee to log into the system</p>
-                  </div>
-                  <Switch
-                    checked={form.login_enabled}
-                    onCheckedChange={(v) => handleFormChange('login_enabled', v)}
-                  />
-                </div>
-                <div className="flex items-center justify-between p-4 bg-[#f7f5ef] rounded-lg">
-                  <div>
-                    <Label className="text-sm font-medium">Attendance Tracking</Label>
-                    <p className="text-xs text-gray-500">Enable attendance tracking for this employee</p>
-                  </div>
-                  <Switch
-                    checked={form.attendance_tracking_enabled}
-                    onCheckedChange={(v) => handleFormChange('attendance_tracking_enabled', v)}
-                  />
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-          <DialogFooter className="flex gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setShowEditSheet(false)}>Cancel</Button>
-            <Button onClick={submitEdit} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white" data-testid="submit-edit">
-              Update Employee
-            </Button>
+          <div className="py-4"><EmployeeForm isEdit /></div>
+          <DialogFooter className="flex gap-2 pt-4 border-t border-slate-100">
+            <Button variant="outline" onClick={() => setShowEditSheet(false)} className="rounded-lg">Cancel</Button>
+            <Button onClick={submitEdit} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg" data-testid="submit-edit">Update Employee</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* View Employee Dialog */}
+      {/* View Dialog */}
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
-        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="view-employee-desc">
+        <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
-            <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Employee Details - {selectedEmployee?.emp_id}
-            </DialogTitle>
+            <DialogTitle style={{ fontFamily: 'Outfit' }}>Employee Profile</DialogTitle>
+            <DialogDescription>{selectedEmployee?.emp_id}</DialogDescription>
           </DialogHeader>
-          <p id="view-employee-desc" className="sr-only">View detailed employee information</p>
           {selectedEmployee && (
             <div className="space-y-6 py-4">
-              <div className="flex items-center gap-4 pb-4 border-b">
-                <div className="w-16 h-16 rounded-full bg-[#0b1f3b] flex items-center justify-center">
-                  <span className="text-white text-2xl font-bold">
-                    {selectedEmployee.full_name?.charAt(0)?.toUpperCase()}
-                  </span>
+              <div className="flex items-center gap-4 pb-6 border-b border-slate-100">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center shadow-lg">
+                  <span className="text-white text-3xl font-bold">{selectedEmployee.full_name?.charAt(0)?.toUpperCase()}</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold">{selectedEmployee.full_name}</h3>
-                  <p className="text-gray-500">{selectedEmployee.designation} • {selectedEmployee.tier_level}</p>
-                  <Badge className={getStatusBadge(selectedEmployee.employee_status)}>
-                    {selectedEmployee.employee_status}
-                  </Badge>
+                  <h3 className="text-xl font-bold text-slate-900">{selectedEmployee.full_name}</h3>
+                  <p className="text-slate-500">{selectedEmployee.designation} • {selectedEmployee.tier_level}</p>
+                  <Badge className={`${getStatusBadge(selectedEmployee.employee_status)} mt-2`}>{selectedEmployee.employee_status}</Badge>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-sm text-gray-500 uppercase">Personal Information</h4>
-                  <div className="space-y-2">
-                    <p className="text-sm"><span className="text-gray-500">Email:</span> {selectedEmployee.official_email}</p>
-                    <p className="text-sm"><span className="text-gray-500">Phone:</span> {selectedEmployee.phone_number || '-'}</p>
-                    <p className="text-sm"><span className="text-gray-500">Gender:</span> {selectedEmployee.gender || '-'}</p>
-                    <p className="text-sm"><span className="text-gray-500">DOB:</span> {selectedEmployee.date_of_birth || '-'}</p>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-sm text-slate-500 uppercase tracking-wide">Personal</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3"><Mail className="w-4 h-4 text-slate-400" /><span className="text-sm text-slate-600">{selectedEmployee.official_email}</span></div>
+                    <div className="flex items-center gap-3"><Phone className="w-4 h-4 text-slate-400" /><span className="text-sm text-slate-600">{selectedEmployee.phone_number || '-'}</span></div>
+                    <div className="flex items-center gap-3"><Calendar className="w-4 h-4 text-slate-400" /><span className="text-sm text-slate-600">DOB: {selectedEmployee.date_of_birth || '-'}</span></div>
                   </div>
                 </div>
-
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-sm text-gray-500 uppercase">Employment</h4>
-                  <div className="space-y-2">
-                    <p className="text-sm"><span className="text-gray-500">Joined:</span> {selectedEmployee.date_of_joining}</p>
-                    <p className="text-sm"><span className="text-gray-500">Type:</span> {selectedEmployee.employment_type}</p>
-                    <p className="text-sm"><span className="text-gray-500">Manager:</span> {selectedEmployee.reporting_manager_name || '-'}</p>
-                    <p className="text-sm"><span className="text-gray-500">Location:</span> {selectedEmployee.work_location}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-sm text-gray-500 uppercase">Organization</h4>
-                  <div className="space-y-2">
-                    <p className="text-sm"><span className="text-gray-500">Department:</span> {selectedEmployee.department}</p>
-                    <p className="text-sm"><span className="text-gray-500">Team:</span> {selectedEmployee.team}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-sm text-gray-500 uppercase">System</h4>
-                  <div className="space-y-2">
-                    <p className="text-sm"><span className="text-gray-500">Role:</span> {selectedEmployee.user_role}</p>
-                    <p className="text-sm"><span className="text-gray-500">Login:</span> {selectedEmployee.login_enabled ? 'Enabled' : 'Disabled'}</p>
-                    <p className="text-sm"><span className="text-gray-500">Attendance:</span> {selectedEmployee.attendance_tracking_enabled ? 'Enabled' : 'Disabled'}</p>
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-sm text-slate-500 uppercase tracking-wide">Employment</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3"><Briefcase className="w-4 h-4 text-slate-400" /><span className="text-sm text-slate-600">Joined: {selectedEmployee.date_of_joining}</span></div>
+                    <div className="flex items-center gap-3"><Users className="w-4 h-4 text-slate-400" /><span className="text-sm text-slate-600">{selectedEmployee.department} / {selectedEmployee.team}</span></div>
+                    <div className="flex items-center gap-3"><MapPin className="w-4 h-4 text-slate-400" /><span className="text-sm text-slate-600">{selectedEmployee.work_location}</span></div>
                   </div>
                 </div>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowViewDialog(false)}>Close</Button>
-            {canEdit && (
-              <Button onClick={() => { setShowViewDialog(false); handleEdit(selectedEmployee); }} className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white">
-                Edit
-              </Button>
-            )}
+            <Button variant="outline" onClick={() => setShowViewDialog(false)} className="rounded-lg">Close</Button>
+            {canEdit && <Button onClick={() => { setShowViewDialog(false); handleEdit(selectedEmployee); }} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg">Edit</Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="bg-[#fffdf7]" aria-describedby="delete-employee-desc">
+        <DialogContent className="bg-[#fffdf7] rounded-2xl">
           <DialogHeader>
-            <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>Deactivate Employee</DialogTitle>
+            <DialogTitle style={{ fontFamily: 'Outfit' }}>Deactivate Employee</DialogTitle>
+            <DialogDescription>This will disable their login access and mark them as inactive.</DialogDescription>
           </DialogHeader>
-          <div className="py-4" id="delete-employee-desc">
-            <p className="text-gray-600">
-              Are you sure you want to deactivate <span className="font-semibold">{selectedEmployee?.full_name}</span>?
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              This will disable their login access and mark them as inactive. This action can be reversed.
-            </p>
+          <div className="py-4">
+            <p className="text-slate-600">Are you sure you want to deactivate <span className="font-semibold">{selectedEmployee?.full_name}</span>?</p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
-            <Button onClick={confirmDelete} className="bg-red-500 hover:bg-red-600 text-white" data-testid="confirm-delete">
-              Deactivate
-            </Button>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} className="rounded-lg">Cancel</Button>
+            <Button onClick={confirmDelete} className="bg-red-500 hover:bg-red-600 text-white rounded-lg" data-testid="confirm-delete">Deactivate</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
