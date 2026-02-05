@@ -3,95 +3,50 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { 
-  CalendarCheck, 
-  CalendarX, 
-  Clock, 
-  AlertTriangle,
-  LogIn,
-  LogOut as LogOutIcon,
-  CalendarDays,
-  User,
-  FileText
-} from 'lucide-react';
+import { CalendarCheck, CalendarX, Clock, AlertTriangle, LogIn, LogOut as LogOutIcon, CalendarDays, User, FileText, Star, TrendingUp, Activity } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const SummaryCard = ({ title, value, icon: Icon, color, bgColor, onClick }) => (
-  <div 
-    onClick={onClick}
-    className={`bg-[#fffdf7] rounded-xl border border-black/5 p-5 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer' : ''}`}
-    data-testid={`summary-card-${title.toLowerCase().replace(/\s/g, '-')}`}
-  >
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-2xl font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: '#0f172a' }}>
-          {value}
-        </p>
-        <p className="text-sm text-gray-500 mt-1">{title}</p>
-      </div>
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${bgColor}`}>
-        <Icon className="w-6 h-6" style={{ color }} strokeWidth={1.5} />
-      </div>
-    </div>
-  </div>
-);
-
-const QuickLinkCard = ({ title, icon: Icon, onClick, testId }) => (
-  <button 
-    onClick={onClick}
-    className="bg-[#fffdf7] rounded-xl border border-black/5 p-4 hover:shadow-md transition-all duration-200 flex items-center gap-3 w-full text-left"
-    data-testid={testId}
-  >
-    <div className="w-10 h-10 rounded-lg bg-[#0b1f3b]/5 flex items-center justify-center">
-      <Icon className="w-5 h-5 text-[#0b1f3b]" strokeWidth={1.5} />
-    </div>
-    <span className="text-sm font-medium text-gray-700">{title}</span>
-  </button>
-);
-
 const EmployeeDashboard = () => {
-  const { getAuthHeaders } = useAuth();
+  const { getAuthHeaders, user } = useAuth();
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [clockLoading, setClockLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  // Mock working hours data for chart
+  const [workingHoursData] = useState([
+    { day: 'Mon', hours: 8.5 },
+    { day: 'Tue', hours: 9.2 },
+    { day: 'Wed', hours: 7.8 },
+    { day: 'Thu', hours: 8.0 },
+    { day: 'Fri', hours: 8.7 },
+    { day: 'Sat', hours: 4.0 },
+    { day: 'Sun', hours: 0 },
+  ]);
+
   const fetchDashboard = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/employee/dashboard`, { 
-        headers: getAuthHeaders() 
-      });
+      const response = await axios.get(`${API}/employee/dashboard`, { headers: getAuthHeaders() });
       setDashboardData(response.data);
     } catch (error) {
-      console.error('Dashboard fetch error:', error);
       toast.error('Failed to load dashboard');
     } finally {
       setLoading(false);
     }
   }, [getAuthHeaders]);
 
-  useEffect(() => {
-    fetchDashboard();
-  }, [fetchDashboard]);
-
-  // Live clock update
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  useEffect(() => { fetchDashboard(); }, [fetchDashboard]);
+  useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 1000); return () => clearInterval(timer); }, []);
 
   const handleClockIn = async () => {
     try {
       setClockLoading(true);
-      await axios.post(`${API}/employee/clock-in`, {}, { 
-        headers: getAuthHeaders() 
-      });
+      await axios.post(`${API}/employee/clock-in`, {}, { headers: getAuthHeaders() });
       toast.success('Clocked in successfully!');
       fetchDashboard();
     } catch (error) {
@@ -104,9 +59,7 @@ const EmployeeDashboard = () => {
   const handleClockOut = async () => {
     try {
       setClockLoading(true);
-      await axios.post(`${API}/employee/clock-out`, {}, { 
-        headers: getAuthHeaders() 
-      });
+      await axios.post(`${API}/employee/clock-out`, {}, { headers: getAuthHeaders() });
       toast.success('Clocked out successfully!');
       fetchDashboard();
     } catch (error) {
@@ -116,180 +69,211 @@ const EmployeeDashboard = () => {
     }
   };
 
-  const navigateToAttendance = (statusFilter = 'All') => {
-    navigate(`/employee/attendance?status=${statusFilter}`);
-  };
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b1f3b]"></div>
+      <div className="flex items-center justify-center h-[60vh]">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-slate-500 text-sm">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
 
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long',
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  const formatTime = (date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      second: '2-digit',
-      hour12: true 
-    });
-  };
+  const todayStatus = dashboardData?.today_attendance;
+  const isLoggedIn = todayStatus?.status === 'Login';
+  const isCompleted = todayStatus?.status === 'Completed' || todayStatus?.check_out;
 
   return (
-    <div className="space-y-6 animate-fade-in" data-testid="employee-dashboard-page">
-      {/* Greeting Section */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6">
-        <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          Welcome back! {dashboardData?.employee_name || 'Employee'}
-        </h1>
-        <p className="text-gray-500 mt-1">{formatDate(currentTime)}</p>
+    <div className="space-y-6 animate-fade-in" data-testid="employee-dashboard">
+      {/* Welcome Section */}
+      <div className="card-premium p-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="relative z-10">
+          <h1 className="text-2xl lg:text-3xl font-bold" style={{ fontFamily: 'Outfit' }}>
+            Good {currentTime.getHours() < 12 ? 'Morning' : currentTime.getHours() < 17 ? 'Afternoon' : 'Evening'}, {user?.name?.split(' ')[0]}!
+          </h1>
+          <p className="text-white/80 mt-1">
+            {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+          </p>
+        </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <SummaryCard 
-          title="Active Days" 
-          value={dashboardData?.summary?.active_days || 0} 
-          icon={CalendarCheck}
-          color="#10b981"
-          bgColor="bg-emerald-100"
-          onClick={() => navigateToAttendance('Present')}
-        />
-        <SummaryCard 
-          title="Inactive Days" 
-          value={dashboardData?.summary?.inactive_days || 0} 
-          icon={CalendarX}
-          color="#ef4444"
-          bgColor="bg-red-100"
-          onClick={() => navigateToAttendance('Absent')}
-        />
-        <SummaryCard 
-          title="Late Arrivals" 
-          value={dashboardData?.summary?.late_arrivals || 0} 
-          icon={Clock}
-          color="#f59e0b"
-          bgColor="bg-amber-100"
-          onClick={() => navigateToAttendance('Late')}
-        />
-        <SummaryCard 
-          title="Early Out" 
-          value={dashboardData?.summary?.early_outs || 0} 
-          icon={AlertTriangle}
-          color="#8b5cf6"
-          bgColor="bg-purple-100"
-          onClick={() => navigateToAttendance('Early Out')}
-        />
-      </div>
-
-      {/* Clock Panel */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Live Clock */}
-          <div className="text-center lg:text-left">
-            <p className="text-5xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              {formatTime(currentTime)}
-            </p>
-            <p className="text-gray-500 mt-2">{dashboardData?.current_month}</p>
-            
-            {/* Clock In/Out Buttons */}
-            <div className="flex gap-3 mt-6 justify-center lg:justify-start">
-              {!dashboardData?.today?.is_logged_in ? (
-                <Button 
-                  onClick={handleClockIn}
-                  disabled={clockLoading}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-6"
-                  data-testid="clock-in-btn"
-                >
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Clock In
-                </Button>
-              ) : !dashboardData?.today?.is_logged_out ? (
-                <Button 
-                  onClick={handleClockOut}
-                  disabled={clockLoading}
-                  className="bg-red-600 hover:bg-red-700 text-white px-6"
-                  data-testid="clock-out-btn"
-                >
-                  <LogOutIcon className="w-4 h-4 mr-2" />
-                  Clock Out
-                </Button>
-              ) : (
-                <div className="px-4 py-2 bg-gray-100 rounded-lg text-gray-600 text-sm">
-                  Today's attendance completed
-                </div>
-              )}
+        {[
+          { label: 'Present Days', value: dashboardData?.attendance_summary?.present || 0, icon: CalendarCheck, color: 'emerald' },
+          { label: 'Leave Taken', value: dashboardData?.attendance_summary?.leaves || 0, icon: CalendarX, color: 'amber' },
+          { label: 'Absent', value: dashboardData?.attendance_summary?.absent || 0, icon: AlertTriangle, color: 'red' },
+          { label: 'This Month', value: `${Math.round((dashboardData?.attendance_summary?.present || 0) / 22 * 100)}%`, icon: TrendingUp, color: 'blue' },
+        ].map((stat, i) => (
+          <div key={i} className="stat-card">
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-xl bg-${stat.color}-100 flex items-center justify-center`}>
+                <stat.icon className={`w-6 h-6 text-${stat.color}-600`} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900 number-display">{stat.value}</p>
+                <p className="text-xs text-slate-500">{stat.label}</p>
+              </div>
             </div>
           </div>
+        ))}
+      </div>
 
-          {/* Today's Status */}
-          <div className="bg-gray-50 rounded-xl p-5 space-y-4">
-            <h3 className="font-semibold text-gray-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Today's Status
-            </h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-2">
-                  <LogIn className="w-5 h-5 text-emerald-600" />
-                </div>
-                <p className="text-xs text-gray-500">Login</p>
-                <p className="font-semibold text-sm">{dashboardData?.today?.login_time || '-'}</p>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Clock In/Out Card */}
+        <div className="lg:col-span-1">
+          <div className="card-premium p-6 h-full">
+            <h3 className="text-lg font-semibold text-slate-900 mb-6" style={{ fontFamily: 'Outfit' }}>Time Tracker</h3>
+            
+            {/* Digital Clock */}
+            <div className="text-center mb-6">
+              <div className="text-4xl font-bold text-slate-900 number-display" style={{ fontFamily: 'JetBrains Mono' }}>
+                {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
               </div>
-              <div className="text-center">
-                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-2">
-                  <LogOutIcon className="w-5 h-5 text-red-600" />
-                </div>
-                <p className="text-xs text-gray-500">Logout</p>
-                <p className="font-semibold text-sm">{dashboardData?.today?.logout_time || '-'}</p>
+              <p className="text-sm text-slate-500 mt-1">
+                {currentTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+              </p>
+            </div>
+
+            {/* Today's Status */}
+            <div className="p-4 rounded-xl bg-slate-50 mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-slate-500">Check-in</span>
+                <span className="text-sm font-medium text-slate-900">{todayStatus?.check_in || '--:--'}</span>
               </div>
-              <div className="text-center">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                </div>
-                <p className="text-xs text-gray-500">Hours Today</p>
-                <p className="font-semibold text-sm">{dashboardData?.today?.hours_today || '-'}</p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-500">Check-out</span>
+                <span className="text-sm font-medium text-slate-900">{todayStatus?.check_out || '--:--'}</span>
               </div>
+            </div>
+
+            {/* Clock Button */}
+            {isCompleted ? (
+              <div className="text-center p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                <CalendarCheck className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
+                <p className="text-emerald-700 font-medium">Day Completed</p>
+                <p className="text-xs text-emerald-600 mt-1">Great work today!</p>
+              </div>
+            ) : isLoggedIn ? (
+              <Button
+                onClick={handleClockOut}
+                disabled={clockLoading}
+                className="w-full h-14 bg-red-500 hover:bg-red-600 text-white rounded-xl text-lg font-medium shadow-lg shadow-red-500/20"
+                data-testid="clock-out-btn"
+              >
+                {clockLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <LogOutIcon className="w-5 h-5 mr-2" /> Clock Out
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleClockIn}
+                disabled={clockLoading}
+                className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-lg font-medium shadow-lg shadow-emerald-500/20"
+                data-testid="clock-in-btn"
+              >
+                {clockLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <LogIn className="w-5 h-5 mr-2" /> Clock In
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Working Hours Chart */}
+        <div className="lg:col-span-2">
+          <div className="card-premium p-6 h-full">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900" style={{ fontFamily: 'Outfit' }}>Working Hours This Week</h3>
+                <p className="text-sm text-slate-500">Daily breakdown</p>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Activity className="w-4 h-4 text-emerald-500" />
+                <span className="text-slate-600">Avg: 7.5 hrs</span>
+              </div>
+            </div>
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={workingHoursData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                  <Tooltip contentStyle={{ backgroundColor: 'white', border: 'none', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
+                  <Area type="monotone" dataKey="hours" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorHours)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
       </div>
 
       {/* Quick Links */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          Quick Links
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <QuickLinkCard 
-            title="Apply Leave" 
-            icon={CalendarDays} 
-            onClick={() => navigate('/employee/leave?action=apply')}
-            testId="quick-link-apply-leave"
-          />
-          <QuickLinkCard 
-            title="Attendance" 
-            icon={CalendarCheck} 
-            onClick={() => navigate('/employee/attendance')}
-            testId="quick-link-attendance"
-          />
-          <QuickLinkCard 
-            title="View Profile" 
-            icon={User} 
-            onClick={() => navigate('/employee/profile')}
-            testId="quick-link-profile"
-          />
+      <div className="card-flat p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4" style={{ fontFamily: 'Outfit' }}>Quick Actions</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'My Attendance', icon: CalendarCheck, path: '/employee/attendance' },
+            { label: 'Apply Leave', icon: CalendarDays, path: '/employee/leave' },
+            { label: 'My Profile', icon: User, path: '/employee/profile' },
+            { label: 'Policies', icon: FileText, path: '#' },
+          ].map((link, i) => (
+            <button
+              key={i}
+              onClick={() => navigate(link.path)}
+              className="p-4 rounded-xl bg-white border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all flex items-center gap-3"
+              data-testid={`quick-link-${link.label.toLowerCase().replace(/\s/g, '-')}`}
+            >
+              <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                <link.icon className="w-5 h-5 text-emerald-600" />
+              </div>
+              <span className="text-sm font-medium text-slate-700">{link.label}</span>
+            </button>
+          ))}
         </div>
       </div>
+
+      {/* Leave Balance */}
+      {dashboardData?.leave_balance && (
+        <div className="card-premium p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4" style={{ fontFamily: 'Outfit' }}>Leave Balance</h3>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: 'Sick Leave', used: dashboardData.leave_balance.sick_used || 0, total: dashboardData.leave_balance.sick_total || 12 },
+              { label: 'Casual Leave', used: dashboardData.leave_balance.casual_used || 0, total: dashboardData.leave_balance.casual_total || 12 },
+              { label: 'Annual Leave', used: dashboardData.leave_balance.annual_used || 0, total: dashboardData.leave_balance.annual_total || 15 },
+            ].map((leave, i) => (
+              <div key={i} className="p-4 rounded-xl bg-slate-50">
+                <p className="text-sm text-slate-500 mb-2">{leave.label}</p>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-bold text-slate-900">{leave.total - leave.used}</span>
+                  <span className="text-sm text-slate-500">/ {leave.total}</span>
+                </div>
+                <div className="h-2 bg-slate-200 rounded-full mt-2 overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${((leave.total - leave.used) / leave.total) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
