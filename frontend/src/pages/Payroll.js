@@ -173,11 +173,12 @@ const Payroll = () => {
           Payroll Management ({formatMonthDisplay()})
         </h1>
         <div className="flex items-center gap-4">
-          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-40 bg-white border-gray-300" data-testid="month-select">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
+          <MonthPicker
+            value={selectedMonth}
+            onChange={setSelectedMonth}
+            className="w-40"
+            data-testid="month-select"
+          />
               {getMonthOptions().map(opt => (
                 <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
               ))}
