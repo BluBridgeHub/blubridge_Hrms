@@ -80,11 +80,8 @@ const Login = () => {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
-              <span className="text-white font-bold text-xl" style={{ fontFamily: 'Outfit' }}>B</span>
-            </div>
+            <img src="/logo-white.png" alt="BluBridge" className="h-12 w-auto" />
             <div>
-              <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Outfit' }}>BluBridge</h1>
               <p className="text-xs text-white/60 uppercase tracking-widest">HRMS Platform</p>
             </div>
           </div>
