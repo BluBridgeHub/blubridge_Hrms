@@ -2722,7 +2722,7 @@ async def get_employee_leaves(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="No employee profile linked")
     
     employee_id = current_user["employee_id"]
-    now = datetime.now(timezone.utc)
+    now = get_ist_now()
     today_str = now.strftime("%Y-%m-%d")
     
     # Get all leaves for this employee
