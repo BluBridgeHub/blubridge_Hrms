@@ -1119,14 +1119,74 @@ const Employees = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="General">General</SelectItem>
-                        <SelectItem value="Morning">Morning</SelectItem>
-                        <SelectItem value="Evening">Evening</SelectItem>
-                        <SelectItem value="Night">Night</SelectItem>
-                        <SelectItem value="Flexible">Flexible</SelectItem>
+                        <SelectItem value="General">General (10:00 AM - 9:00 PM)</SelectItem>
+                        <SelectItem value="Morning">Morning (6:00 AM - 2:00 PM)</SelectItem>
+                        <SelectItem value="Evening">Evening (2:00 PM - 10:00 PM)</SelectItem>
+                        <SelectItem value="Night">Night (10:00 PM - 6:00 AM)</SelectItem>
+                        <SelectItem value="Flexible">Flexible (8 hrs required)</SelectItem>
+                        <SelectItem value="Custom">Custom</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+                
+                {/* Custom Shift Time Inputs */}
+                {form.shift_type === 'Custom' && (
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                    <div>
+                      <Label className="text-sm font-medium">Login Time *</Label>
+                      <Input
+                        type="time"
+                        value={form.custom_login_time}
+                        onChange={(e) => handleFormChange('custom_login_time', e.target.value)}
+                        className="mt-1 bg-white"
+                        required
+                      />
+                      <p className="text-xs text-gray-500 mt-1">e.g., 09:00 for 9:00 AM</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Logout Time *</Label>
+                      <Input
+                        type="time"
+                        value={form.custom_logout_time}
+                        onChange={(e) => handleFormChange('custom_logout_time', e.target.value)}
+                        className="mt-1 bg-white"
+                        required
+                      />
+                      <p className="text-xs text-gray-500 mt-1">e.g., 18:00 for 6:00 PM</p>
+                    </div>
+                    {form.custom_login_time && form.custom_logout_time && (
+                      <div className="col-span-2">
+                        <p className="text-sm text-amber-700">
+                          Total Hours: {(() => {
+                            const [loginH, loginM] = form.custom_login_time.split(':').map(Number);
+                            const [logoutH, logoutM] = form.custom_logout_time.split(':').map(Number);
+                            const loginMins = loginH * 60 + loginM;
+                            const logoutMins = logoutH * 60 + logoutM;
+                            const totalMins = logoutMins < loginMins 
+                              ? (24 * 60 - loginMins + logoutMins) 
+                              : (logoutMins - loginMins);
+                            return `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
+                          })()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Monthly Salary */}
+                <div>
+                  <Label className="text-sm font-medium">Monthly Salary (₹)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="1000"
+                    value={form.monthly_salary}
+                    onChange={(e) => handleFormChange('monthly_salary', parseFloat(e.target.value) || 0)}
+                    className="mt-1 bg-white"
+                    placeholder="Enter monthly salary"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Used for payroll & LOP calculations</p>
                 </div>
               </TabsContent>
 
