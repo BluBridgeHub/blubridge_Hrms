@@ -160,7 +160,7 @@ class User(BaseModel):
     employee_id: Optional[str] = None
     department: Optional[str] = None
     team: Optional[str] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: get_ist_now())
     is_active: bool = True
 
 class LoginRequest(BaseModel):
@@ -224,7 +224,7 @@ class Employee(BaseModel):
     deleted_at: Optional[datetime] = None
     
     # Timestamps
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: get_ist_now())
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class EmployeeCreate(BaseModel):
@@ -322,7 +322,7 @@ class Attendance(BaseModel):
     shift_type: Optional[str] = "General"  # Employee's shift at time of attendance
     expected_login: Optional[str] = None  # Expected login time based on shift
     expected_logout: Optional[str] = None  # Expected logout time based on shift
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: get_ist_now())
 
 class LeaveRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -338,7 +338,7 @@ class LeaveRequest(BaseModel):
     reason: Optional[str] = None
     status: str = "pending"
     approved_by: Optional[str] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: get_ist_now())
 
 class LeaveRequestCreate(BaseModel):
     employee_id: str
@@ -356,7 +356,7 @@ class StarReward(BaseModel):
     type: str = "performance"  # performance, learning, innovation, unsafe
     awarded_by: str
     month: str
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: get_ist_now())
 
 class StarRewardCreate(BaseModel):
     employee_id: str
@@ -371,7 +371,7 @@ class Team(BaseModel):
     department: str
     lead_id: Optional[str] = None
     member_count: int = 0
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: get_ist_now())
 
 class Department(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -410,7 +410,7 @@ class PayrollRecord(BaseModel):
     lop_deduction: float = 0.0
     net_salary: float = 0.0
     attendance_details: List[dict] = []  # Daily attendance breakdown
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: get_ist_now())
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ShiftConfigCreate(BaseModel):
