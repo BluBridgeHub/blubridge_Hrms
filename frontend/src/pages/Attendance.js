@@ -7,7 +7,11 @@ import {
   Search, 
   Filter,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Clock,
+  LogIn,
+  LogOut as LogOutIcon,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -34,9 +38,7 @@ const Attendance = () => {
     status: 'All'
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
@@ -44,10 +46,7 @@ const Attendance = () => {
       const [attendanceRes, teamsRes, deptsRes] = await Promise.all([
         axios.get(`${API}/attendance`, {
           headers: getAuthHeaders(),
-          params: {
-            from_date: formatDateForApi(filters.fromDate),
-            to_date: formatDateForApi(filters.toDate)
-          }
+          params: { from_date: formatDateForApi(filters.fromDate), to_date: formatDateForApi(filters.toDate) }
         }),
         axios.get(`${API}/teams`, { headers: getAuthHeaders() }),
         axios.get(`${API}/departments`, { headers: getAuthHeaders() })
@@ -67,11 +66,6 @@ const Attendance = () => {
     if (!date) return '';
     const d = new Date(date);
     return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
-  };
-
-  const formatDateDisplay = (dateStr) => {
-    if (!dateStr) return '-';
-    return dateStr;
   };
 
   const handleFilter = async () => {
@@ -109,100 +103,107 @@ const Attendance = () => {
   const sortedAttendance = [...attendance].sort((a, b) => {
     const aVal = a[sortField] || '';
     const bVal = b[sortField] || '';
-    if (sortOrder === 'asc') {
-      return aVal.localeCompare(bVal);
-    }
-    return bVal.localeCompare(aVal);
+    return sortOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
   });
 
   const getSortIcon = (field) => {
     if (sortField !== field) return null;
-    return sortOrder === 'asc' ? 
-      <ChevronUp className="w-4 h-4 inline ml-1" /> : 
-      <ChevronDown className="w-4 h-4 inline ml-1" />;
+    return sortOrder === 'asc' ? <ChevronUp className="w-4 h-4 inline ml-1" /> : <ChevronDown className="w-4 h-4 inline ml-1" />;
   };
 
   const getStatusBadge = (status, isLop) => {
-    if (isLop || status === 'Loss of Pay') {
-      return 'bg-red-100 text-red-700 font-bold';
-    }
+    if (isLop || status === 'Loss of Pay') return 'badge-error font-bold';
     const styles = {
-      'Login': 'bg-emerald-100 text-emerald-700',
-      'Completed': 'bg-blue-100 text-blue-700',
-      'Present': 'bg-green-100 text-green-700',
-      'Not Logged': 'bg-gray-100 text-gray-700',
-      'Early Out': 'bg-red-100 text-red-700',
-      'Late Login': 'bg-amber-100 text-amber-700',
-      'Loss of Pay': 'bg-red-100 text-red-700 font-bold'
+      'Login': 'badge-success', 'Completed': 'badge-info', 'Present': 'badge-success',
+      'Not Logged': 'badge-neutral', 'Early Out': 'badge-error', 'Late Login': 'badge-warning'
     };
-    return styles[status] || 'bg-gray-100 text-gray-700';
+    return styles[status] || 'badge-neutral';
+  };
+
+  const getStatusIcon = (status) => {
+    if (status === 'Login') return <LogIn className="w-3 h-3" />;
+    if (status === 'Completed') return <LogOutIcon className="w-3 h-3" />;
+    if (status === 'Late Login') return <Clock className="w-3 h-3" />;
+    return null;
+  };
+
+  // Stats
+  const stats = {
+    present: sortedAttendance.filter(a => a.status === 'Present' || a.status === 'Completed').length,
+    login: sortedAttendance.filter(a => a.status === 'Login').length,
+    late: sortedAttendance.filter(a => a.status === 'Late Login').length,
+    absent: sortedAttendance.filter(a => a.status === 'Not Logged' || a.is_lop).length,
   };
 
   return (
     <div className="space-y-6 animate-fade-in" data-testid="attendance-page">
-      {/* Page Header */}
+      {/* Header */}
       <div className="flex items-center gap-3">
-        <CalendarCheck className="w-6 h-6 text-[#0b1f3b]" />
-        <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-          Attendance
-        </h1>
+        <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+          <CalendarCheck className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>Attendance</h1>
+          <p className="text-sm text-slate-500">Track employee attendance records</p>
+        </div>
       </div>
 
-      {/* Filter Section */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Emp Name:</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Search"
-                value={filters.empName}
-                onChange={(e) => setFilters({ ...filters, empName: e.target.value })}
-                className="pl-9 bg-white"
-                data-testid="search-emp-name"
-              />
+      {/* Quick Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Present', value: stats.present, icon: LogOutIcon, color: 'emerald' },
+          { label: 'Logged In', value: stats.login, icon: LogIn, color: 'blue' },
+          { label: 'Late Login', value: stats.late, icon: Clock, color: 'amber' },
+          { label: 'Absent/LOP', value: stats.absent, icon: AlertCircle, color: 'red' },
+        ].map((stat, i) => (
+          <div key={i} className="card-flat p-4 flex items-center gap-4">
+            <div className={`w-10 h-10 rounded-xl bg-${stat.color}-100 flex items-center justify-center`}>
+              <stat.icon className={`w-5 h-5 text-${stat.color}-600`} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900 number-display">{stat.value}</p>
+              <p className="text-xs text-slate-500">{stat.label}</p>
             </div>
           </div>
-          
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div className="card-flat p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">Department:</label>
+            <label className="text-sm text-slate-600 mb-1.5 block font-medium">Employee Name</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input placeholder="Search..." value={filters.empName} onChange={(e) => setFilters({ ...filters, empName: e.target.value })} className="pl-10 rounded-lg" data-testid="search-emp-name" />
+            </div>
+          </div>
+          <div>
+            <label className="text-sm text-slate-600 mb-1.5 block font-medium">Department</label>
             <Select value={filters.department} onValueChange={(v) => setFilters({ ...filters, department: v })}>
-              <SelectTrigger className="bg-white" data-testid="filter-department">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="rounded-lg" data-testid="filter-department"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All</SelectItem>
-                {departments.map((dept) => (
-                  <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
-                ))}
+                <SelectItem value="All">All Departments</SelectItem>
+                {departments.map((dept) => <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">Team:</label>
+            <label className="text-sm text-slate-600 mb-1.5 block font-medium">Team</label>
             <Select value={filters.team} onValueChange={(v) => setFilters({ ...filters, team: v })}>
-              <SelectTrigger className="bg-white" data-testid="filter-team">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="rounded-lg" data-testid="filter-team"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All</SelectItem>
-                {teams.map((team) => (
-                  <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
-                ))}
+                <SelectItem value="All">All Teams</SelectItem>
+                {teams.map((team) => <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">Status:</label>
+            <label className="text-sm text-slate-600 mb-1.5 block font-medium">Status</label>
             <Select value={filters.status} onValueChange={(v) => setFilters({ ...filters, status: v })}>
-              <SelectTrigger className="bg-white" data-testid="filter-status">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="rounded-lg" data-testid="filter-status"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All</SelectItem>
+                <SelectItem value="All">All Status</SelectItem>
                 <SelectItem value="Login">Login</SelectItem>
                 <SelectItem value="Completed">Completed</SelectItem>
                 <SelectItem value="Present">Present</SelectItem>
@@ -217,131 +218,82 @@ const Attendance = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">From:</label>
-            <DatePicker
-              value={filters.fromDate}
-              onChange={(val) => setFilters({ ...filters, fromDate: val })}
-              placeholder="Select date"
-              data-testid="filter-from"
-            />
+            <label className="text-sm text-slate-600 mb-1.5 block font-medium">From Date</label>
+            <DatePicker value={filters.fromDate} onChange={(val) => setFilters({ ...filters, fromDate: val })} placeholder="Select date" data-testid="filter-from" />
           </div>
-
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">To:</label>
-            <DatePicker
-              value={filters.toDate}
-              onChange={(val) => setFilters({ ...filters, toDate: val })}
-              placeholder="Select date"
-              data-testid="filter-to"
-            />
+            <label className="text-sm text-slate-600 mb-1.5 block font-medium">To Date</label>
+            <DatePicker value={filters.toDate} onChange={(val) => setFilters({ ...filters, toDate: val })} placeholder="Select date" data-testid="filter-to" />
           </div>
-
           <div className="flex items-end gap-2 lg:col-span-2">
-            <Button 
-              onClick={handleFilter}
-              className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
-              data-testid="apply-filter-btn"
-            >
-              <Filter className="w-4 h-4 mr-2" />
-              Filter
+            <Button onClick={handleFilter} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg" data-testid="apply-filter-btn">
+              <Filter className="w-4 h-4 mr-2" /> Apply Filter
             </Button>
-            <Button 
-              variant="outline"
-              onClick={() => {
-                setFilters({
-                  empName: '',
-                  team: 'All',
-                  department: 'All',
-                  fromDate: new Date().toISOString().split('T')[0],
-                  toDate: new Date().toISOString().split('T')[0],
-                  status: 'All'
-                });
-                fetchData();
-              }}
-              data-testid="reset-filter-btn"
-            >
+            <Button variant="outline" onClick={() => { setFilters({ empName: '', team: 'All', department: 'All', fromDate: new Date().toISOString().split('T')[0], toDate: new Date().toISOString().split('T')[0], status: 'All' }); fetchData(); }} className="rounded-lg" data-testid="reset-filter-btn">
               Reset
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Attendance Table */}
-      <div className="bg-[#fffdf7] rounded-xl border border-black/5 overflow-hidden">
+      {/* Table */}
+      <div className="card-premium overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b1f3b]"></div>
+            <div className="w-10 h-10 border-2 border-[#004EEB] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50/50">
+            <table className="table-premium">
+              <thead>
                 <tr>
-                  <th 
-                    className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('emp_name')}
-                  >
-                    Emp Name {getSortIcon('emp_name')}
-                  </th>
-                  <th 
-                    className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('team')}
-                  >
-                    Team {getSortIcon('team')}
-                  </th>
-                  <th 
-                    className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('date')}
-                  >
-                    Date {getSortIcon('date')}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Check-In
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Check-Out
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Total Hours
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Status
-                  </th>
+                  <th className="cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('emp_name')}>Employee {getSortIcon('emp_name')}</th>
+                  <th className="cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('team')}>Team {getSortIcon('team')}</th>
+                  <th className="cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('date')}>Date {getSortIcon('date')}</th>
+                  <th>Check-In</th>
+                  <th>Check-Out</th>
+                  <th>Total Hours</th>
+                  <th>Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody>
                 {sortedAttendance.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
-                      No attendance records found
+                    <td colSpan="7" className="text-center py-12 text-slate-500">
+                      <CalendarCheck className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                      <p>No attendance records found</p>
                     </td>
                   </tr>
                 ) : (
                   sortedAttendance.map((record, index) => (
-                    <tr key={record.id || index} className={`hover:bg-gray-50/50 transition-colors ${record.is_lop ? 'bg-red-50/50' : ''}`}>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{record.emp_name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{record.team}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{formatDateDisplay(record.date)}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        <div>{record.check_in || '-'}</div>
-                        {record.expected_login && (
-                          <div className="text-xs text-gray-400">Expected: {record.expected_login}</div>
-                        )}
+                    <tr key={record.id || index} className={record.is_lop ? 'bg-red-50/50' : ''}>
+                      <td>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center">
+                            <span className="text-white text-xs font-medium">{record.emp_name?.charAt(0)}</span>
+                          </div>
+                          <span className="font-medium text-slate-900">{record.emp_name}</span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        <div>{record.check_out || '-'}</div>
-                        {record.expected_logout && (
-                          <div className="text-xs text-gray-400">Expected: {record.expected_logout}</div>
-                        )}
+                      <td className="text-slate-600">{record.team}</td>
+                      <td className="text-slate-600">{record.date}</td>
+                      <td>
+                        <div className="text-slate-900 font-medium">{record.check_in || '-'}</div>
+                        {record.expected_login && <div className="text-xs text-slate-400">Expected: {record.expected_login}</div>}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{record.total_hours || '-'}</td>
-                      <td className="px-6 py-4">
-                        <Badge className={getStatusBadge(record.status, record.is_lop)}>
+                      <td>
+                        <div className="text-slate-900 font-medium">{record.check_out || '-'}</div>
+                        {record.expected_logout && <div className="text-xs text-slate-400">Expected: {record.expected_logout}</div>}
+                      </td>
+                      <td className="text-slate-600 font-medium">{record.total_hours || '-'}</td>
+                      <td>
+                        <Badge className={`${getStatusBadge(record.status, record.is_lop)} flex items-center gap-1 w-fit`}>
+                          {getStatusIcon(record.is_lop ? 'Loss of Pay' : record.status)}
                           {record.is_lop ? 'Loss of Pay' : record.status}
                         </Badge>
                         {record.is_lop && record.lop_reason && (
-                          <div className="text-xs text-red-600 mt-1 max-w-[200px]" title={record.lop_reason}>
-                            {record.lop_reason.substring(0, 50)}...
+                          <div className="text-xs text-red-600 mt-1 max-w-[200px] truncate" title={record.lop_reason}>
+                            {record.lop_reason}
                           </div>
                         )}
                       </td>
