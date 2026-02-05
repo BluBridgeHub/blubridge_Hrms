@@ -290,7 +290,7 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#063c88]" />
+                <div className="w-3 h-3 rounded-full bg-[#004EEB]" />
                 <span className="text-slate-600">Present</span>
               </div>
               <div className="flex items-center gap-2">
@@ -308,8 +308,8 @@ const Dashboard = () => {
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#063c88" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#063c88" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#004EEB" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#004EEB" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -323,7 +323,7 @@ const Dashboard = () => {
                     boxShadow: '0 4px 20px rgba(0,0,0,0.1)' 
                   }}
                 />
-                <Area type="monotone" dataKey="present" stroke="#063c88" strokeWidth={2} fillOpacity={1} fill="url(#colorPresent)" />
+                <Area type="monotone" dataKey="present" stroke="#004EEB" strokeWidth={2} fillOpacity={1} fill="url(#colorPresent)" />
                 <Area type="monotone" dataKey="late" stroke="#f59e0b" strokeWidth={2} fill="transparent" />
                 <Area type="monotone" dataKey="absent" stroke="#f87171" strokeWidth={2} fill="transparent" />
               </AreaChart>
