@@ -204,11 +204,11 @@ const Reports = () => {
             {/* Row 1 */}
             <div>
               <label className="text-sm text-gray-600 mb-2 block">From:</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={leaveFilters.fromDate}
-                onChange={(e) => setLeaveFilters({ ...leaveFilters, fromDate: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
+                onChange={(val) => setLeaveFilters({ ...leaveFilters, fromDate: val })}
+                placeholder="Select date"
+                className="w-full border-0 border-b-2 border-b-[#0b1f3b] rounded-none"
                 data-testid="leave-filter-from"
               />
             </div>
@@ -241,11 +241,11 @@ const Reports = () => {
             {/* Row 2 */}
             <div>
               <label className="text-sm text-gray-600 mb-2 block">To:</label>
-              <Input
-                type="date"
+              <DatePicker
                 value={leaveFilters.toDate}
-                onChange={(e) => setLeaveFilters({ ...leaveFilters, toDate: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
+                onChange={(val) => setLeaveFilters({ ...leaveFilters, toDate: val })}
+                placeholder="Select date"
+                className="w-full border-0 border-b-2 border-b-[#0b1f3b] rounded-none"
                 data-testid="leave-filter-to"
               />
             </div>
