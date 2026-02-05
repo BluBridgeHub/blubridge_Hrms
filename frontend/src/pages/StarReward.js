@@ -133,9 +133,6 @@ const StarReward = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [goToPage, setGoToPage] = useState('1');
-  
-  // Expanded teams in table view
-  const [expandedTeams, setExpandedTeams] = useState({});
 
   useEffect(() => {
     fetchData();
