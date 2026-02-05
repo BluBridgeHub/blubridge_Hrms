@@ -136,15 +136,49 @@ const Layout = ({ children }) => {
             </button>
             
             <div className="flex items-center gap-4 ml-auto">
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-[#0b1f3b] flex items-center justify-center">
-                <span className="text-white font-medium">
-                  {user?.name?.charAt(0)?.toUpperCase()}
-                </span>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-3 hover:bg-black/5 rounded-lg px-3 py-2 transition-colors" data-testid="admin-profile-dropdown">
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                      <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-[#0b1f3b] flex items-center justify-center">
+                      <span className="text-white font-medium">
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                      </span>
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-white">
+                  <DropdownMenuItem 
+                    onClick={() => navigate('/admin-profile')}
+                    className="cursor-pointer"
+                    data-testid="admin-profile-btn"
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Admin Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => navigate('/change-password')}
+                    className="cursor-pointer"
+                    data-testid="change-password-btn"
+                  >
+                    <KeyRound className="w-4 h-4 mr-2" />
+                    Password Change
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={handleLogout}
+                    className="cursor-pointer text-red-600 focus:text-red-600"
+                    data-testid="dropdown-logout-btn"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </header>
