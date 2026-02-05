@@ -2548,7 +2548,7 @@ async def employee_clock_out(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="No employee profile linked")
     
     employee_id = current_user["employee_id"]
-    now = datetime.now(timezone.utc)
+    now = get_ist_now()
     today_str = now.strftime("%d-%m-%Y")
     check_out_time = now.strftime("%I:%M %p")
     
