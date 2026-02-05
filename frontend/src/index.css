@@ -186,7 +186,7 @@
 }
 
 .table-premium thead th {
-    @apply px-4 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider;
+    @apply px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider;
     letter-spacing: 0.05em;
 }
 
@@ -199,7 +199,7 @@
 }
 
 .table-premium tbody td {
-    @apply px-4 py-4 text-sm;
+    @apply px-3 py-3 text-sm;
 }
 
 /* Status Badges */
