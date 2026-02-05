@@ -200,7 +200,7 @@ const EmployeeDashboard = () => {
                 <p className="text-sm text-slate-500">Daily breakdown</p>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <Activity className="w-4 h-4 text-[#063c88]" />
+                <Activity className="w-4 h-4 text-[#3271ec]" />
                 <span className="text-slate-600">Avg: 7.5 hrs</span>
               </div>
             </div>
@@ -209,15 +209,15 @@ const EmployeeDashboard = () => {
                 <AreaChart data={workingHoursData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#063c88" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#063c88" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#3271ec" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#3271ec" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                   <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
                   <Tooltip contentStyle={{ backgroundColor: 'white', border: 'none', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
-                  <Area type="monotone" dataKey="hours" stroke="#063c88" strokeWidth={2} fillOpacity={1} fill="url(#colorHours)" />
+                  <Area type="monotone" dataKey="hours" stroke="#3271ec" strokeWidth={2} fillOpacity={1} fill="url(#colorHours)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
