@@ -218,22 +218,20 @@ const Attendance = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="text-sm text-gray-600 mb-1 block">From:</label>
-            <Input
-              type="date"
+            <DatePicker
               value={filters.fromDate}
-              onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
-              className="bg-white"
+              onChange={(val) => setFilters({ ...filters, fromDate: val })}
+              placeholder="Select date"
               data-testid="filter-from"
             />
           </div>
 
           <div>
             <label className="text-sm text-gray-600 mb-1 block">To:</label>
-            <Input
-              type="date"
+            <DatePicker
               value={filters.toDate}
-              onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
-              className="bg-white"
+              onChange={(val) => setFilters({ ...filters, toDate: val })}
+              placeholder="Select date"
               data-testid="filter-to"
             />
           </div>
