@@ -1,153 +1,102 @@
 # BluBridge HRMS - Product Requirements Document
 
 ## Original Problem Statement
-Build production-ready Enterprise HRMS with:
-- **Admin Module**: Dashboard, Employee Management, Attendance, Leave, Star Rewards, Teams, Reports, Payroll
-- **Employee Module**: Personal Dashboard, Self-service Attendance, Leave Management, Profile View
-- Role-based access control (Admin, HR Manager, Team Lead, Employee)
+Build a complete Human Resource Management System (HRMS) with admin and employee modules, including:
+- Employee management with CRUD operations
+- Attendance tracking with check-in/out
+- Leave management with approval workflows
+- Star reward system for performance tracking
+- Team management by departments
+- Payroll with attendance-based calculations
+- Reports generation and export
 
-## Architecture
-- **Frontend**: React with React Router, Tailwind CSS, Shadcn/UI components
-- **Backend**: FastAPI (Python) with async MongoDB driver (Motor)
-- **Database**: MongoDB (local)
-- **Authentication**: JWT tokens with role-based permissions
-- **File Storage**: Cloudinary (image & document uploads)
-- **Email**: Resend (configured with API key)
-- **Design System**: Custom BluBridge theme (#efede5 background, #fffdf7 containers, #0b1f3b primary)
+## Latest Update: Premium UI/UX Redesign (Feb 5, 2026)
+
+### Completed: Full Visual Redesign
+**100% Complete** - All pages redesigned with premium enterprise-grade UI/UX
+
+#### Design System
+- **Color Palette**: Primary Blue (#004EEB), Background (#efede5), Cards (#fffdf7)
+- **Typography**: Outfit for headings, Public Sans for body, JetBrains Mono for numbers
+- **Components**: Glassmorphism sidebar, Bento grid layouts, Premium stat cards
+- **Charts**: Recharts integration for data visualization
+
+#### Pages Redesigned
+1. **Login** - Premium split layout with blue gradient branding
+2. **Admin Layout** - Glassmorphism sidebar with active states, search bar, notifications
+3. **Employee Layout** - Simplified employee navigation with emerald/teal accent
+4. **Dashboard** - Bento grid with stats, Weekly Attendance chart, Attendance Distribution
+5. **Employees** - Stats cards, advanced filters, premium table, tabbed forms
+6. **Attendance** - Quick stats, sortable table, status badges with icons
+7. **Leave** - Request/History tabs, approve/reject workflows
+8. **Star Reward** - Amber/gold theme, employees/teams tabs, grid/table views
+9. **Team** - Department tabs, team cards grid, member modals
+10. **Payroll** - Summary cards, salary chart, attendance/salary view tabs
+11. **Reports** - Leave/Attendance report filters and export
+12. **Admin Profile** - Premium gradient header with editable fields
+13. **Change Password** - Security-focused with password strength indicator
+14. **Employee Dashboard** - Clock in/out with working hours chart
+15. **Employee Attendance** - Personal attendance history
+16. **Employee Leave** - Leave balance and application
+17. **Employee Profile** - Personal information display
+
+### Testing Status
+- **Testing Agent**: Iteration 15 - 100% Pass Rate (11/11 features)
+- **All functionality preserved** - No logic changes made
+- **Design Guidelines**: `/app/design_guidelines.json`
+
+## Technology Stack
+- **Frontend**: React 18, Tailwind CSS, Shadcn/UI, Recharts
+- **Backend**: FastAPI, Python
+- **Database**: MongoDB
+- **Authentication**: JWT tokens
 
 ## User Personas
-1. **Admin** - Full system access, user management, audit logs, payroll management
-2. **HR Manager** - Employee management, leave approvals, reports, payroll
-3. **Team Lead** - Team member management, leave approvals for team
-4. **Employee** - Self-service attendance, leave requests, profile view
+1. **Admin/HR Manager** - Full access to all modules
+2. **Team Lead** - Department-level access, approve leaves
+3. **Employee** - Personal dashboard, attendance, leave requests
 
----
+## Core Features (All Implemented)
+1. ✅ Authentication with role-based access
+2. ✅ Employee CRUD with advanced search/filters
+3. ✅ Attendance tracking with check-in/out
+4. ✅ Leave management with approval workflow
+5. ✅ Star reward system with weekly tracking
+6. ✅ Team dashboard by departments
+7. ✅ Payroll with LOP calculations
+8. ✅ CSV export for reports
 
-## What's Been Implemented
+## Future Enhancements (Backlog)
+- P2: Email notifications for leave approvals
+- P2: Calendar view for attendance
+- P3: Performance review module
+- P3: Document management
 
-### Admin Module (Completed)
-- **Dashboard**: Summary cards with navigation, attendance status tabs, leave list table, date range filtering
-- **Employee Management**: Full CRUD, section-based forms, search/filter, pagination, CSV export, reactivation logic
-- **Attendance Tracking**: Daily check-in/out tracking, status management, filters (department, team, status, date range), LOP detection
-- **Leave Management**: Request/approval workflow, approve/reject modals, email notifications, corrected leave type filter
-- **Star Rating Module**: COMPLETE REDESIGN (Feb 4, 2026) - View modal fix (Feb 5, 2026)
-- **Team Dashboard**: Department tabs, team cards with member counts
-- **Reports**: Attendance, Leave, Employee reports with CSV export
-- **Payroll Module**: NEW (Feb 5, 2026) - Full payroll management with LOP calculations
-- **Admin Profile & Password Change Pages**: NEW (Feb 5, 2026)
-
-### Employee Module (Completed)
-- **Dashboard**: Summary cards, live clock, clock-in/out, quick links
-- **Attendance**: Duration filters, status filters, calendar view
-- **Leave**: Apply/edit leave requests with document upload
-- **Profile**: Read-only profile with password change
-
-### Shift Rules & LOP System (NEW - Feb 5, 2026)
-**Backend Implementation:**
-- `SHIFT_DEFINITIONS` with 6 shift types:
-  - General: 10:00 AM - 9:00 PM (11 hours)
-  - Morning: 6:00 AM - 2:00 PM (8 hours)
-  - Evening: 2:00 PM - 10:00 PM (8 hours)
-  - Night: 10:00 PM - 6:00 AM (8 hours)
-  - Flexible: 8 hours required, no fixed time
-  - Custom: Admin-defined login/logout times
-  
-**Strict LOP Rules (No Grace Period):**
-- Late Login (even 1 minute) = 0.5 Day LOP
-- Early Logout (even 1 minute) = 0.5 Day LOP
-- Both Late Login AND Early Logout = 1 Full Day LOP
-- Insufficient Hours = Loss of Pay
-- All rules enforced in backend, frontend is display-only
-
-**New API Endpoints:**
-- `GET /api/config/shifts` - Get all shift configurations
-- `GET /api/config/shift/{type}` - Get specific shift details
-- `PUT /api/employees/{id}/shift` - Update employee shift (supports Custom)
-- `PUT /api/employees/{id}/salary` - Update employee monthly salary
-- `GET /api/payroll?month=YYYY-MM` - Get payroll for all employees
-- `GET /api/payroll/{employee_id}?month=YYYY-MM` - Get individual payroll
-- `GET /api/payroll/summary/{month}` - Get payroll summary
-
-**Payroll Calculation Formula:**
-- Per Day Salary = Monthly Salary / 30
-- LOP Deduction = Per Day Salary × (LOP Days + Absent Days)
-- Net Salary = Monthly Salary - LOP Deduction
-
-**Frontend Updates:**
-- Payroll.js: Summary cards, Attendance View (calendar grid), Salary View (table with LOP columns)
-- Employees.js: Custom Shift option with login/logout time inputs, Monthly Salary field
-- Attendance.js: LOP status filter, expected times display, LOP reason display
-
----
-
-## Recent Bug Fix (Feb 5, 2026)
-
-### Star Rating "View" Button Modal Fix
-**Issue:** When clicking the "View" button for an employee in the Star Rating module, the modal with employee details failed to appear.
-
-**Root Cause:** The Dialog component was only rendered in the main list view's return statement. When in Team Details view or Add Form view (both use early returns), the Dialog was never rendered.
-
-**Solution:** Extracted the modal into a reusable `ViewHistoryModal` component and included it in all three return statements:
-1. Add/Edit Form view (line 439)
-2. Team Details view (line 651)
-3. Main List view (line 771)
-
-**Files Modified:** `frontend/src/pages/StarReward.js`
-
-**Test Results:** 100% pass rate (iteration_14.json)
-
----
-
-## Integrations
-
-### Cloudinary (Configured & Active)
-- Cloud Name: dpkhfdlnp
-- Signed uploads via `/api/cloudinary/signature`
-- Used for: Employee avatars, Leave supporting documents
-
-### Resend Email (Configured & Active)
-- API Key: Configured in backend/.env
-- HTML email templates for leave approval/rejection, welcome emails
-- Professional BluBridge branding
-
----
+## File Structure
+```
+/app/frontend/src/
+├── components/
+│   ├── Layout.js          # Admin layout with premium sidebar
+│   ├── EmployeeLayout.js  # Employee layout
+│   └── ui/                # Shadcn components
+├── pages/
+│   ├── Login.js           # Premium login page
+│   ├── Dashboard.js       # Admin dashboard with charts
+│   ├── Employees.js       # Employee management
+│   ├── Attendance.js      # Attendance tracking
+│   ├── Leave.js           # Leave management
+│   ├── StarReward.js      # Star rewards (amber theme)
+│   ├── Team.js            # Team dashboard
+│   ├── Payroll.js         # Payroll management
+│   ├── Reports.js         # Report generation
+│   ├── AdminProfile.js    # Admin profile
+│   ├── ChangePassword.js  # Password change
+│   ├── EmployeeDashboard.js
+│   ├── EmployeeAttendance.js
+│   ├── EmployeeLeave.js
+│   └── EmployeeProfile.js
+└── index.css              # Global premium styles
+```
 
 ## Test Credentials
-
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | admin | admin |
-| Employee | user | user |
-
----
-
-## Test Results
-- P0 Dashboard Fixes: 100% pass rate (iteration_6.json)
-- P1 Admin Fixes: 100% pass rate (iteration_7.json)
-- Star Rating Redesign: 100% pass rate (iteration_8.json)
-- Shift Rules & Payroll: 100% pass rate (iteration_9.json) - Feb 5, 2026
-- Star Rating Logic & Theme Fixes: 100% pass rate (iteration_10.json) - Feb 5, 2026
-- Star Rating View Members & Check-In Sync: 100% pass rate (iteration_11.json) - Feb 5, 2026
-- Date Picker & LOP 0.5 Day Calculation: 100% pass rate (iteration_12.json) - Feb 5, 2026
-- IST Timezone Implementation: 100% pass rate (iteration_13.json) - Feb 5, 2026
-- Star Rating View Button Modal Fix: 100% pass rate (iteration_14.json) - Feb 5, 2026
-
----
-
-## Pending Issues
-None - All issues resolved.
-
-## Upcoming Tasks (P1)
-1. **Department & Team Creation UI** - Add UI for creating Departments & Teams in Admin module (currently hardcoded)
-2. **Responsive Layout Verification** - Verify Dashboard and Team pages at various zoom levels
-
-## Future/Backlog (P2)
-- Employee Avatar Upload UI
-- Clock-in/out widget on Admin Dashboard
-- Visual organization chart
-- Push notifications
-- Mobile-responsive enhancements
-- Dark mode support
-- Payroll PDF export
-- Payslip generation
-- Backend modularization using Flask Blueprints (server.py is large)
+- **Admin**: admin / admin
