@@ -1114,6 +1114,7 @@ const StarReward = () => {
           </>
         )}
       </div>
+    </div>
     </>
   );
 };
