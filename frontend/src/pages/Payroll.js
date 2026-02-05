@@ -144,19 +144,6 @@ const Payroll = () => {
     toast.success('CSV exported');
   };
 
-  // Generate month options
-  const getMonthOptions = () => {
-    const options = [];
-    const now = new Date();
-    for (let i = 0; i < 12; i++) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-      const label = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-      options.push({ value, label });
-    }
-    return options;
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64 bg-[#efede5]">
