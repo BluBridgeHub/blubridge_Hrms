@@ -142,12 +142,14 @@ const Dashboard = () => {
       if (filters.fromDate) statsParams.from_date = formatDateForAPI(filters.fromDate);
       if (filters.toDate) statsParams.to_date = formatDateForAPI(filters.toDate);
       
-      const [statsRes, leaveRes] = await Promise.all([
+      const [statsRes, leaveRes, teamsRes] = await Promise.all([
         axios.get(`${API}/dashboard/stats`, { headers: getAuthHeaders(), params: statsParams }),
-        axios.get(`${API}/dashboard/leave-list`, { headers: getAuthHeaders(), params: statsParams })
+        axios.get(`${API}/dashboard/leave-list`, { headers: getAuthHeaders(), params: statsParams }),
+        axios.get(`${API}/teams`, { headers: getAuthHeaders() })
       ]);
       setStats(statsRes.data);
       setLeaveList(leaveRes.data);
+      setTeams(teamsRes.data);
     } catch (error) {
       console.error('Dashboard fetch error:', error);
       toast.error('Failed to load dashboard data');
@@ -159,6 +161,119 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Fetch chart data based on filters
+  const getDateRangeParams = () => {
+    const today = new Date();
+    let fromDate, toDate;
+    
+    switch (chartFilters.dateRange) {
+      case 'today':
+        fromDate = toDate = today;
+        break;
+      case 'this_week': {
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+        fromDate = startOfWeek;
+        toDate = today;
+        break;
+      }
+      case 'last_week': {
+        const startOfLastWeek = new Date(today);
+        startOfLastWeek.setDate(today.getDate() - today.getDay() - 6);
+        const endOfLastWeek = new Date(today);
+        endOfLastWeek.setDate(today.getDate() - today.getDay());
+        fromDate = startOfLastWeek;
+        toDate = endOfLastWeek;
+        break;
+      }
+      case 'this_month': {
+        fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        toDate = today;
+        break;
+      }
+      case 'last_month': {
+        fromDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        toDate = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      }
+      case 'custom':
+        if (chartFilters.customFrom) fromDate = new Date(chartFilters.customFrom);
+        if (chartFilters.customTo) toDate = new Date(chartFilters.customTo);
+        break;
+      default:
+        fromDate = new Date(today);
+        fromDate.setDate(today.getDate() - today.getDay() + 1);
+        toDate = today;
+    }
+    
+    return { fromDate, toDate };
+  };
+
+  const fetchChartData = useCallback(async () => {
+    try {
+      setChartLoading(true);
+      const { fromDate, toDate } = getDateRangeParams();
+      
+      if (!fromDate || !toDate) return;
+      
+      const params = {
+        from_date: formatDateForAPI(fromDate.toISOString().split('T')[0]),
+        to_date: formatDateForAPI(toDate.toISOString().split('T')[0])
+      };
+      
+      if (chartFilters.team !== 'All') {
+        params.team = chartFilters.team;
+      }
+      
+      const response = await axios.get(`${API}/attendance`, { 
+        headers: getAuthHeaders(), 
+        params 
+      });
+      
+      // Process attendance data for chart
+      const attendanceData = response.data;
+      const dayMap = {};
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      
+      // Initialize days
+      days.forEach(day => {
+        dayMap[day] = { name: day, present: 0, absent: 0, late: 0 };
+      });
+      
+      // Count by day
+      attendanceData.forEach(record => {
+        if (record.date) {
+          const parts = record.date.split('-');
+          const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+          const dayName = days[dateObj.getDay()];
+          
+          if (record.status === 'Completed' || record.status === 'Present') {
+            dayMap[dayName].present++;
+          } else if (record.status === 'Late Login') {
+            dayMap[dayName].late++;
+          } else if (record.status === 'Not Logged' || record.is_lop) {
+            dayMap[dayName].absent++;
+          }
+        }
+      });
+      
+      // Convert to array in correct order (Mon to Sun)
+      const orderedDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      setChartData(orderedDays.map(day => dayMap[day]));
+      
+    } catch (error) {
+      console.error('Chart data fetch error:', error);
+    } finally {
+      setChartLoading(false);
+    }
+  }, [getAuthHeaders, chartFilters.team, chartFilters.dateRange, chartFilters.customFrom, chartFilters.customTo]);
+
+  useEffect(() => {
+    if (teams.length > 0) {
+      fetchChartData();
+    }
+  }, [fetchChartData, teams.length]);
 
   const fetchAttendanceByStatus = async (statusType) => {
     setActiveAttendanceTab(statusType);
