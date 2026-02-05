@@ -342,13 +342,6 @@ const StarReward = () => {
     });
   }, [teams, filteredEmployees]);
 
-  const toggleTeamExpansion = (teamId) => {
-    setExpandedTeams(prev => ({
-      ...prev,
-      [teamId]: !prev[teamId]
-    }));
-  };
-
   // Handle View Members click - opens Team Details view
   const handleViewTeamMembers = (team) => {
     setSelectedTeam(team);
