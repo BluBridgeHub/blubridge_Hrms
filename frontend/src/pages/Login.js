@@ -70,7 +70,7 @@ const Login = () => {
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#004EEB] via-[#0052cc] to-[#003399]">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#063c88] via-[#0854a0] to-[#052d66]">
           <div className="absolute inset-0" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }} />
@@ -134,7 +134,7 @@ const Login = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-10">
             <div className="inline-flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-[#004EEB] flex items-center justify-center shadow-lg shadow-[#004EEB]/30">
+              <div className="w-12 h-12 rounded-xl bg-[#063c88] flex items-center justify-center shadow-lg shadow-[#063c88]/30">
                 <span className="text-white font-bold text-xl" style={{ fontFamily: 'Outfit' }}>B</span>
               </div>
               <div className="text-left">
@@ -200,7 +200,7 @@ const Login = () => {
               <Button
                 type="submit"
                 disabled={loading || seeding}
-                className="w-full h-12 bg-[#004EEB] hover:bg-[#003cc9] text-white font-semibold rounded-xl shadow-lg shadow-[#004EEB]/30 transition-all duration-200 active:scale-[0.98]"
+                className="w-full h-12 bg-[#063c88] hover:bg-[#052d66] text-white font-semibold rounded-xl shadow-lg shadow-[#063c88]/30 transition-all duration-200 active:scale-[0.98]"
                 data-testid="login-submit-btn"
               >
                 {loading ? (
