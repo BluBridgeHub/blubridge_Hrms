@@ -7,7 +7,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://hrms-preview-deploy.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://star-rating-fix-3.preview.emergentagent.com').rstrip('/')
 
 class TestAuthentication:
     """Authentication endpoint tests"""
