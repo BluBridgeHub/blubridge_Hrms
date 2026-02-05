@@ -282,19 +282,19 @@ const Attendance = () => {
                     className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('emp_name')}
                   >
-                    Emp Name <SortIcon field="emp_name" />
+                    Emp Name {getSortIcon('emp_name')}
                   </th>
                   <th 
                     className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('team')}
                   >
-                    Team <SortIcon field="team" />
+                    Team {getSortIcon('team')}
                   </th>
                   <th 
                     className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('date')}
                   >
-                    Date <SortIcon field="date" />
+                    Date {getSortIcon('date')}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Check-In
