@@ -534,17 +534,17 @@ const Employees = () => {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="table-premium">
+              <table className="table-premium w-full">
                 <thead>
                   <tr>
-                    <th>Emp ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Department</th>
-                    <th>Team</th>
-                    <th>Designation</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th className="whitespace-nowrap">Emp ID</th>
+                    <th className="whitespace-nowrap">Name</th>
+                    <th className="whitespace-nowrap hidden md:table-cell">Email</th>
+                    <th className="whitespace-nowrap hidden lg:table-cell">Department</th>
+                    <th className="whitespace-nowrap hidden lg:table-cell">Team</th>
+                    <th className="whitespace-nowrap hidden xl:table-cell">Designation</th>
+                    <th className="whitespace-nowrap">Status</th>
+                    <th className="whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -555,31 +555,37 @@ const Employees = () => {
                   ) : (
                     employees.map((emp) => (
                       <tr key={emp.id}>
-                        <td className="font-semibold text-[#063c88]">{emp.emp_id}</td>
+                        <td className="font-semibold text-[#063c88] whitespace-nowrap">{emp.emp_id}</td>
                         <td>
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center flex-shrink-0">
                               <span className="text-white text-xs font-medium">{emp.full_name?.charAt(0)}</span>
                             </div>
-                            <span className="font-medium text-slate-900">{emp.full_name}</span>
+                            <span className="font-medium text-slate-900 truncate max-w-[120px]" title={emp.full_name}>{emp.full_name}</span>
                           </div>
                         </td>
-                        <td className="text-slate-600">{emp.official_email}</td>
-                        <td className="text-slate-600">{emp.department}</td>
-                        <td className="text-slate-600">{emp.team}</td>
-                        <td className="text-slate-600">{emp.designation}</td>
+                        <td className="text-slate-600 hidden md:table-cell">
+                          <span className="truncate max-w-[180px] block" title={emp.official_email}>{emp.official_email}</span>
+                        </td>
+                        <td className="text-slate-600 hidden lg:table-cell whitespace-nowrap">{emp.department}</td>
+                        <td className="text-slate-600 hidden lg:table-cell">
+                          <span className="truncate max-w-[120px] block" title={emp.team}>{emp.team}</span>
+                        </td>
+                        <td className="text-slate-600 hidden xl:table-cell">
+                          <span className="truncate max-w-[100px] block" title={emp.designation}>{emp.designation}</span>
+                        </td>
                         <td><Badge className={getStatusBadge(emp.employee_status)}>{emp.employee_status}</Badge></td>
                         <td>
                           <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" onClick={() => handleView(emp)} className="h-8 w-8 p-0 rounded-lg" data-testid={`view-${emp.id}`}>
+                            <Button size="sm" variant="ghost" onClick={() => handleView(emp)} className="h-7 w-7 p-0 rounded-lg" data-testid={`view-${emp.id}`}>
                               <Eye className="w-4 h-4 text-slate-500" />
                             </Button>
                             {canEdit && (
                               <>
-                                <Button size="sm" variant="ghost" onClick={() => handleEdit(emp)} className="h-8 w-8 p-0 rounded-lg" data-testid={`edit-${emp.id}`}>
+                                <Button size="sm" variant="ghost" onClick={() => handleEdit(emp)} className="h-7 w-7 p-0 rounded-lg" data-testid={`edit-${emp.id}`}>
                                   <Edit className="w-4 h-4 text-blue-500" />
                                 </Button>
-                                <Button size="sm" variant="ghost" onClick={() => handleDelete(emp)} className="h-8 w-8 p-0 rounded-lg" data-testid={`delete-${emp.id}`}>
+                                <Button size="sm" variant="ghost" onClick={() => handleDelete(emp)} className="h-7 w-7 p-0 rounded-lg" data-testid={`delete-${emp.id}`}>
                                   <Trash2 className="w-4 h-4 text-red-500" />
                                 </Button>
                               </>
