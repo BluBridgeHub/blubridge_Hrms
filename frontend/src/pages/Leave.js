@@ -218,7 +218,7 @@ const Leave = () => {
           </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <Button onClick={handleFilter} className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg" data-testid="filter-btn">
+          <Button onClick={handleFilter} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg" data-testid="filter-btn">
             <Filter className="w-4 h-4 mr-2" /> Filter
           </Button>
           <Button variant="outline" onClick={handleReset} className="rounded-lg" data-testid="reset-btn">

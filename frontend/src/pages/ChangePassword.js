@@ -158,7 +158,7 @@ const ChangePassword = () => {
               </ul>
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg h-12 shadow-lg shadow-[#063c88]/20" data-testid="change-password-btn">
+            <Button type="submit" disabled={loading} className="w-full bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg h-12 shadow-lg shadow-[#063c88]/20" data-testid="change-password-btn">
               {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Change Password'}
             </Button>
           </form>

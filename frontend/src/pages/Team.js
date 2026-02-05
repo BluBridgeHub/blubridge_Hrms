@@ -169,7 +169,7 @@ const Team = () => {
                     <Button
                       onClick={() => handleViewDetails(team)}
                       size="sm"
-                      className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg shadow-lg shadow-[#063c88]/20"
+                      className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg shadow-lg shadow-[#063c88]/20"
                       data-testid={`view-team-btn-${team.id}`}
                     >
                       <Eye className="w-4 h-4 mr-1" /> View

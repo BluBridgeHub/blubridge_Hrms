@@ -134,7 +134,7 @@ const Payroll = () => {
         </div>
         <div className="flex items-center gap-4">
           <MonthPicker value={selectedMonth} onChange={setSelectedMonth} className="w-44" data-testid="month-select" />
-          <Button onClick={handleExportCSV} className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-xl shadow-lg shadow-[#063c88]/20" data-testid="export-csv-btn">
+          <Button onClick={handleExportCSV} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-xl shadow-lg shadow-[#063c88]/20" data-testid="export-csv-btn">
             <Download className="w-4 h-4 mr-2" /> Export CSV
           </Button>
         </div>

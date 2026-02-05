@@ -238,7 +238,7 @@ const Reports = () => {
           <Button onClick={handleReset} variant="outline" className="rounded-lg px-6" data-testid="reset-btn">
             <RotateCcw className="w-4 h-4 mr-2" /> Reset
           </Button>
-          <Button onClick={handleExport} disabled={loading} className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg px-6 shadow-lg shadow-[#063c88]/20" data-testid="export-btn">
+          <Button onClick={handleExport} disabled={loading} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg px-6 shadow-lg shadow-[#063c88]/20" data-testid="export-btn">
             {loading ? <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
             {loading ? 'Exporting...' : 'Export'}
           </Button>

@@ -126,7 +126,7 @@ const AdminProfile = () => {
           </div>
 
           <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
-            <Button onClick={handleSave} disabled={saving} className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg px-8 shadow-lg shadow-[#063c88]/20" data-testid="save-profile-btn">
+            <Button onClick={handleSave} disabled={saving} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg px-8 shadow-lg shadow-[#063c88]/20" data-testid="save-profile-btn">
               {saving ? <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
