@@ -677,6 +677,7 @@ const StarReward = () => {
                       size="sm" 
                       onClick={() => handleViewEmployee(member)} 
                       className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white"
+                      data-testid={`view-member-${member.id}`}
                     >
                       View
                     </Button>
@@ -686,6 +687,7 @@ const StarReward = () => {
                         variant="outline" 
                         onClick={() => handleAddStars(member)} 
                         className="border-[#0b1f3b] text-[#0b1f3b]"
+                        data-testid={`add-member-${member.id}`}
                       >
                         Add
                       </Button>
