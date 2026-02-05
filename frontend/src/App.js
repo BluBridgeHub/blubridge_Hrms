@@ -10,6 +10,8 @@ import StarReward from "./pages/StarReward";
 import Team from "./pages/Team";
 import Reports from "./pages/Reports";
 import Payroll from "./pages/Payroll";
+import AdminProfile from "./pages/AdminProfile";
+import ChangePassword from "./pages/ChangePassword";
 import Layout from "./components/Layout";
 import EmployeeLayout from "./components/EmployeeLayout";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
