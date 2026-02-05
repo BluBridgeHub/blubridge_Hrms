@@ -964,7 +964,7 @@ async def delete_cloudinary_asset(
     current_user: dict = Depends(get_current_user)
 ):
     """Delete asset from Cloudinary"""
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     try:
@@ -1119,7 +1119,7 @@ async def get_employee(employee_id: str, current_user: dict = Depends(get_curren
 
 @api_router.post("/employees")
 async def create_employee(data: EmployeeCreate, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     # Check for duplicate email among active employees
@@ -1305,7 +1305,7 @@ async def create_employee(data: EmployeeCreate, current_user: dict = Depends(get
 
 @api_router.put("/employees/{employee_id}")
 async def update_employee(employee_id: str, data: EmployeeUpdate, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     existing = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
@@ -1343,7 +1343,7 @@ async def update_employee(employee_id: str, data: EmployeeUpdate, current_user: 
 @api_router.delete("/employees/{employee_id}")
 async def deactivate_employee(employee_id: str, current_user: dict = Depends(get_current_user)):
     """Soft delete - deactivates employee"""
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     existing = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
@@ -1377,7 +1377,7 @@ async def deactivate_employee(employee_id: str, current_user: dict = Depends(get
 @api_router.put("/employees/{employee_id}/restore")
 async def restore_employee(employee_id: str, current_user: dict = Depends(get_current_user)):
     """Restore soft-deleted employee"""
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     existing = await db.employees.find_one({"id": employee_id, "is_deleted": True}, {"_id": 0})
@@ -1408,7 +1408,7 @@ class AvatarUpdate(BaseModel):
 @api_router.put("/employees/{employee_id}/avatar")
 async def update_employee_avatar(employee_id: str, data: AvatarUpdate, current_user: dict = Depends(get_current_user)):
     """Update employee avatar/photo"""
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     existing = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
@@ -2089,7 +2089,7 @@ async def get_payroll_data(
     current_user: dict = Depends(get_current_user)
 ):
     """Get payroll data for all employees for a given month"""
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     query = {"is_deleted": {"$ne": True}, "employee_status": EmployeeStatus.ACTIVE}
@@ -2127,7 +2127,7 @@ async def get_payroll_summary(
     current_user: dict = Depends(get_current_user)
 ):
     """Get payroll summary for a month"""
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     query = {"is_deleted": {"$ne": True}, "employee_status": EmployeeStatus.ACTIVE}
@@ -2200,7 +2200,7 @@ async def update_employee_shift(
     current_user: dict = Depends(get_current_user)
 ):
     """Update employee's shift configuration"""
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
@@ -2248,7 +2248,7 @@ async def update_employee_salary(
     current_user: dict = Depends(get_current_user)
 ):
     """Update employee's monthly salary"""
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.HR_MANAGER]:
+    if current_user["role"] not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER]:
         raise HTTPException(status_code=403, detail="Permission denied")
     
     employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
