@@ -2386,8 +2386,8 @@ async def get_employee_dashboard(current_user: dict = Depends(get_current_user))
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     
-    # Get current month attendance stats
-    now = datetime.now(timezone.utc)
+    # Get current month attendance stats (in IST)
+    now = get_ist_now()
     current_month = now.strftime("%m-%Y")
     today_str = now.strftime("%d-%m-%Y")
     
