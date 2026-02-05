@@ -224,9 +224,11 @@ const StarReward = () => {
   const handleViewEmployee = async (employee) => {
     // Set selected employee and open modal immediately
     setSelectedEmployee(employee);
+    setStarHistory([]); // Clear previous history
+    setLoadingHistory(true);
     setShowViewModal(true);
     
-    // Then fetch history (modal will show loading state if needed)
+    // Then fetch history
     try {
       const response = await axios.get(`${API}/star-rewards/history/${employee.id}`, {
         headers: getAuthHeaders()
@@ -235,6 +237,8 @@ const StarReward = () => {
     } catch (error) {
       console.error('Failed to load history:', error);
       setStarHistory([]);
+    } finally {
+      setLoadingHistory(false);
     }
   };
 
