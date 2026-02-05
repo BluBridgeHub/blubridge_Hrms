@@ -139,7 +139,7 @@ const Attendance = () => {
     <div className="space-y-6 animate-fade-in" data-testid="attendance-page">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
           <CalendarCheck className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -226,7 +226,7 @@ const Attendance = () => {
             <DatePicker value={filters.toDate} onChange={(val) => setFilters({ ...filters, toDate: val })} placeholder="Select date" data-testid="filter-to" />
           </div>
           <div className="flex items-end gap-2 lg:col-span-2">
-            <Button onClick={handleFilter} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg" data-testid="apply-filter-btn">
+            <Button onClick={handleFilter} className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg" data-testid="apply-filter-btn">
               <Filter className="w-4 h-4 mr-2" /> Apply Filter
             </Button>
             <Button variant="outline" onClick={() => { setFilters({ empName: '', team: 'All', department: 'All', fromDate: new Date().toISOString().split('T')[0], toDate: new Date().toISOString().split('T')[0], status: 'All' }); fetchData(); }} className="rounded-lg" data-testid="reset-filter-btn">
@@ -240,7 +240,7 @@ const Attendance = () => {
       <div className="card-premium overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="w-10 h-10 border-2 border-[#004EEB] border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-2 border-[#063c88] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -269,7 +269,7 @@ const Attendance = () => {
                     <tr key={record.id || index} className={record.is_lop ? 'bg-red-50/50' : ''}>
                       <td>
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#063c88] to-[#0066ff] flex items-center justify-center">
                             <span className="text-white text-xs font-medium">{record.emp_name?.charAt(0)}</span>
                           </div>
                           <span className="font-medium text-slate-900">{record.emp_name}</span>

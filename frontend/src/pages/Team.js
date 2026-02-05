@@ -70,7 +70,7 @@ const Team = () => {
     <div className="space-y-6 animate-fade-in" data-testid="team-page">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
           <Users className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -92,7 +92,7 @@ const Team = () => {
                 onClick={() => setActiveDept(dept.name)}
                 className={`
                   relative px-6 py-4 text-sm font-medium transition-all duration-200 whitespace-nowrap
-                  ${isActive ? 'bg-[#004EEB] text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-white'}
+                  ${isActive ? 'bg-[#063c88] text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-white'}
                 `}
                 data-testid={`tab-${dept.name.replace(/\s+/g, '-').toLowerCase()}`}
               >
@@ -111,7 +111,7 @@ const Team = () => {
           {/* Department Summary */}
           <div className="flex items-center justify-between p-5 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#004EEB] flex items-center justify-center shadow-lg shadow-[#004EEB]/20">
+              <div className="w-14 h-14 rounded-2xl bg-[#063c88] flex items-center justify-center shadow-lg shadow-[#063c88]/20">
                 <Building2 className="w-7 h-7 text-white" />
               </div>
               <div>
@@ -136,7 +136,7 @@ const Team = () => {
           {/* Teams Grid */}
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="w-10 h-10 border-2 border-[#004EEB] border-t-transparent rounded-full animate-spin" />
+              <div className="w-10 h-10 border-2 border-[#063c88] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : filteredTeams.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 text-slate-500">
@@ -148,7 +148,7 @@ const Team = () => {
               {filteredTeams.map((team, index) => (
                 <div 
                   key={team.id} 
-                  className="group p-5 rounded-xl bg-white border border-slate-100 hover:border-[#004EEB]/20 hover:shadow-lg transition-all duration-300 animate-slide-up"
+                  className="group p-5 rounded-xl bg-white border border-slate-100 hover:border-[#063c88]/20 hover:shadow-lg transition-all duration-300 animate-slide-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -156,8 +156,8 @@ const Team = () => {
                       <h3 className="font-semibold text-slate-900 text-lg" style={{ fontFamily: 'Outfit' }}>{team.name}</h3>
                       <p className="text-xs text-slate-500 mt-1">{team.department}</p>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-[#004EEB]/5 flex items-center justify-center group-hover:bg-[#004EEB]/10 transition-colors">
-                      <Users className="w-5 h-5 text-[#004EEB]" />
+                    <div className="w-10 h-10 rounded-xl bg-[#063c88]/5 flex items-center justify-center group-hover:bg-[#063c88]/10 transition-colors">
+                      <Users className="w-5 h-5 text-[#063c88]" />
                     </div>
                   </div>
                   
@@ -169,7 +169,7 @@ const Team = () => {
                     <Button
                       onClick={() => handleViewDetails(team)}
                       size="sm"
-                      className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg shadow-lg shadow-[#004EEB]/20"
+                      className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg shadow-lg shadow-[#063c88]/20"
                       data-testid={`view-team-btn-${team.id}`}
                     >
                       <Eye className="w-4 h-4 mr-1" /> View
@@ -187,7 +187,7 @@ const Team = () => {
         <DialogContent className="bg-[#fffdf7] max-w-2xl rounded-2xl">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit' }} className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
                 <Users className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -222,7 +222,7 @@ const Team = () => {
                   {teamMembers.map((member) => (
                     <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center shadow-md">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#063c88] to-[#0066ff] flex items-center justify-center shadow-md">
                           <span className="text-white font-medium text-sm">{member.full_name?.charAt(0)?.toUpperCase()}</span>
                         </div>
                         <div>
@@ -233,7 +233,7 @@ const Team = () => {
                           </div>
                         </div>
                       </div>
-                      <Badge className="bg-[#004EEB]/10 text-[#004EEB] border-0">
+                      <Badge className="bg-[#063c88]/10 text-[#063c88] border-0">
                         <Briefcase className="w-3 h-3 mr-1" />
                         {member.designation || 'Employee'}
                       </Badge>

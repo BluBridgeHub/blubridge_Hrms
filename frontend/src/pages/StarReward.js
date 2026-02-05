@@ -511,8 +511,8 @@ const StarReward = () => {
             {/* View Toggle */}
             <div className="flex justify-end mb-4">
               <div className="flex rounded-lg overflow-hidden border border-slate-200">
-                <Button variant={viewMode === 'table' ? 'default' : 'ghost'} onClick={() => setViewMode('table')} className={`rounded-none px-4 ${viewMode === 'table' ? 'bg-[#004EEB] text-white' : ''}`} size="sm">Table</Button>
-                <Button variant={viewMode === 'grid' ? 'default' : 'ghost'} onClick={() => setViewMode('grid')} className={`rounded-none px-4 ${viewMode === 'grid' ? 'bg-[#004EEB] text-white' : ''}`} size="sm">Grid</Button>
+                <Button variant={viewMode === 'table' ? 'default' : 'ghost'} onClick={() => setViewMode('table')} className={`rounded-none px-4 ${viewMode === 'table' ? 'bg-[#063c88] text-white' : ''}`} size="sm">Table</Button>
+                <Button variant={viewMode === 'grid' ? 'default' : 'ghost'} onClick={() => setViewMode('grid')} className={`rounded-none px-4 ${viewMode === 'grid' ? 'bg-[#063c88] text-white' : ''}`} size="sm">Grid</Button>
               </div>
             </div>
 

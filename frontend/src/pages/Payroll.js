@@ -112,7 +112,7 @@ const Payroll = () => {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-3 border-[#004EEB] border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-12 h-12 border-3 border-[#063c88] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-slate-500 text-sm">Loading payroll data...</p>
         </div>
       </div>
@@ -124,7 +124,7 @@ const Payroll = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
             <Wallet className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -134,7 +134,7 @@ const Payroll = () => {
         </div>
         <div className="flex items-center gap-4">
           <MonthPicker value={selectedMonth} onChange={setSelectedMonth} className="w-44" data-testid="month-select" />
-          <Button onClick={handleExportCSV} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-xl shadow-lg shadow-[#004EEB]/20" data-testid="export-csv-btn">
+          <Button onClick={handleExportCSV} className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-xl shadow-lg shadow-[#063c88]/20" data-testid="export-csv-btn">
             <Download className="w-4 h-4 mr-2" /> Export CSV
           </Button>
         </div>
@@ -177,7 +177,7 @@ const Payroll = () => {
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} />
                 <Tooltip contentStyle={{ backgroundColor: 'white', border: 'none', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
                 <Bar dataKey="salary" radius={[4, 4, 0, 0]}>
-                  {chartData.map((_, index) => <Cell key={index} fill={index % 2 === 0 ? '#004EEB' : '#10b981'} />)}
+                  {chartData.map((_, index) => <Cell key={index} fill={index % 2 === 0 ? '#063c88' : '#10b981'} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>

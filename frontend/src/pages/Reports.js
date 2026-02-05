@@ -104,7 +104,7 @@ const Reports = () => {
     <div className="space-y-6 animate-fade-in" data-testid="reports-page">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
           <FileText className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -117,14 +117,14 @@ const Reports = () => {
       <div className="flex gap-2">
         <Button
           onClick={() => { setActiveTab('leave'); setReportData([]); }}
-          className={`rounded-xl px-6 ${activeTab === 'leave' ? 'bg-[#004EEB] text-white shadow-lg shadow-[#004EEB]/20' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
+          className={`rounded-xl px-6 ${activeTab === 'leave' ? 'bg-[#063c88] text-white shadow-lg shadow-[#063c88]/20' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
           data-testid="tab-leave"
         >
           <FileSpreadsheet className="w-4 h-4 mr-2" /> Leave Report
         </Button>
         <Button
           onClick={() => { setActiveTab('attendance'); setReportData([]); }}
-          className={`rounded-xl px-6 ${activeTab === 'attendance' ? 'bg-[#004EEB] text-white shadow-lg shadow-[#004EEB]/20' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
+          className={`rounded-xl px-6 ${activeTab === 'attendance' ? 'bg-[#063c88] text-white shadow-lg shadow-[#063c88]/20' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
           data-testid="tab-attendance"
         >
           <FileBarChart className="w-4 h-4 mr-2" /> Attendance Report
@@ -238,7 +238,7 @@ const Reports = () => {
           <Button onClick={handleReset} variant="outline" className="rounded-lg px-6" data-testid="reset-btn">
             <RotateCcw className="w-4 h-4 mr-2" /> Reset
           </Button>
-          <Button onClick={handleExport} disabled={loading} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg px-6 shadow-lg shadow-[#004EEB]/20" data-testid="export-btn">
+          <Button onClick={handleExport} disabled={loading} className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg px-6 shadow-lg shadow-[#063c88]/20" data-testid="export-btn">
             {loading ? <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
             {loading ? 'Exporting...' : 'Export'}
           </Button>
@@ -252,7 +252,7 @@ const Reports = () => {
             <h3 className="font-semibold text-slate-900" style={{ fontFamily: 'Outfit' }}>
               {activeTab === 'leave' ? 'Leave' : 'Attendance'} Report Results
             </h3>
-            <Badge className="bg-[#004EEB]/10 text-[#004EEB] border-0 px-3 py-1">{reportData.length} records</Badge>
+            <Badge className="bg-[#063c88]/10 text-[#063c88] border-0 px-3 py-1">{reportData.length} records</Badge>
           </div>
           <div className="overflow-x-auto">
             <table className="table-premium">

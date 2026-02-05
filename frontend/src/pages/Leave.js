@@ -136,7 +136,7 @@ const Leave = () => {
     <div className="space-y-6 animate-fade-in" data-testid="leave-page">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
           <CalendarDays className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -218,7 +218,7 @@ const Leave = () => {
           </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <Button onClick={handleFilter} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg" data-testid="filter-btn">
+          <Button onClick={handleFilter} className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg" data-testid="filter-btn">
             <Filter className="w-4 h-4 mr-2" /> Filter
           </Button>
           <Button variant="outline" onClick={handleReset} className="rounded-lg" data-testid="reset-btn">
@@ -232,10 +232,10 @@ const Leave = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="border-b border-slate-100 bg-slate-50/50">
             <TabsList className="bg-transparent h-auto p-0">
-              <TabsTrigger value="requests" className="px-6 py-4 rounded-none data-[state=active]:bg-[#004EEB] data-[state=active]:text-white transition-all" data-testid="tab-requests">
+              <TabsTrigger value="requests" className="px-6 py-4 rounded-none data-[state=active]:bg-[#063c88] data-[state=active]:text-white transition-all" data-testid="tab-requests">
                 Leave Requests ({pendingLeaves.length})
               </TabsTrigger>
-              <TabsTrigger value="history" className="px-6 py-4 rounded-none data-[state=active]:bg-[#004EEB] data-[state=active]:text-white transition-all" data-testid="tab-history">
+              <TabsTrigger value="history" className="px-6 py-4 rounded-none data-[state=active]:bg-[#063c88] data-[state=active]:text-white transition-all" data-testid="tab-history">
                 History ({historyLeaves.length})
               </TabsTrigger>
             </TabsList>
@@ -244,7 +244,7 @@ const Leave = () => {
           <TabsContent value="requests" className="mt-0">
             {loading ? (
               <div className="flex items-center justify-center h-64">
-                <div className="w-10 h-10 border-2 border-[#004EEB] border-t-transparent rounded-full animate-spin" />
+                <div className="w-10 h-10 border-2 border-[#063c88] border-t-transparent rounded-full animate-spin" />
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -347,7 +347,7 @@ const Leave = () => {
           {selectedLeave && (
             <div className="py-6 space-y-6">
               <div className="flex items-center gap-4 pb-6 border-b border-slate-100">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center shadow-lg">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#063c88] to-[#0066ff] flex items-center justify-center shadow-lg">
                   <span className="text-white text-xl font-bold">{selectedLeave.emp_name?.charAt(0)?.toUpperCase()}</span>
                 </div>
                 <div>

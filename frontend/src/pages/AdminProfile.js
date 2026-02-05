@@ -52,7 +52,7 @@ const AdminProfile = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <div className="w-12 h-12 border-3 border-[#004EEB] border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-3 border-[#063c88] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -61,7 +61,7 @@ const AdminProfile = () => {
     <div className="space-y-6 animate-fade-in" data-testid="admin-profile-page">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
           <User className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -73,7 +73,7 @@ const AdminProfile = () => {
       {/* Profile Card */}
       <div className="card-premium overflow-hidden">
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-[#004EEB] to-[#0066ff] p-8 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-[#063c88] to-[#0066ff] p-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="relative z-10 flex items-center gap-6">
             <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center border-2 border-white/20 shadow-xl">
@@ -126,7 +126,7 @@ const AdminProfile = () => {
           </div>
 
           <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
-            <Button onClick={handleSave} disabled={saving} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg px-8 shadow-lg shadow-[#004EEB]/20" data-testid="save-profile-btn">
+            <Button onClick={handleSave} disabled={saving} className="bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg px-8 shadow-lg shadow-[#063c88]/20" data-testid="save-profile-btn">
               {saving ? <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>

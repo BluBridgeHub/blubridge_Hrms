@@ -64,7 +64,7 @@ const ChangePassword = () => {
     <div className="space-y-6 animate-fade-in" data-testid="change-password-page">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
           <KeyRound className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -76,7 +76,7 @@ const ChangePassword = () => {
       {/* Password Card */}
       <div className="max-w-xl mx-auto">
         <div className="card-premium overflow-hidden">
-          <div className="bg-gradient-to-r from-[#004EEB] to-[#0066ff] p-6">
+          <div className="bg-gradient-to-r from-[#063c88] to-[#0066ff] p-6">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
                 <ShieldCheck className="w-6 h-6 text-white" />
@@ -158,7 +158,7 @@ const ChangePassword = () => {
               </ul>
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg h-12 shadow-lg shadow-[#004EEB]/20" data-testid="change-password-btn">
+            <Button type="submit" disabled={loading} className="w-full bg-[#063c88] hover:bg-[#003cc9] text-white rounded-lg h-12 shadow-lg shadow-[#063c88]/20" data-testid="change-password-btn">
               {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Change Password'}
             </Button>
           </form>
