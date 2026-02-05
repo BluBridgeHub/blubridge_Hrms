@@ -2310,7 +2310,7 @@ async def get_work_locations():
 
 @api_router.get("/config/user-roles")
 async def get_user_roles():
-    return [UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD, UserRole.EMPLOYEE]
+    return [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.TEAM_LEAD, UserRole.EMPLOYEE]
 
 # ============== EMPLOYEE PORTAL MODELS ==============
 
