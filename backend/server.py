@@ -67,6 +67,7 @@ logger = logging.getLogger(__name__)
 # ============== ENUMS ==============
 
 class UserRole:
+    SUPER_ADMIN = "super_admin"
     ADMIN = "admin"
     HR_MANAGER = "hr_manager"
     TEAM_LEAD = "team_lead"
