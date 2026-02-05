@@ -81,7 +81,7 @@ const Login = () => {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full h-full">
           {/* Logo */}
           <div>
-            <img src="/logo-white.png" alt="BluBridge" className="h-10 w-auto" />
+            <img src="/logo-white.png" alt="BluBridge" className="w-auto" />
           </div>
 
           {/* Main Content - Centered */}
@@ -116,12 +116,8 @@ const Login = () => {
 
           {/* Footer */}
           <div className="flex items-center justify-between">
-            <p className="text-white/30 text-sm">Enterprise-grade security</p>
-            <div className="flex gap-1">
-              {[1,2,3,4,5].map(i => (
-                <div key={i} className="w-1.5 h-1.5 rounded-full bg-white/20" />
-              ))}
-            </div>
+            <p className="text-white/30 text-sm">© 2026 BluBridge HRMS.</p>
+            
           </div>
         </div>
       </div>
@@ -214,7 +210,7 @@ const Login = () => {
           </div>
 
           <p className="text-center text-sm text-slate-400 mt-8">
-            © 2024 BluBridge HRMS. All rights reserved.
+            © 2026 BluBridge HRMS. All rights reserved.
           </p>
         </div>
       </div>
