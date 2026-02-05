@@ -288,30 +288,30 @@ const StarReward = () => {
             </div>
 
             {(addFormType === 'performance' || addFormType === 'learning') && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
                 {weeklyData.map((week, index) => (
-                  <div key={index} className="p-4 rounded-xl bg-gradient-to-br from-amber-50/50 to-orange-50/50 border border-amber-200/30">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-semibold text-amber-700">Week {week.week}</span>
-                      <span className="text-xs text-slate-500">{week.startDate} → {week.endDate}</span>
+                  <div key={index} className="p-5 rounded-2xl bg-[#f8f6f0] border border-[#e8e4d9]">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-semibold text-[#e67e22] text-lg">Week {week.week}</span>
+                      <span className="text-xs text-slate-400">{week.startDate} → {week.endDate}</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div className="grid grid-cols-2 gap-3 mb-4">
                       <div>
-                        <Label className="text-xs text-slate-600">From</Label>
-                        <Input type="date" value={week.fromDate} onChange={(e) => updateWeekData(index, 'fromDate', e.target.value)} className="rounded-lg text-sm mt-1" />
+                        <Label className="text-sm text-slate-600 font-medium">From</Label>
+                        <Input type="date" value={week.fromDate} onChange={(e) => updateWeekData(index, 'fromDate', e.target.value)} className="rounded-xl text-sm mt-1.5 bg-white border-slate-200" />
                       </div>
                       <div>
-                        <Label className="text-xs text-slate-600">To</Label>
-                        <Input type="date" value={week.toDate} onChange={(e) => updateWeekData(index, 'toDate', e.target.value)} className="rounded-lg text-sm mt-1" />
+                        <Label className="text-sm text-slate-600 font-medium">To</Label>
+                        <Input type="date" value={week.toDate} onChange={(e) => updateWeekData(index, 'toDate', e.target.value)} className="rounded-xl text-sm mt-1.5 bg-white border-slate-200" />
                       </div>
                     </div>
-                    <div className="mb-3">
-                      <Label className="text-xs text-slate-600">Stars</Label>
-                      <Input type="number" value={week.value} onChange={(e) => updateWeekData(index, 'value', e.target.value)} className="rounded-lg mt-1" placeholder="0" data-testid={`week-${index}-value`} />
+                    <div className="mb-4">
+                      <Label className="text-sm text-slate-600 font-medium">Stars</Label>
+                      <Input type="number" value={week.value} onChange={(e) => updateWeekData(index, 'value', e.target.value)} className="rounded-xl mt-1.5 bg-white border-slate-200" placeholder="0" data-testid={`week-${index}-value`} />
                     </div>
                     <div>
-                      <Label className="text-xs text-slate-600">Reason</Label>
-                      <Textarea value={week.reason} onChange={(e) => updateWeekData(index, 'reason', e.target.value)} className="rounded-lg mt-1 min-h-[60px]" placeholder="Enter reason..." data-testid={`week-${index}-reason`} />
+                      <Label className="text-sm text-slate-600 font-medium">Reason</Label>
+                      <Textarea value={week.reason} onChange={(e) => updateWeekData(index, 'reason', e.target.value)} className="rounded-xl mt-1.5 min-h-[80px] bg-white border-slate-200 resize-none" placeholder="Enter reason..." data-testid={`week-${index}-reason`} />
                     </div>
                   </div>
                 ))}
