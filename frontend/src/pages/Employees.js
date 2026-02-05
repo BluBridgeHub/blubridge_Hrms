@@ -443,7 +443,7 @@ const Employees = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
             <Users className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -452,7 +452,7 @@ const Employees = () => {
           </div>
         </div>
         {canEdit && (
-          <Button onClick={handleAdd} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-xl shadow-lg shadow-[#004EEB]/20" data-testid="add-employee-btn">
+          <Button onClick={handleAdd} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-xl shadow-lg shadow-[#063c88]/20" data-testid="add-employee-btn">
             <Plus className="w-4 h-4 mr-2" />
             Add Employee
           </Button>
@@ -462,7 +462,7 @@ const Employees = () => {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard title="Total Employees" value={stats.total} icon={Users} color="#004EEB" bgColor="bg-blue-100" />
+          <StatCard title="Total Employees" value={stats.total} icon={Users} color="#063c88" bgColor="bg-blue-100" />
           <StatCard title="Active" value={stats.active} icon={UserCheck} color="#10b981" bgColor="bg-emerald-100" />
           <StatCard title="Inactive" value={stats.inactive} icon={UserX} color="#64748b" bgColor="bg-slate-100" />
           <StatCard title="Resigned" value={stats.resigned} icon={Briefcase} color="#ef4444" bgColor="bg-red-100" />
@@ -510,7 +510,7 @@ const Employees = () => {
             </Select>
           </div>
           <div className="flex items-end gap-2">
-            <Button onClick={handleSearch} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg" data-testid="search-btn">
+            <Button onClick={handleSearch} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg" data-testid="search-btn">
               <Filter className="w-4 h-4 mr-1" /> Filter
             </Button>
             <Button variant="outline" onClick={handleReset} className="rounded-lg" data-testid="reset-btn">
@@ -529,7 +529,7 @@ const Employees = () => {
       <div className="card-premium overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="w-10 h-10 border-2 border-[#004EEB] border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-2 border-[#063c88] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <>
@@ -555,10 +555,10 @@ const Employees = () => {
                   ) : (
                     employees.map((emp) => (
                       <tr key={emp.id}>
-                        <td className="font-semibold text-[#004EEB]">{emp.emp_id}</td>
+                        <td className="font-semibold text-[#063c88]">{emp.emp_id}</td>
                         <td>
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center">
                               <span className="text-white text-xs font-medium">{emp.full_name?.charAt(0)}</span>
                             </div>
                             <span className="font-medium text-slate-900">{emp.full_name}</span>
@@ -622,7 +622,7 @@ const Employees = () => {
           <div className="py-4"><EmployeeForm /></div>
           <DialogFooter className="flex gap-2 pt-4 border-t border-slate-100">
             <Button variant="outline" onClick={() => setShowAddSheet(false)} className="rounded-lg">Cancel</Button>
-            <Button onClick={submitAdd} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg" data-testid="submit-add">Save Employee</Button>
+            <Button onClick={submitAdd} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg" data-testid="submit-add">Save Employee</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -637,7 +637,7 @@ const Employees = () => {
           <div className="py-4"><EmployeeForm isEdit /></div>
           <DialogFooter className="flex gap-2 pt-4 border-t border-slate-100">
             <Button variant="outline" onClick={() => setShowEditSheet(false)} className="rounded-lg">Cancel</Button>
-            <Button onClick={submitEdit} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg" data-testid="submit-edit">Update Employee</Button>
+            <Button onClick={submitEdit} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg" data-testid="submit-edit">Update Employee</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -652,7 +652,7 @@ const Employees = () => {
           {selectedEmployee && (
             <div className="space-y-6 py-4">
               <div className="flex items-center gap-4 pb-6 border-b border-slate-100">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center shadow-lg">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center shadow-lg">
                   <span className="text-white text-3xl font-bold">{selectedEmployee.full_name?.charAt(0)?.toUpperCase()}</span>
                 </div>
                 <div>
@@ -683,7 +683,7 @@ const Employees = () => {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowViewDialog(false)} className="rounded-lg">Close</Button>
-            {canEdit && <Button onClick={() => { setShowViewDialog(false); handleEdit(selectedEmployee); }} className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg">Edit</Button>}
+            {canEdit && <Button onClick={() => { setShowViewDialog(false); handleEdit(selectedEmployee); }} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg">Edit</Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>
