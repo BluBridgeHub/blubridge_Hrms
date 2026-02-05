@@ -807,21 +807,19 @@ const StarReward = () => {
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">From</span>
-                <Input
-                  type="month"
+                <MonthPicker
                   value={tableFilters.fromMonth}
-                  onChange={(e) => setTableFilters({ ...tableFilters, fromMonth: e.target.value })}
-                  className="w-36 bg-white border-gray-300"
+                  onChange={(val) => setTableFilters({ ...tableFilters, fromMonth: val })}
+                  className="w-40"
                   data-testid="table-filter-from"
                 />
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">To</span>
-                <Input
-                  type="month"
+                <MonthPicker
                   value={tableFilters.toMonth}
-                  onChange={(e) => setTableFilters({ ...tableFilters, toMonth: e.target.value })}
-                  className="w-36 bg-white border-gray-300"
+                  onChange={(val) => setTableFilters({ ...tableFilters, toMonth: val })}
+                  className="w-40"
                   data-testid="table-filter-to"
                 />
               </div>
