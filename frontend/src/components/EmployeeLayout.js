@@ -133,7 +133,7 @@ const EmployeeLayout = ({ children }) => {
       <div className="lg:pl-72">
         {/* Header */}
         <header className="h-20 bg-[#fffdf7]/70 backdrop-blur-xl border-b border-black/5 sticky top-0 z-30">
-          <div className="h-full px-4 lg:px-8 flex items-center justify-between max-w-[1400px] mx-auto">
+          <div className="h-full px-4 lg:px-8 flex items-center justify-between max-w-[6400px] mx-auto">
             {/* Left: Mobile menu + Page title */}
             <div className="flex items-center gap-4">
               <button 
