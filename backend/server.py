@@ -997,6 +997,63 @@ async def login(request: LoginRequest):
 async def get_me(current_user: dict = Depends(get_current_user)):
     return {k: v for k, v in current_user.items() if k != "password_hash"}
 
+@api_router.put("/auth/update-profile")
+async def update_admin_profile(
+    name: Optional[str] = None,
+    email: Optional[str] = None,
+    phone: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update admin user profile"""
+    update_data = {}
+    if name:
+        update_data["name"] = name
+    if email:
+        update_data["email"] = email
+    if phone:
+        update_data["phone"] = phone
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data to update")
+    
+    update_data["updated_at"] = get_ist_now().isoformat()
+    
+    await db.users.update_one({"id": current_user["id"]}, {"$set": update_data})
+    
+    user = await db.users.find_one({"id": current_user["id"]}, {"_id": 0, "password_hash": 0})
+    return serialize_doc(user)
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@api_router.post("/auth/change-password")
+async def change_admin_password(
+    data: ChangePasswordRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Change admin user password"""
+    user = await db.users.find_one({"id": current_user["id"]})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Verify current password
+    current_hash = hashlib.sha256(data.current_password.encode()).hexdigest()
+    if user.get("password_hash") != current_hash:
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Update to new password
+    new_hash = hashlib.sha256(data.new_password.encode()).hexdigest()
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {
+            "password_hash": new_hash,
+            "updated_at": get_ist_now().isoformat()
+        }}
+    )
+    
+    return {"message": "Password changed successfully"}
+
 # ============== EMPLOYEE MASTER ROUTES ==============
 
 @api_router.get("/employees")
