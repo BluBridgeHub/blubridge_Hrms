@@ -382,7 +382,7 @@ const Reports = () => {
               <Button 
                 onClick={handleExport}
                 disabled={loading}
-                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 rounded-lg"
+                className="bg-[#0b1f3b] hover:bg-[#162d4d] text-white px-8 rounded-lg"
                 data-testid="export-btn"
               >
                 {loading ? 'Exporting...' : 'Export'}
@@ -403,10 +403,10 @@ const Reports = () => {
       {reportData.length > 0 && (
         <div className="bg-[#fffdf7] rounded-lg border border-black/5 overflow-hidden">
           <div className="p-4 border-b border-black/5 flex items-center justify-between">
-            <h3 className="font-semibold" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            <h3 className="font-semibold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
               {activeTab === 'leave' ? 'Leave' : 'Attendance'} Report Results
             </h3>
-            <Badge className="bg-blue-100 text-blue-700">
+            <Badge className="bg-[#0b1f3b]/10 text-[#0b1f3b]">
               {reportData.length} records
             </Badge>
           </div>
