@@ -161,8 +161,20 @@ class TestISTTimezone:
         assert response.status_code == 200, f"Payroll fetch failed: {response.text}"
         
         data = response.json()
+        # Payroll returns a list directly
+        payroll_records = data if isinstance(data, list) else data.get("payroll", [])
         print(f"PASS: Payroll endpoint working for month {current_month}")
-        print(f"      Found {len(data.get('payroll', []))} payroll records")
+        print(f"      Found {len(payroll_records)} payroll records")
+        
+        # Verify date format in payroll records
+        if payroll_records:
+            record = payroll_records[0]
+            attendance_details = record.get("attendance_details", [])
+            if attendance_details:
+                # Check date format is DD-MM-YYYY
+                sample_date = attendance_details[0].get("date", "")
+                assert len(sample_date.split("-")) == 3, f"Invalid date format: {sample_date}"
+                print(f"      Sample attendance date: {sample_date} (DD-MM-YYYY format verified)")
     
     def test_employee_dashboard_attendance(self):
         """Test employee dashboard attendance data uses IST"""
@@ -293,7 +305,8 @@ class TestISTDateCalculations:
         assert response.status_code == 200, f"Payroll failed: {response.text}"
         
         data = response.json()
-        payroll_records = data.get("payroll", [])
+        # Payroll returns a list directly
+        payroll_records = data if isinstance(data, list) else data.get("payroll", [])
         
         if payroll_records:
             record = payroll_records[0]
