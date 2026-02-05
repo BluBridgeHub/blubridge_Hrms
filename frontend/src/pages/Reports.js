@@ -156,8 +156,8 @@ const Reports = () => {
     <div className="space-y-6 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="reports-page">
       {/* Page Header */}
       <div className="flex items-center gap-3">
-        <FileText className="w-6 h-6 text-[#3b82f6]" />
-        <h1 className="text-2xl font-bold" style={{ fontFamily: 'Outfit, sans-serif' }}>
+        <FileText className="w-6 h-6 text-[#0b1f3b]" />
+        <h1 className="text-2xl font-bold text-[#0b1f3b]" style={{ fontFamily: 'Outfit, sans-serif' }}>
           HRMS Reports
         </h1>
       </div>
