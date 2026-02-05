@@ -13,9 +13,19 @@ import {
   X,
   ChevronRight,
   UserCog,
-  Wallet
+  Wallet,
+  User,
+  KeyRound,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from './ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
