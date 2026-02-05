@@ -2778,7 +2778,7 @@ async def apply_employee_leave(data: EmployeeLeaveCreate, current_user: dict = D
         raise HTTPException(status_code=400, detail="Invalid date format. Use dd-mm-yyyy")
     
     # Validate not in past
-    if leave_dt.date() < datetime.now(timezone.utc).date():
+    if leave_dt.date() < get_ist_now().date():
         raise HTTPException(status_code=400, detail="Cannot apply leave for past dates")
     
     # Create leave request
@@ -2839,7 +2839,7 @@ async def update_employee_leave(leave_id: str, data: EmployeeLeaveCreate, curren
         raise HTTPException(status_code=400, detail="Invalid date format. Use dd-mm-yyyy")
     
     # Validate not in past
-    if leave_dt.date() < datetime.now(timezone.utc).date():
+    if leave_dt.date() < get_ist_now().date():
         raise HTTPException(status_code=400, detail="Cannot set leave date in the past")
     
     # Update the leave request
