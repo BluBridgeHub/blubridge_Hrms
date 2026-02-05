@@ -204,6 +204,8 @@ const Attendance = () => {
                 <SelectItem value="All">All</SelectItem>
                 <SelectItem value="Login">Login</SelectItem>
                 <SelectItem value="Completed">Completed</SelectItem>
+                <SelectItem value="Present">Present</SelectItem>
+                <SelectItem value="Loss of Pay">Loss of Pay</SelectItem>
                 <SelectItem value="Early Out">Early Out</SelectItem>
                 <SelectItem value="Late Login">Late Login</SelectItem>
                 <SelectItem value="Not Logged">Not Logged</SelectItem>
