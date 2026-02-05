@@ -216,6 +216,9 @@ const Employees = () => {
       work_location: 'Office',
       leave_policy: 'Standard',
       shift_type: 'General',
+      custom_login_time: '',
+      custom_logout_time: '',
+      monthly_salary: 0,
       attendance_tracking_enabled: true,
       user_role: 'employee',
       login_enabled: true
@@ -245,6 +248,9 @@ const Employees = () => {
       work_location: employee.work_location || 'Office',
       leave_policy: employee.leave_policy || 'Standard',
       shift_type: employee.shift_type || 'General',
+      custom_login_time: employee.custom_login_time || '',
+      custom_logout_time: employee.custom_logout_time || '',
+      monthly_salary: employee.monthly_salary || 0,
       attendance_tracking_enabled: employee.attendance_tracking_enabled ?? true,
       user_role: employee.user_role || 'employee',
       login_enabled: employee.login_enabled ?? true
