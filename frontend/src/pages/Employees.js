@@ -93,6 +93,9 @@ const Employees = () => {
     work_location: 'Office',
     leave_policy: 'Standard',
     shift_type: 'General',
+    custom_login_time: '',
+    custom_logout_time: '',
+    monthly_salary: 0,
     attendance_tracking_enabled: true,
     user_role: 'employee',
     login_enabled: true
