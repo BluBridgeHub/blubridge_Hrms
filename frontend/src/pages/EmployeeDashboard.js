@@ -73,7 +73,7 @@ const EmployeeDashboard = () => {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-12 h-12 border-3 border-[#063c88] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-slate-500 text-sm">Loading dashboard...</p>
         </div>
       </div>
@@ -87,7 +87,7 @@ const EmployeeDashboard = () => {
   return (
     <div className="space-y-6 animate-fade-in" data-testid="employee-dashboard">
       {/* Welcome Section */}
-      <div className="card-premium p-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white relative overflow-hidden">
+      <div className="card-premium p-6 bg-gradient-to-r from-[#063c88] to-[#0a5cba] text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="relative z-10">
           <h1 className="text-2xl lg:text-3xl font-bold" style={{ fontFamily: 'Outfit' }}>
@@ -102,7 +102,7 @@ const EmployeeDashboard = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Present Days', value: dashboardData?.attendance_summary?.present || 0, icon: CalendarCheck, color: 'emerald' },
+          { label: 'Present Days', value: dashboardData?.attendance_summary?.present || 0, icon: CalendarCheck, color: 'blue' },
           { label: 'Leave Taken', value: dashboardData?.attendance_summary?.leaves || 0, icon: CalendarX, color: 'amber' },
           { label: 'Absent', value: dashboardData?.attendance_summary?.absent || 0, icon: AlertTriangle, color: 'red' },
           { label: 'This Month', value: `${Math.round((dashboardData?.attendance_summary?.present || 0) / 22 * 100)}%`, icon: TrendingUp, color: 'blue' },
@@ -152,10 +152,10 @@ const EmployeeDashboard = () => {
 
             {/* Clock Button */}
             {isCompleted ? (
-              <div className="text-center p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-                <CalendarCheck className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-                <p className="text-emerald-700 font-medium">Day Completed</p>
-                <p className="text-xs text-emerald-600 mt-1">Great work today!</p>
+              <div className="text-center p-4 rounded-xl bg-blue-50 border border-blue-200">
+                <CalendarCheck className="w-8 h-8 text-[#063c88] mx-auto mb-2" />
+                <p className="text-[#063c88] font-medium">Day Completed</p>
+                <p className="text-xs text-blue-600 mt-1">Great work today!</p>
               </div>
             ) : isLoggedIn ? (
               <Button
@@ -176,7 +176,7 @@ const EmployeeDashboard = () => {
               <Button
                 onClick={handleClockIn}
                 disabled={clockLoading}
-                className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-lg font-medium shadow-lg shadow-emerald-500/20"
+                className="w-full h-14 bg-[#063c88] hover:bg-[#052d66] text-white rounded-xl text-lg font-medium shadow-lg shadow-[#063c88]/20"
                 data-testid="clock-in-btn"
               >
                 {clockLoading ? (
@@ -200,7 +200,7 @@ const EmployeeDashboard = () => {
                 <p className="text-sm text-slate-500">Daily breakdown</p>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <Activity className="w-4 h-4 text-emerald-500" />
+                <Activity className="w-4 h-4 text-[#063c88]" />
                 <span className="text-slate-600">Avg: 7.5 hrs</span>
               </div>
             </div>
@@ -209,15 +209,15 @@ const EmployeeDashboard = () => {
                 <AreaChart data={workingHoursData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#063c88" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#063c88" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                   <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
                   <Tooltip contentStyle={{ backgroundColor: 'white', border: 'none', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
-                  <Area type="monotone" dataKey="hours" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorHours)" />
+                  <Area type="monotone" dataKey="hours" stroke="#063c88" strokeWidth={2} fillOpacity={1} fill="url(#colorHours)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -238,11 +238,11 @@ const EmployeeDashboard = () => {
             <button
               key={i}
               onClick={() => navigate(link.path)}
-              className="p-4 rounded-xl bg-white border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all flex items-center gap-3"
+              className="p-4 rounded-xl bg-white border border-slate-100 hover:border-[#063c88]/30 hover:shadow-md transition-all flex items-center gap-3"
               data-testid={`quick-link-${link.label.toLowerCase().replace(/\s/g, '-')}`}
             >
-              <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                <link.icon className="w-5 h-5 text-emerald-600" />
+              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <link.icon className="w-5 h-5 text-[#063c88]" />
               </div>
               <span className="text-sm font-medium text-slate-700">{link.label}</span>
             </button>
@@ -267,7 +267,7 @@ const EmployeeDashboard = () => {
                   <span className="text-sm text-slate-500">/ {leave.total}</span>
                 </div>
                 <div className="h-2 bg-slate-200 rounded-full mt-2 overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${((leave.total - leave.used) / leave.total) * 100}%` }} />
+                  <div className="h-full bg-[#063c88] rounded-full" style={{ width: `${((leave.total - leave.used) / leave.total) * 100}%` }} />
                 </div>
               </div>
             ))}
