@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   LayoutDashboard, 
@@ -11,12 +11,14 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronRight,
   UserCog,
   Wallet,
   User,
   KeyRound,
-  ChevronDown
+  ChevronDown,
+  Search,
+  Bell,
+  Settings
 } from 'lucide-react';
 import { Button } from './ui/button';
 import {
@@ -35,12 +37,13 @@ const navItems = [
   { path: '/star-reward', label: 'Star Reward', icon: Star },
   { path: '/team', label: 'Team', icon: Users },
   { path: '/payroll', label: 'Payroll', icon: Wallet },
-  { path: '/reports', label: 'Report', icon: FileText },
+  { path: '/reports', label: 'Reports', icon: FileText },
 ];
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
@@ -48,134 +51,189 @@ const Layout = ({ children }) => {
     navigate('/login');
   };
 
+  const getPageTitle = () => {
+    const current = navItems.find(item => location.pathname === item.path);
+    return current?.label || 'Dashboard';
+  };
+
   return (
     <div className="min-h-screen bg-[#efede5]">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden transition-opacity"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 h-full w-64 bg-[#fffdf7]/90 backdrop-blur-xl border-r border-black/5 z-50
+        fixed top-0 left-0 h-full w-72 z-50
+        bg-[#fffdf7]/90 backdrop-blur-2xl
+        border-r border-black/5
         transform transition-transform duration-300 ease-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        flex flex-col
       `}>
-        {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-black/5">
-          <div className="flex items-center gap-2">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_25d72bd1-2848-402d-8255-1f5e67431c0e/artifacts/o66msiwa_logo-main2.png" 
-              alt="BluBridge" 
-              className="w-auto"
-            />
+        {/* Logo Section */}
+        <div className="h-20 flex items-center px-6 border-b border-black/5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center shadow-lg shadow-[#004EEB]/20">
+              <span className="text-white font-bold text-lg" style={{ fontFamily: 'Outfit' }}>B</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>BluBridge</h1>
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest font-medium">HRMS Platform</p>
+            </div>
           </div>
           <button 
-            className="ml-auto lg:hidden p-1 hover:bg-black/5 rounded"
+            className="ml-auto lg:hidden p-2 hover:bg-black/5 rounded-lg transition-colors"
             onClick={() => setSidebarOpen(false)}
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 text-slate-500" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-1">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) => `
-                flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
-                transition-all duration-200
-                ${isActive 
-                  ? 'bg-[#0b1f3b] text-white shadow-lg shadow-[#0b1f3b]/20' 
-                  : 'text-gray-600 hover:bg-black/5 hover:text-gray-900'
-                }
-              `}
-            >
-              {({ isActive }) => (
-                <>
-                  <item.icon className="w-5 h-5" strokeWidth={1.5} />
-                  <span>{item.label}</span>
-                  {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
-                </>
-              )}
-            </NavLink>
-          ))}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          <p className="px-4 py-2 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Main Menu</p>
+          {navItems.map((item, index) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={() => setSidebarOpen(false)}
+                className={`
+                  nav-item animate-slide-up
+                  ${isActive ? 'nav-item-active' : 'nav-item-inactive'}
+                `}
+                style={{ animationDelay: `${index * 0.03}s` }}
+                data-testid={`nav-${item.path.replace('/', '')}`}
+              >
+                <item.icon className="w-5 h-5" strokeWidth={isActive ? 2 : 1.5} />
+                <span>{item.label}</span>
+                {item.path === '/star-reward' && (
+                  <span className="ml-auto w-2 h-2 rounded-full bg-amber-400 animate-pulse-soft" />
+                )}
+              </NavLink>
+            );
+          })}
         </nav>
 
-        {/* Logout button */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-black/5">
+        {/* User Section */}
+        <div className="p-4 border-t border-black/5">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/80 mb-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center shadow-md">
+              <span className="text-white font-semibold text-sm">
+                {user?.name?.charAt(0)?.toUpperCase()}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-900 truncate">{user?.name}</p>
+              <p className="text-xs text-slate-500 capitalize">{user?.role?.replace('_', ' ')}</p>
+            </div>
+          </div>
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 text-gray-600 hover:text-red-600 hover:bg-red-50"
+            className="w-full justify-start gap-3 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl h-11"
             onClick={handleLogout}
             data-testid="logout-btn"
           >
             <LogOut className="w-5 h-5" strokeWidth={1.5} />
-            <span>Logout</span>
+            <span>Sign Out</span>
           </Button>
         </div>
       </aside>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-72">
         {/* Header */}
-        <header className="h-16 bg-[#fffdf7]/60 backdrop-blur-md border-b border-black/5 sticky top-0 z-30">
-          <div className="h-full px-4 lg:px-8 flex items-center justify-between">
-            <button 
-              className="lg:hidden p-2 hover:bg-black/5 rounded-lg"
-              onClick={() => setSidebarOpen(true)}
-              data-testid="mobile-menu-btn"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+        <header className="h-20 bg-[#fffdf7]/70 backdrop-blur-xl border-b border-black/5 sticky top-0 z-30">
+          <div className="h-full px-4 lg:px-8 flex items-center justify-between max-w-[1600px] mx-auto">
+            {/* Left: Mobile menu + Page title */}
+            <div className="flex items-center gap-4">
+              <button 
+                className="lg:hidden p-2.5 hover:bg-black/5 rounded-xl transition-colors"
+                onClick={() => setSidebarOpen(true)}
+                data-testid="mobile-menu-btn"
+              >
+                <Menu className="w-6 h-6 text-slate-700" />
+              </button>
+              <div>
+                <h2 className="text-xl lg:text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>
+                  {getPageTitle()}
+                </h2>
+                <p className="text-xs text-slate-500 hidden sm:block">
+                  {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                </p>
+              </div>
+            </div>
             
-            <div className="flex items-center gap-4 ml-auto">
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2">
+              {/* Search - Desktop only */}
+              <div className="hidden lg:flex items-center">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Search..." 
+                    className="w-64 h-10 pl-10 pr-4 rounded-xl bg-slate-100/80 border-0 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#004EEB]/20 focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Notifications */}
+              <button className="relative p-2.5 hover:bg-slate-100 rounded-xl transition-colors">
+                <Bell className="w-5 h-5 text-slate-600" strokeWidth={1.5} />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
+              </button>
+
+              {/* Profile Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-3 hover:bg-black/5 rounded-lg px-3 py-2 transition-colors" data-testid="admin-profile-dropdown">
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                      <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-[#0b1f3b] flex items-center justify-center">
-                      <span className="text-white font-medium">
+                  <button 
+                    className="flex items-center gap-3 hover:bg-slate-100 rounded-xl px-3 py-2 transition-colors" 
+                    data-testid="admin-profile-dropdown"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center shadow-md">
+                      <span className="text-white font-semibold text-sm">
                         {user?.name?.charAt(0)?.toUpperCase()}
                       </span>
                     </div>
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                    <ChevronDown className="w-4 h-4 text-slate-500" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white">
+                <DropdownMenuContent align="end" className="w-56 bg-white/95 backdrop-blur-xl border border-slate-200 shadow-xl rounded-xl p-1">
+                  <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                    <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
+                    <p className="text-xs text-slate-500 capitalize">{user?.role?.replace('_', ' ')}</p>
+                  </div>
                   <DropdownMenuItem 
                     onClick={() => navigate('/admin-profile')}
-                    className="cursor-pointer"
+                    className="cursor-pointer rounded-lg"
                     data-testid="admin-profile-btn"
                   >
                     <User className="w-4 h-4 mr-2" />
-                    Admin Profile
+                    Profile
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => navigate('/change-password')}
-                    className="cursor-pointer"
+                    className="cursor-pointer rounded-lg"
                     data-testid="change-password-btn"
                   >
                     <KeyRound className="w-4 h-4 mr-2" />
-                    Password Change
+                    Change Password
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="my-1" />
                   <DropdownMenuItem 
                     onClick={handleLogout}
-                    className="cursor-pointer text-red-600 focus:text-red-600"
+                    className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 rounded-lg"
                     data-testid="dropdown-logout-btn"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -184,7 +242,7 @@ const Layout = ({ children }) => {
         </header>
 
         {/* Page content */}
-        <main className="p-4 lg:p-8">
+        <main className="p-4 lg:p-8 max-w-[1600px] mx-auto">
           {children}
         </main>
       </div>
