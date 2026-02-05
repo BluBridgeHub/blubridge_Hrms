@@ -157,7 +157,7 @@ const Reports = () => {
       {/* Page Header */}
       <div className="flex items-center gap-3">
         <FileText className="w-6 h-6 text-[#3b82f6]" />
-        <h1 className="text-2xl font-bold text-[#3b82f6]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: 'Outfit, sans-serif' }}>
           HRMS Reports
         </h1>
       </div>
@@ -168,7 +168,7 @@ const Reports = () => {
           onClick={() => { setActiveTab('leave'); setReportData([]); }}
           className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ${
             activeTab === 'leave' 
-              ? 'bg-[#3b82f6] text-white' 
+              ? 'bg-[#0b1f3b] text-white' 
               : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
           }`}
           data-testid="tab-leave"
@@ -179,7 +179,7 @@ const Reports = () => {
           onClick={() => { setActiveTab('attendance'); setReportData([]); }}
           className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ml-2 ${
             activeTab === 'attendance' 
-              ? 'bg-[#3b82f6] text-white' 
+              ? 'bg-[#0b1f3b] text-white' 
               : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
           }`}
           data-testid="tab-attendance"
@@ -193,7 +193,7 @@ const Reports = () => {
         <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
           {activeTab === 'leave' ? 'Leave Report Filters' : 'Attendance Report Filters'}
         </h3>
-        <div className="border-b border-amber-400 w-full mb-8"></div>
+        <div className="border-b border-[#dfddd7] w-full mb-8"></div>
         
         {/* Leave Report Filters */}
         {activeTab === 'leave' && (
@@ -205,7 +205,7 @@ const Reports = () => {
                 type="date"
                 value={leaveFilters.fromDate}
                 onChange={(e) => setLeaveFilters({ ...leaveFilters, fromDate: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
+                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
                 data-testid="leave-filter-from"
               />
             </div>
@@ -216,14 +216,14 @@ const Reports = () => {
                 placeholder="Employee Name"
                 value={leaveFilters.empName}
                 onChange={(e) => setLeaveFilters({ ...leaveFilters, empName: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
+                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
                 data-testid="leave-filter-empname"
               />
             </div>
             <div>
               <label className="text-sm text-gray-600 mb-2 block">Leave Type:</label>
               <Select value={leaveFilters.leaveType} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, leaveType: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="leave-filter-type">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="leave-filter-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -242,14 +242,14 @@ const Reports = () => {
                 type="date"
                 value={leaveFilters.toDate}
                 onChange={(e) => setLeaveFilters({ ...leaveFilters, toDate: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
+                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
                 data-testid="leave-filter-to"
               />
             </div>
             <div>
               <label className="text-sm text-gray-600 mb-2 block">Team Name:</label>
               <Select value={leaveFilters.team} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, team: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="leave-filter-team">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="leave-filter-team">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -263,7 +263,7 @@ const Reports = () => {
             <div>
               <label className="text-sm text-gray-600 mb-2 block">Department:</label>
               <Select value={leaveFilters.department} onValueChange={(v) => setLeaveFilters({ ...leaveFilters, department: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="leave-filter-dept">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="leave-filter-dept">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -280,7 +280,7 @@ const Reports = () => {
               <Button 
                 onClick={handleExport}
                 disabled={loading}
-                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 rounded-lg"
+                className="bg-[#0b1f3b] hover:bg-[#2563eb] text-white px-8 rounded-lg"
                 data-testid="export-btn"
               >
                 {loading ? 'Exporting...' : 'Export'}
@@ -306,7 +306,7 @@ const Reports = () => {
                 type="date"
                 value={attendanceFilters.fromDate}
                 onChange={(e) => setAttendanceFilters({ ...attendanceFilters, fromDate: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
+                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
                 data-testid="attendance-filter-from"
               />
             </div>
@@ -317,14 +317,14 @@ const Reports = () => {
                 placeholder="Employee Name"
                 value={attendanceFilters.empName}
                 onChange={(e) => setAttendanceFilters({ ...attendanceFilters, empName: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
+                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
                 data-testid="attendance-filter-empname"
               />
             </div>
             <div>
               <label className="text-sm text-gray-600 mb-2 block">Status:</label>
               <Select value={attendanceFilters.status} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, status: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="attendance-filter-status">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="attendance-filter-status">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -344,14 +344,14 @@ const Reports = () => {
                 type="date"
                 value={attendanceFilters.toDate}
                 onChange={(e) => setAttendanceFilters({ ...attendanceFilters, toDate: e.target.value })}
-                className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none focus:ring-0 shadow-none"
+                className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none focus:ring-0 shadow-none"
                 data-testid="attendance-filter-to"
               />
             </div>
             <div>
               <label className="text-sm text-gray-600 mb-2 block">Team Name:</label>
               <Select value={attendanceFilters.team} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, team: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="attendance-filter-team">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="attendance-filter-team">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -365,7 +365,7 @@ const Reports = () => {
             <div>
               <label className="text-sm text-gray-600 mb-2 block">Department:</label>
               <Select value={attendanceFilters.department} onValueChange={(v) => setAttendanceFilters({ ...attendanceFilters, department: v })}>
-                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#3b82f6] rounded-none shadow-none" data-testid="attendance-filter-dept">
+                <SelectTrigger className="bg-white border-0 border-b-2 border-b-[#0b1f3b] rounded-none shadow-none" data-testid="attendance-filter-dept">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
