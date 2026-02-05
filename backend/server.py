@@ -1531,7 +1531,7 @@ async def check_in(employee_id: str, current_user: dict = Depends(get_current_us
 
 @api_router.post("/attendance/check-out")
 async def check_out(employee_id: str, current_user: dict = Depends(get_current_user)):
-    today = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+    today = get_ist_today()
     attendance = await db.attendance.find_one({"employee_id": employee_id, "date": today}, {"_id": 0})
     
     if not attendance:
@@ -1543,7 +1543,7 @@ async def check_out(employee_id: str, current_user: dict = Depends(get_current_u
     employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
     shift_timings = get_shift_timings(employee) if employee else None
     
-    now = datetime.now(timezone.utc)
+    now = get_ist_now()
     check_out_time = now.strftime("%I:%M %p")
     check_out_24h = now.strftime("%H:%M")
     
