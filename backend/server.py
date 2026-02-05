@@ -279,6 +279,14 @@ class EmployeeUpdate(BaseModel):
     shift_type: Optional[str] = None
     attendance_tracking_enabled: Optional[bool] = None
     
+    # Custom Shift Configuration
+    custom_login_time: Optional[str] = None
+    custom_logout_time: Optional[str] = None
+    custom_total_hours: Optional[float] = None
+    
+    # Salary Configuration
+    monthly_salary: Optional[float] = None
+    
     # System Access
     user_role: Optional[str] = None
     login_enabled: Optional[bool] = None
@@ -291,10 +299,18 @@ class Attendance(BaseModel):
     team: str
     department: str
     date: str
-    check_in: Optional[str] = None
-    check_out: Optional[str] = None
+    check_in: Optional[str] = None  # Time in "HH:MM AM/PM" format
+    check_out: Optional[str] = None  # Time in "HH:MM AM/PM" format
+    check_in_24h: Optional[str] = None  # Time in "HH:MM" 24-hour format for calculations
+    check_out_24h: Optional[str] = None  # Time in "HH:MM" 24-hour format for calculations
     total_hours: Optional[str] = None
+    total_hours_decimal: Optional[float] = None  # For precise calculations
     status: str = "Not Logged"
+    is_lop: bool = False  # Loss of Pay flag
+    lop_reason: Optional[str] = None  # Reason for LOP
+    shift_type: Optional[str] = "General"  # Employee's shift at time of attendance
+    expected_login: Optional[str] = None  # Expected login time based on shift
+    expected_logout: Optional[str] = None  # Expected logout time based on shift
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class LeaveRequest(BaseModel):
