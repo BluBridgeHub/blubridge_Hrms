@@ -2595,7 +2595,7 @@ async def get_employee_attendance(
         raise HTTPException(status_code=404, detail="No employee profile linked")
     
     employee_id = current_user["employee_id"]
-    now = datetime.now(timezone.utc)
+    now = get_ist_now()
     
     # Calculate date range based on duration
     if duration == "this_week":
