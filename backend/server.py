@@ -1837,7 +1837,7 @@ async def add_star_reward(data: StarRewardCreate, current_user: dict = Depends(g
     if employee.get("department") != "Research Unit":
         raise HTTPException(status_code=400, detail="Star rewards can only be given to Research Unit employees")
     
-    current_month = datetime.now(timezone.utc).strftime("%Y-%m")
+    current_month = get_ist_now().strftime("%Y-%m")
     
     reward = StarReward(
         employee_id=data.employee_id,
@@ -1947,7 +1947,7 @@ async def get_dashboard_stats(
     to_date: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    today = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+    today = get_ist_now().strftime("%d-%m-%Y")
     
     # Use provided dates or default to today
     query_from = from_date if from_date else today
@@ -1961,7 +1961,7 @@ async def get_dashboard_stats(
     pending_approvals = await db.leaves.count_documents({"status": "pending"})
     upcoming_leaves = await db.leaves.count_documents({
         "status": "approved",
-        "start_date": {"$gte": datetime.now(timezone.utc).strftime("%Y-%m-%d")}
+        "start_date": {"$gte": get_ist_now().strftime("%Y-%m-%d")}
     })
     
     # Get attendance stats with date range support
@@ -1988,7 +1988,7 @@ async def get_dashboard_leave_list(
     to_date: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    today = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+    today = get_ist_now().strftime("%d-%m-%Y")
     query_date = from_date if from_date else today
     
     # Get employees not logged in on the specified date
@@ -2978,7 +2978,7 @@ async def seed_database():
         await db.employees.insert_one(doc.copy())
     
     # Create sample attendance
-    today = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+    today = get_ist_now().strftime("%d-%m-%Y")
     employees = await db.employees.find({}, {"_id": 0}).to_list(1000)
     
     for emp in employees[:15]:
