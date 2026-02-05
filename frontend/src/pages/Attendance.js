@@ -319,17 +319,32 @@ const Attendance = () => {
                   </tr>
                 ) : (
                   sortedAttendance.map((record, index) => (
-                    <tr key={record.id || index} className="hover:bg-gray-50/50 transition-colors">
+                    <tr key={record.id || index} className={`hover:bg-gray-50/50 transition-colors ${record.is_lop ? 'bg-red-50/50' : ''}`}>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">{record.emp_name}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{record.team}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{formatDateDisplay(record.date)}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{record.check_in || '-'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{record.check_out || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        <div>{record.check_in || '-'}</div>
+                        {record.expected_login && (
+                          <div className="text-xs text-gray-400">Expected: {record.expected_login}</div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        <div>{record.check_out || '-'}</div>
+                        {record.expected_logout && (
+                          <div className="text-xs text-gray-400">Expected: {record.expected_logout}</div>
+                        )}
+                      </td>
                       <td className="px-6 py-4 text-sm text-gray-600">{record.total_hours || '-'}</td>
                       <td className="px-6 py-4">
-                        <Badge className={getStatusBadge(record.status)}>
-                          {record.status}
+                        <Badge className={getStatusBadge(record.status, record.is_lop)}>
+                          {record.is_lop ? 'Loss of Pay' : record.status}
                         </Badge>
+                        {record.is_lop && record.lop_reason && (
+                          <div className="text-xs text-red-600 mt-1 max-w-[200px]" title={record.lop_reason}>
+                            {record.lop_reason.substring(0, 50)}...
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))
