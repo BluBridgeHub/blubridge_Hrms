@@ -80,7 +80,7 @@ const EmployeeLeave = () => {
             <p className="text-sm text-slate-500">Apply for leave and track requests</p>
           </div>
         </div>
-        <Button onClick={() => setShowApplyDialog(true)} className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20" data-testid="apply-leave-btn">
+        <Button onClick={() => setShowApplyDialog(true)} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-xl shadow-lg shadow-[#063c88]/20" data-testid="apply-leave-btn">
           <Plus className="w-4 h-4 mr-2" /> Apply Leave
         </Button>
       </div>
@@ -89,7 +89,7 @@ const EmployeeLeave = () => {
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Pending', value: stats.pending, icon: Clock, color: 'amber' },
-          { label: 'Approved', value: stats.approved, icon: CheckCircle2, color: 'emerald' },
+          { label: 'Approved', value: stats.approved, icon: CheckCircle2, color: 'blue' },
           { label: 'Rejected', value: stats.rejected, icon: XCircle, color: 'red' },
         ].map((stat, i) => (
           <div key={i} className="stat-card">
@@ -123,7 +123,7 @@ const EmployeeLeave = () => {
                   <span className="text-sm text-slate-500">/ {leave.total}</span>
                 </div>
                 <div className="h-2 bg-slate-200 rounded-full mt-2 overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${(leave.remaining / leave.total) * 100}%` }} />
+                  <div className="h-full bg-[#063c88] rounded-full transition-all" style={{ width: `${(leave.remaining / leave.total) * 100}%` }} />
                 </div>
               </div>
             ))}
@@ -138,7 +138,7 @@ const EmployeeLeave = () => {
         </div>
         {loading ? (
           <div className="flex items-center justify-center h-48">
-            <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-2 border-[#063c88] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -212,7 +212,7 @@ const EmployeeLeave = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowApplyDialog(false)} className="rounded-lg">Cancel</Button>
-            <Button onClick={handleApplyLeave} disabled={formLoading} className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg" data-testid="submit-leave-btn">
+            <Button onClick={handleApplyLeave} disabled={formLoading} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg" data-testid="submit-leave-btn">
               {formLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Submit'}
             </Button>
           </DialogFooter>
