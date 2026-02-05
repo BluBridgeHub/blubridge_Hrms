@@ -459,6 +459,301 @@ async def generate_emp_id():
     count = await db.employees.count_documents({})
     return f"EMP{str(count + 1).zfill(4)}"
 
+# ============== SHIFT & LOP CALCULATION HELPERS ==============
+
+def parse_time_12h_to_24h(time_str: str) -> str:
+    """Convert 12-hour format (e.g., '10:00 AM') to 24-hour format (e.g., '10:00')"""
+    if not time_str:
+        return None
+    try:
+        time_str = time_str.strip().upper()
+        if 'AM' in time_str or 'PM' in time_str:
+            dt = datetime.strptime(time_str.replace(' ', ''), "%I:%M%p")
+            return dt.strftime("%H:%M")
+        return time_str  # Already in 24h format
+    except:
+        return None
+
+def parse_time_24h_to_minutes(time_str: str) -> int:
+    """Convert 24-hour time string to minutes since midnight"""
+    if not time_str:
+        return None
+    try:
+        hours, minutes = map(int, time_str.split(':'))
+        return hours * 60 + minutes
+    except:
+        return None
+
+def minutes_to_time_24h(minutes: int) -> str:
+    """Convert minutes since midnight to 24-hour time string"""
+    hours = minutes // 60
+    mins = minutes % 60
+    return f"{hours:02d}:{mins:02d}"
+
+def get_shift_timings(employee: dict) -> dict:
+    """Get shift timings for an employee based on their shift type"""
+    shift_type = employee.get('shift_type', 'General')
+    
+    if shift_type == "Custom":
+        login_time = employee.get('custom_login_time')
+        logout_time = employee.get('custom_logout_time')
+        
+        if login_time and logout_time:
+            login_mins = parse_time_24h_to_minutes(login_time)
+            logout_mins = parse_time_24h_to_minutes(logout_time)
+            
+            # Handle overnight shifts
+            if logout_mins < login_mins:
+                total_hours = (24 * 60 - login_mins + logout_mins) / 60
+            else:
+                total_hours = (logout_mins - login_mins) / 60
+            
+            return {
+                "login_time": login_time,
+                "logout_time": logout_time,
+                "total_hours": total_hours
+            }
+        return None
+    
+    shift_def = SHIFT_DEFINITIONS.get(shift_type, SHIFT_DEFINITIONS["General"])
+    return {
+        "login_time": shift_def["login_time"],
+        "logout_time": shift_def["logout_time"],
+        "total_hours": shift_def["total_hours"]
+    }
+
+def calculate_attendance_status(check_in_24h: str, check_out_24h: str, shift_timings: dict) -> dict:
+    """
+    Calculate attendance status based on strict LOP rules:
+    - Late login (even 1 minute) = LOP
+    - Early logout (even 1 minute) = LOP
+    - Insufficient hours = LOP
+    - No grace period
+    """
+    result = {
+        "status": AttendanceStatus.PRESENT,
+        "is_lop": False,
+        "lop_reason": None,
+        "total_hours_decimal": 0.0
+    }
+    
+    # Flexible shift - only check total hours
+    if shift_timings.get("login_time") is None:
+        if check_in_24h and check_out_24h:
+            in_mins = parse_time_24h_to_minutes(check_in_24h)
+            out_mins = parse_time_24h_to_minutes(check_out_24h)
+            
+            if out_mins < in_mins:
+                total_mins = 24 * 60 - in_mins + out_mins
+            else:
+                total_mins = out_mins - in_mins
+            
+            result["total_hours_decimal"] = total_mins / 60
+            required_hours = shift_timings.get("total_hours", 8)
+            
+            if result["total_hours_decimal"] < required_hours:
+                result["status"] = AttendanceStatus.LOSS_OF_PAY
+                result["is_lop"] = True
+                result["lop_reason"] = f"Insufficient hours: {result['total_hours_decimal']:.2f}h < {required_hours}h required"
+        return result
+    
+    # Fixed shift - strict rules apply
+    expected_login = parse_time_24h_to_minutes(shift_timings["login_time"])
+    expected_logout = parse_time_24h_to_minutes(shift_timings["logout_time"])
+    required_hours = shift_timings["total_hours"]
+    
+    if not check_in_24h:
+        result["status"] = AttendanceStatus.NOT_LOGGED
+        return result
+    
+    actual_login = parse_time_24h_to_minutes(check_in_24h)
+    
+    # Check for late login (STRICT - even 1 minute late = LOP)
+    if actual_login > expected_login:
+        late_mins = actual_login - expected_login
+        result["status"] = AttendanceStatus.LOSS_OF_PAY
+        result["is_lop"] = True
+        result["lop_reason"] = f"Late login by {late_mins} minute(s). Expected: {shift_timings['login_time']}, Actual: {check_in_24h}"
+        
+        # Still calculate hours if checked out
+        if check_out_24h:
+            actual_logout = parse_time_24h_to_minutes(check_out_24h)
+            if actual_logout < actual_login:
+                total_mins = 24 * 60 - actual_login + actual_logout
+            else:
+                total_mins = actual_logout - actual_login
+            result["total_hours_decimal"] = total_mins / 60
+        return result
+    
+    # Check for early logout (STRICT - even 1 minute early = LOP)
+    if check_out_24h:
+        actual_logout = parse_time_24h_to_minutes(check_out_24h)
+        
+        # Calculate total hours
+        if actual_logout < actual_login:
+            total_mins = 24 * 60 - actual_login + actual_logout
+        else:
+            total_mins = actual_logout - actual_login
+        result["total_hours_decimal"] = total_mins / 60
+        
+        if actual_logout < expected_logout:
+            early_mins = expected_logout - actual_logout
+            result["status"] = AttendanceStatus.LOSS_OF_PAY
+            result["is_lop"] = True
+            result["lop_reason"] = f"Early logout by {early_mins} minute(s). Expected: {shift_timings['logout_time']}, Actual: {check_out_24h}"
+            return result
+        
+        # Check total hours requirement
+        if result["total_hours_decimal"] < required_hours:
+            result["status"] = AttendanceStatus.LOSS_OF_PAY
+            result["is_lop"] = True
+            result["lop_reason"] = f"Insufficient hours: {result['total_hours_decimal']:.2f}h < {required_hours}h required"
+            return result
+        
+        # All conditions met - Present
+        result["status"] = AttendanceStatus.PRESENT
+    else:
+        # Only logged in, not logged out yet
+        result["status"] = AttendanceStatus.LOGIN
+    
+    return result
+
+def calculate_total_hours_str(total_hours_decimal: float) -> str:
+    """Convert decimal hours to string format (e.g., '8h 30m')"""
+    if not total_hours_decimal:
+        return "-"
+    hours = int(total_hours_decimal)
+    minutes = int((total_hours_decimal - hours) * 60)
+    return f"{hours}h {minutes}m"
+
+async def calculate_payroll_for_employee(employee_id: str, month: str) -> dict:
+    """
+    Calculate payroll for an employee for a given month.
+    Month format: "YYYY-MM"
+    """
+    employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
+    if not employee:
+        return None
+    
+    year, month_num = map(int, month.split('-'))
+    
+    # Get number of days in month and working days (excluding Sundays)
+    import calendar
+    days_in_month = calendar.monthrange(year, month_num)[1]
+    
+    working_days = 0
+    for day in range(1, days_in_month + 1):
+        date_obj = datetime(year, month_num, day)
+        if date_obj.weekday() != 6:  # Not Sunday
+            working_days += 1
+    
+    # Get attendance records for the month
+    from_date = f"01-{month_num:02d}-{year}"
+    to_date = f"{days_in_month:02d}-{month_num:02d}-{year}"
+    
+    attendance_records = await db.attendance.find({
+        "employee_id": employee_id,
+        "date": {"$gte": from_date, "$lte": to_date}
+    }, {"_id": 0}).to_list(days_in_month)
+    
+    # Get leave records for the month
+    leave_records = await db.leaves.find({
+        "employee_id": employee_id,
+        "status": "approved",
+        "$or": [
+            {"start_date": {"$regex": f"^{year}-{month_num:02d}"}},
+            {"end_date": {"$regex": f"^{year}-{month_num:02d}"}}
+        ]
+    }, {"_id": 0}).to_list(100)
+    
+    # Build attendance map
+    attendance_map = {}
+    for record in attendance_records:
+        attendance_map[record["date"]] = record
+    
+    # Calculate days
+    present_days = 0
+    lop_days = 0
+    leave_days = 0
+    absent_days = 0
+    attendance_details = []
+    
+    for day in range(1, days_in_month + 1):
+        date_obj = datetime(year, month_num, day)
+        date_str = f"{day:02d}-{month_num:02d}-{year}"
+        
+        detail = {
+            "date": date_str,
+            "day_name": date_obj.strftime("%a"),
+            "is_sunday": date_obj.weekday() == 6,
+            "status": "NA",
+            "is_lop": False,
+            "check_in": None,
+            "check_out": None,
+            "total_hours": None
+        }
+        
+        if date_obj.weekday() == 6:  # Sunday
+            detail["status"] = "Sunday"
+            attendance_details.append(detail)
+            continue
+        
+        record = attendance_map.get(date_str)
+        
+        if record:
+            detail["check_in"] = record.get("check_in")
+            detail["check_out"] = record.get("check_out")
+            detail["total_hours"] = record.get("total_hours")
+            detail["status"] = record.get("status", "NA")
+            detail["is_lop"] = record.get("is_lop", False)
+            
+            if record.get("is_lop"):
+                lop_days += 1
+            elif record.get("status") in [AttendanceStatus.PRESENT, AttendanceStatus.COMPLETED, "Present", "Completed"]:
+                present_days += 1
+            elif record.get("status") == AttendanceStatus.LEAVE or record.get("status") == "Leave":
+                leave_days += 1
+            elif record.get("status") in [AttendanceStatus.NOT_LOGGED, "Not Logged", "NA"]:
+                absent_days += 1
+            else:
+                # Late Login, Early Out without is_lop flag - count as LOP
+                if record.get("status") in [AttendanceStatus.LATE_LOGIN, AttendanceStatus.EARLY_OUT, "Late Login", "Early Out"]:
+                    lop_days += 1
+                    detail["is_lop"] = True
+                else:
+                    present_days += 1
+        else:
+            detail["status"] = "Absent"
+            absent_days += 1
+        
+        attendance_details.append(detail)
+    
+    # Calculate salary
+    monthly_salary = employee.get("monthly_salary", 0.0) or 0.0
+    per_day_salary = monthly_salary / 30 if monthly_salary > 0 else 0  # Standard 30-day calculation
+    lop_deduction = per_day_salary * (lop_days + absent_days)
+    net_salary = monthly_salary - lop_deduction
+    
+    return {
+        "employee_id": employee_id,
+        "emp_name": employee.get("full_name"),
+        "emp_id": employee.get("emp_id"),
+        "department": employee.get("department"),
+        "team": employee.get("team"),
+        "shift_type": employee.get("shift_type"),
+        "month": month,
+        "monthly_salary": monthly_salary,
+        "working_days": working_days,
+        "present_days": present_days,
+        "lop_days": lop_days,
+        "leave_days": leave_days,
+        "absent_days": absent_days,
+        "per_day_salary": round(per_day_salary, 2),
+        "lop_deduction": round(lop_deduction, 2),
+        "net_salary": round(max(0, net_salary), 2),
+        "attendance_details": attendance_details
+    }
+
 # ============== EMAIL HELPERS ==============
 
 async def send_email_notification(to_email: str, subject: str, html_content: str):
