@@ -22,6 +22,17 @@ import time
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Indian Standard Time (IST) - UTC+5:30
+IST = timezone(timedelta(hours=5, minutes=30))
+
+def get_ist_now():
+    """Get current datetime in Indian Standard Time"""
+    return datetime.now(IST)
+
+def get_ist_today():
+    """Get today's date string in IST (format: DD-MM-YYYY)"""
+    return get_ist_now().strftime("%d-%m-%Y")
+
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
