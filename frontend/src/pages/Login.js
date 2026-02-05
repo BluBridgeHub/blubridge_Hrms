@@ -151,7 +151,7 @@ const Login = () => {
           </form>
 
           {/* Test credentials hint */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+          {/* <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
             <p className="text-xs text-blue-700 font-medium mb-2">Test Credentials:</p>
             <div className="text-xs text-blue-600 space-y-2">
               <div className="pb-2 border-b border-blue-100">
@@ -165,7 +165,7 @@ const Login = () => {
                 <p><span className="font-medium">Password:</span> user</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <p className="text-center text-sm text-gray-400 mt-6">
