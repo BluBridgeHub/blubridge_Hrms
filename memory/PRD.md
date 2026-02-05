@@ -40,9 +40,25 @@ Build a complete Human Resource Management System (HRMS) with admin and employee
 16. **Employee Leave** - Leave balance and application
 17. **Employee Profile** - Personal information display
 
+### Latest Feature: Dashboard Attendance Chart Filters (Feb 5, 2026)
+**100% Complete** - Filters for Attendance Overview chart implemented and tested
+
+#### Filter Features
+- **Team Filter**: Filter by "All Teams" or any specific team (14+ teams available)
+- **Date Range Filter**: Today, This Week, Last Week, This Month, Last Month, Custom
+- **Custom Date Range**: Displays date picker inputs when "Custom" is selected
+- **Dynamic Chart Updates**: Chart data refreshes automatically when filters change
+
+#### Implementation Details
+- State management with `chartFilters` state in Dashboard.js
+- `getDateRangeParams()` function calculates date ranges
+- `fetchChartData()` calls `/api/attendance` endpoint with filter params
+- Proper status counting: Login, Completed, Early Out, Late Login mapped correctly
+
 ### Testing Status
-- **Testing Agent**: Iteration 15 - 100% Pass Rate (11/11 features)
-- **All functionality preserved** - No logic changes made
+- **Testing Agent**: Iteration 16 - 100% Pass Rate (8/8 chart filter features)
+- **Previous**: Iteration 15 - 100% Pass Rate (11/11 UI redesign features)
+- **All functionality preserved** - No breaking changes
 - **Design Guidelines**: `/app/design_guidelines.json`
 
 ## Technology Stack
