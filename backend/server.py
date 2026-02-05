@@ -191,6 +191,14 @@ class Employee(BaseModel):
     shift_type: Optional[str] = "General"
     attendance_tracking_enabled: bool = True
     
+    # Custom Shift Configuration (only for shift_type = "Custom")
+    custom_login_time: Optional[str] = None  # Format: "HH:MM" (24-hour)
+    custom_logout_time: Optional[str] = None  # Format: "HH:MM" (24-hour)
+    custom_total_hours: Optional[float] = None  # Auto-calculated from times
+    
+    # Salary Configuration (for payroll)
+    monthly_salary: Optional[float] = 0.0
+    
     # System Access
     user_role: str = UserRole.EMPLOYEE
     login_enabled: bool = True
