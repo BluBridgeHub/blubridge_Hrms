@@ -122,16 +122,32 @@ class TestReportsDatePicker(TestAuth):
     """Test Reports page uses DatePicker component"""
     
     def test_leave_report_endpoint(self, auth_headers):
-        """Test leave report endpoint"""
-        response = requests.get(f"{BASE_URL}/api/reports/leaves", headers=auth_headers)
+        """Test leave report endpoint with date filters"""
+        response = requests.get(
+            f"{BASE_URL}/api/reports/leaves",
+            headers=auth_headers,
+            params={
+                "from_date": "2026-01-01",
+                "to_date": "2026-02-28"
+            }
+        )
         assert response.status_code == 200, f"Leave report failed: {response.status_code}"
-        print("✅ Leave report endpoint accessible")
+        data = response.json()
+        print(f"✅ Leave report endpoint returns {len(data)} records")
     
     def test_attendance_report_endpoint(self, auth_headers):
-        """Test attendance report endpoint"""
-        response = requests.get(f"{BASE_URL}/api/reports/attendance", headers=auth_headers)
+        """Test attendance report endpoint with date filters"""
+        response = requests.get(
+            f"{BASE_URL}/api/reports/attendance",
+            headers=auth_headers,
+            params={
+                "from_date": "01-02-2026",
+                "to_date": "28-02-2026"
+            }
+        )
         assert response.status_code == 200, f"Attendance report failed: {response.status_code}"
-        print("✅ Attendance report endpoint accessible")
+        data = response.json()
+        print(f"✅ Attendance report endpoint returns {len(data)} records")
 
 
 if __name__ == "__main__":
