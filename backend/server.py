@@ -1166,7 +1166,7 @@ async def create_employee(data: EmployeeCreate, current_user: dict = Depends(get
             "attendance_tracking_enabled": data.attendance_tracking_enabled,
             "user_role": data.user_role,
             "login_enabled": data.login_enabled,
-            "updated_at": datetime.now(timezone.utc).isoformat()
+            "updated_at": get_ist_now().isoformat()
         }
         
         await db.employees.update_one({"id": employee_id}, {"$set": update_data})
@@ -1321,7 +1321,7 @@ async def update_employee(employee_id: str, data: EmployeeUpdate, current_user: 
     if not update_data:
         raise HTTPException(status_code=400, detail="No data to update")
     
-    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_data["updated_at"] = get_ist_now().isoformat()
     
     # Handle team change
     old_team = existing.get("team")
@@ -1351,10 +1351,10 @@ async def deactivate_employee(employee_id: str, current_user: dict = Depends(get
     
     update_data = {
         "is_deleted": True,
-        "deleted_at": datetime.now(timezone.utc).isoformat(),
+        "deleted_at": get_ist_now().isoformat(),
         "employee_status": EmployeeStatus.INACTIVE,
         "login_enabled": False,
-        "updated_at": datetime.now(timezone.utc).isoformat()
+        "updated_at": get_ist_now().isoformat()
     }
     
     await db.employees.update_one({"id": employee_id}, {"$set": update_data})
@@ -1387,7 +1387,7 @@ async def restore_employee(employee_id: str, current_user: dict = Depends(get_cu
         "is_deleted": False,
         "deleted_at": None,
         "employee_status": EmployeeStatus.ACTIVE,
-        "updated_at": datetime.now(timezone.utc).isoformat()
+        "updated_at": get_ist_now().isoformat()
     }
     
     await db.employees.update_one({"id": employee_id}, {"$set": update_data})
@@ -1427,7 +1427,7 @@ async def update_employee_avatar(employee_id: str, data: AvatarUpdate, current_u
         {"$set": {
             "avatar": data.avatar_url,
             "avatar_public_id": data.avatar_public_id,
-            "updated_at": datetime.now(timezone.utc).isoformat()
+            "updated_at": get_ist_now().isoformat()
         }}
     )
     
@@ -1735,7 +1735,7 @@ async def approve_leave(leave_id: str, current_user: dict = Depends(get_current_
     
     result = await db.leaves.update_one(
         {"id": leave_id},
-        {"$set": {"status": "approved", "approved_by": current_user["id"], "approved_at": datetime.now(timezone.utc).isoformat()}}
+        {"$set": {"status": "approved", "approved_by": current_user["id"], "approved_at": get_ist_now().isoformat()}}
     )
     
     await log_audit(current_user["id"], "approve", "leave", leave_id)
@@ -1769,7 +1769,7 @@ async def reject_leave(leave_id: str, current_user: dict = Depends(get_current_u
     
     result = await db.leaves.update_one(
         {"id": leave_id},
-        {"$set": {"status": "rejected", "approved_by": current_user["id"], "approved_at": datetime.now(timezone.utc).isoformat()}}
+        {"$set": {"status": "rejected", "approved_by": current_user["id"], "approved_at": get_ist_now().isoformat()}}
     )
     
     await log_audit(current_user["id"], "reject", "leave", leave_id)
@@ -2231,7 +2231,7 @@ async def update_employee_shift(
         update_data["custom_logout_time"] = None
         update_data["custom_total_hours"] = None
     
-    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_data["updated_at"] = get_ist_now().isoformat()
     
     await db.employees.update_one({"id": employee_id}, {"$set": update_data})
     
@@ -2256,7 +2256,7 @@ async def update_employee_salary(
     
     update_data = {
         "monthly_salary": monthly_salary,
-        "updated_at": datetime.now(timezone.utc).isoformat()
+        "updated_at": get_ist_now().isoformat()
     }
     
     await db.employees.update_one({"id": employee_id}, {"$set": update_data})
