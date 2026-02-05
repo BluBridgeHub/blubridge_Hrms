@@ -1056,7 +1056,7 @@ const StarReward = () => {
 
       {/* View History Modal */}
       <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-        <DialogContent className="bg-[#fffdf7] max-w-2xl">
+        <DialogContent className="bg-[#fffdf7] max-w-2xl z-[100]">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
               Star History - {selectedEmployee?.name}
