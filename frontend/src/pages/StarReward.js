@@ -116,6 +116,7 @@ const StarReward = () => {
   // View modal
   const [showViewModal, setShowViewModal] = useState(false);
   const [starHistory, setStarHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   
   // Filters
   const [filters, setFilters] = useState({
