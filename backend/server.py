@@ -379,6 +379,34 @@ class AuditLog(BaseModel):
     details: Optional[str] = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# ============== PAYROLL MODEL ==============
+
+class PayrollRecord(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employee_id: str
+    emp_name: str
+    department: str
+    team: str
+    month: str  # Format: "YYYY-MM"
+    monthly_salary: float = 0.0
+    working_days: int = 0  # Total working days in month (excluding Sundays)
+    present_days: int = 0
+    lop_days: int = 0
+    leave_days: int = 0
+    absent_days: int = 0
+    per_day_salary: float = 0.0
+    lop_deduction: float = 0.0
+    net_salary: float = 0.0
+    attendance_details: List[dict] = []  # Daily attendance breakdown
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ShiftConfigCreate(BaseModel):
+    shift_type: str
+    login_time: Optional[str] = None  # For custom shifts
+    logout_time: Optional[str] = None  # For custom shifts
+
 # ============== HELPERS ==============
 
 def hash_password(password: str) -> str:
