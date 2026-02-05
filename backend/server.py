@@ -225,7 +225,7 @@ class Employee(BaseModel):
     
     # Timestamps
     created_at: datetime = Field(default_factory=lambda: get_ist_now())
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: get_ist_now())
 
 class EmployeeCreate(BaseModel):
     # Personal Information
@@ -411,7 +411,7 @@ class PayrollRecord(BaseModel):
     net_salary: float = 0.0
     attendance_details: List[dict] = []  # Daily attendance breakdown
     created_at: datetime = Field(default_factory=lambda: get_ist_now())
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: get_ist_now())
 
 class ShiftConfigCreate(BaseModel):
     shift_type: str
