@@ -80,7 +80,7 @@ const Login = () => {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <img src="/logo-white.png" alt="BluBridge" className="h-12 w-auto" />
+            <img src="/logo-white.png" alt="BluBridge" className="w-auto" />
             <div>
               <p className="text-xs text-white/60 uppercase tracking-widest">HRMS Platform</p>
             </div>

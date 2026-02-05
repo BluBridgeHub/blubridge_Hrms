@@ -107,7 +107,7 @@ const EmployeeLayout = ({ children }) => {
         {/* User Section */}
         <div className="p-4 border-t border-black/5">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/80 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center shadow-md">
               <span className="text-white font-semibold text-sm">
                 {user?.name?.charAt(0)?.toUpperCase()}
               </span>
@@ -164,7 +164,7 @@ const EmployeeLayout = ({ children }) => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-3 hover:bg-slate-100 rounded-xl px-3 py-2 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center shadow-md">
                       <span className="text-white font-semibold text-sm">
                         {user?.name?.charAt(0)?.toUpperCase()}
                       </span>
