@@ -37,7 +37,7 @@ const EmployeeProfile = () => {
     <div className="space-y-6 animate-fade-in" data-testid="employee-profile-page">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
           <User className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -51,7 +51,7 @@ const EmployeeProfile = () => {
         <div className="flex flex-col md:flex-row gap-8 items-start">
           {/* Avatar & Basic Info */}
           <div className="text-center md:text-left">
-            <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-xl mx-auto md:mx-0">
+            <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center shadow-xl mx-auto md:mx-0">
               <span className="text-white text-5xl font-bold" style={{ fontFamily: 'Outfit' }}>
                 {profile?.full_name?.charAt(0)?.toUpperCase()}
               </span>
@@ -59,7 +59,7 @@ const EmployeeProfile = () => {
             <div className="mt-4">
               <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>{profile?.full_name}</h2>
               <p className="text-slate-500">{profile?.designation}</p>
-              <p className="text-sm text-emerald-600 font-medium mt-1">{profile?.emp_id}</p>
+              <p className="text-sm text-[#063c88] font-medium mt-1">{profile?.emp_id}</p>
             </div>
           </div>
 
@@ -108,7 +108,7 @@ const EmployeeProfile = () => {
         <div className="card-flat p-5">
           <p className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-3">Reporting Manager</p>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center">
               <span className="text-white font-medium text-sm">{profile.reporting_manager.name?.charAt(0)}</span>
             </div>
             <div>

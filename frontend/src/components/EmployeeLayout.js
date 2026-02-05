@@ -199,7 +199,7 @@ const EmployeeLayout = ({ children }) => {
         </header>
 
         {/* Page content */}
-        <main className="p-4 lg:p-8 max-w-[1400px] mx-auto">
+        <main className="p-4 lg:p-8 max-w-[1600px] mx-auto">
           {children}
         </main>
       </div>
