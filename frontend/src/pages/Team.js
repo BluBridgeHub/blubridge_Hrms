@@ -222,7 +222,7 @@ const Team = () => {
                   {teamMembers.map((member) => (
                     <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#063c88] to-[#0066ff] flex items-center justify-center shadow-md">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center shadow-md">
                           <span className="text-white font-medium text-sm">{member.full_name?.charAt(0)?.toUpperCase()}</span>
                         </div>
                         <div>

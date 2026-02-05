@@ -76,7 +76,7 @@ const ChangePassword = () => {
       {/* Password Card */}
       <div className="max-w-xl mx-auto">
         <div className="card-premium overflow-hidden">
-          <div className="bg-gradient-to-r from-[#063c88] to-[#0066ff] p-6">
+          <div className="bg-gradient-to-r from-[#063c88] to-[#0a5cba] p-6">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
                 <ShieldCheck className="w-6 h-6 text-white" />

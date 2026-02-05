@@ -269,7 +269,7 @@ const Attendance = () => {
                     <tr key={record.id || index} className={record.is_lop ? 'bg-red-50/50' : ''}>
                       <td>
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#063c88] to-[#0066ff] flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center">
                             <span className="text-white text-xs font-medium">{record.emp_name?.charAt(0)}</span>
                           </div>
                           <span className="font-medium text-slate-900">{record.emp_name}</span>

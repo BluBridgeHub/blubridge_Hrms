@@ -347,7 +347,7 @@ const Leave = () => {
           {selectedLeave && (
             <div className="py-6 space-y-6">
               <div className="flex items-center gap-4 pb-6 border-b border-slate-100">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#063c88] to-[#0066ff] flex items-center justify-center shadow-lg">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center shadow-lg">
                   <span className="text-white text-xl font-bold">{selectedLeave.emp_name?.charAt(0)?.toUpperCase()}</span>
                 </div>
                 <div>

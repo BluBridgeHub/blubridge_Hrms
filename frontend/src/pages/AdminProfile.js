@@ -73,7 +73,7 @@ const AdminProfile = () => {
       {/* Profile Card */}
       <div className="card-premium overflow-hidden">
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-[#063c88] to-[#0066ff] p-8 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-[#063c88] to-[#0a5cba] p-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="relative z-10 flex items-center gap-6">
             <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center border-2 border-white/20 shadow-xl">
