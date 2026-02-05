@@ -131,11 +131,8 @@ const Login = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-10">
             <div className="inline-flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-[#063c88] flex items-center justify-center shadow-lg shadow-[#063c88]/30">
-                <span className="text-white font-bold text-xl" style={{ fontFamily: 'Outfit' }}>B</span>
-              </div>
+              <img src="/logo-black.png" alt="BluBridge" className="h-12 w-auto" />
               <div className="text-left">
-                <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>BluBridge</h1>
                 <p className="text-[10px] text-slate-500 uppercase tracking-widest">HRMS Platform</p>
               </div>
             </div>
