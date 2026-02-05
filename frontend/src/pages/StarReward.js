@@ -23,6 +23,7 @@ import {
 } from '../components/ui/dialog';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
+import { MonthPicker } from '../components/ui/month-picker';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
