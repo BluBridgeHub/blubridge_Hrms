@@ -222,11 +222,13 @@ const StarReward = () => {
   };
 
   const handleViewEmployee = async (employee) => {
+    console.log('handleViewEmployee called with:', employee);
     // Set selected employee and open modal immediately
     setSelectedEmployee(employee);
     setStarHistory([]); // Clear previous history
     setLoadingHistory(true);
     setShowViewModal(true);
+    console.log('Modal should be open now, showViewModal:', true);
     
     // Then fetch history
     try {
