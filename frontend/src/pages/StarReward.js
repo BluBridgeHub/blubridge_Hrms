@@ -640,13 +640,16 @@ const StarReward = () => {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   // RENDER TEAM DETAILS VIEW
   if (showTeamDetails && selectedTeam) {
     return (
-      <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="team-details-view">
+      <>
+        <ViewHistoryModal />
+        <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="team-details-view">
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>
