@@ -67,11 +67,8 @@ const EmployeeLayout = ({ children }) => {
         {/* Logo Section */}
         <div className="h-20 flex items-center px-6 border-b border-black/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center shadow-lg shadow-[#004EEB]/20">
-              <span className="text-white font-bold text-lg" style={{ fontFamily: 'Outfit' }}>B</span>
-            </div>
+            <img src="/logo-black.png" alt="BluBridge" className="h-10 w-auto" />
             <div>
-              <h1 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'Outfit' }}>BluBridge</h1>
               <p className="text-[10px] text-slate-500 uppercase tracking-widest font-medium">Employee Portal</p>
             </div>
           </div>
