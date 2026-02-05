@@ -761,12 +761,15 @@ const StarReward = () => {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   // RENDER MAIN LIST VIEW
   return (
-    <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="star-reward-page">
+    <>
+      <ViewHistoryModal />
+      <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="star-reward-page">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
