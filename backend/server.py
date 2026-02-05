@@ -1477,13 +1477,13 @@ async def check_in(employee_id: str, current_user: dict = Depends(get_current_us
     if not employee.get("attendance_tracking_enabled", True):
         raise HTTPException(status_code=400, detail="Attendance tracking disabled for this employee")
     
-    today = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+    today = get_ist_today()
     existing = await db.attendance.find_one({"employee_id": employee_id, "date": today})
     
     if existing and existing.get("check_in"):
         raise HTTPException(status_code=400, detail="Already checked in today")
     
-    now = datetime.now(timezone.utc)
+    now = get_ist_now()
     check_in_time = now.strftime("%I:%M %p")
     check_in_24h = now.strftime("%H:%M")
     
