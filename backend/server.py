@@ -706,22 +706,35 @@ async def calculate_payroll_for_employee(employee_id: str, month: str) -> dict:
             detail["total_hours"] = record.get("total_hours")
             detail["status"] = record.get("status", "NA")
             detail["is_lop"] = record.get("is_lop", False)
+            detail["lop_value"] = 0  # Default: no LOP
             
-            if record.get("is_lop"):
+            status = record.get("status", "NA")
+            is_lop = record.get("is_lop", False)
+            
+            # Full day LOP: is_lop flag or Loss of Pay status (late + early out combined)
+            if is_lop or status == "Loss of Pay":
                 lop_days += 1
-            elif record.get("status") in [AttendanceStatus.PRESENT, AttendanceStatus.COMPLETED, "Present", "Completed"]:
+                detail["lop_value"] = 1
+            # Half day LOP: Late Login only OR Early Out only (without is_lop flag)
+            elif status in [AttendanceStatus.LATE_LOGIN, "Late Login"]:
+                lop_days += 0.5
+                detail["is_lop"] = True
+                detail["lop_value"] = 0.5
+            elif status in [AttendanceStatus.EARLY_OUT, "Early Out"]:
+                lop_days += 0.5
+                detail["is_lop"] = True
+                detail["lop_value"] = 0.5
+            # Present: no LOP
+            elif status in [AttendanceStatus.PRESENT, AttendanceStatus.COMPLETED, "Present", "Completed"]:
                 present_days += 1
-            elif record.get("status") == AttendanceStatus.LEAVE or record.get("status") == "Leave":
+            # Leave
+            elif status == AttendanceStatus.LEAVE or status == "Leave":
                 leave_days += 1
-            elif record.get("status") in [AttendanceStatus.NOT_LOGGED, "Not Logged", "NA"]:
+            # Not logged / NA
+            elif status in [AttendanceStatus.NOT_LOGGED, "Not Logged", "NA"]:
                 absent_days += 1
             else:
-                # Late Login, Early Out without is_lop flag - count as LOP
-                if record.get("status") in [AttendanceStatus.LATE_LOGIN, AttendanceStatus.EARLY_OUT, "Late Login", "Early Out"]:
-                    lop_days += 1
-                    detail["is_lop"] = True
-                else:
-                    present_days += 1
+                present_days += 1
         else:
             detail["status"] = "Absent"
             absent_days += 1
@@ -745,7 +758,7 @@ async def calculate_payroll_for_employee(employee_id: str, month: str) -> dict:
         "monthly_salary": monthly_salary,
         "working_days": working_days,
         "present_days": present_days,
-        "lop_days": lop_days,
+        "lop_days": lop_days,  # Now can be decimal (e.g., 2.5)
         "leave_days": leave_days,
         "absent_days": absent_days,
         "per_day_salary": round(per_day_salary, 2),
