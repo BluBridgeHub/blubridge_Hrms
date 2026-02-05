@@ -51,7 +51,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 const AdminRoute = ({ children }) => {
   const { user } = useAuth();
   return (
-    <ProtectedRoute allowedRoles={['admin', 'hr_manager', 'team_lead']}>
+    <ProtectedRoute allowedRoles={['super_admin', 'admin', 'hr_manager', 'team_lead']}>
       <Layout>{children}</Layout>
     </ProtectedRoute>
   );
