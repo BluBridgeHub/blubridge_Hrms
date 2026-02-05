@@ -101,14 +101,21 @@ const Dashboard = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [showDetailSheet, setShowDetailSheet] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [teams, setTeams] = useState([]);
   const [filters, setFilters] = useState({
     fromDate: '',
     toDate: '',
     leaveType: 'All'
   });
-
-  // Mock chart data - in real app this would come from API
-  const [chartData] = useState([
+  
+  // Chart filter state
+  const [chartFilters, setChartFilters] = useState({
+    team: 'All',
+    dateRange: 'this_week',
+    customFrom: '',
+    customTo: ''
+  });
+  const [chartData, setChartData] = useState([
     { name: 'Mon', present: 45, absent: 5, late: 3 },
     { name: 'Tue', present: 48, absent: 2, late: 2 },
     { name: 'Wed', present: 44, absent: 6, late: 4 },
@@ -117,6 +124,7 @@ const Dashboard = () => {
     { name: 'Sat', present: 20, absent: 30, late: 0 },
     { name: 'Sun', present: 0, absent: 50, late: 0 },
   ]);
+  const [chartLoading, setChartLoading] = useState(false);
 
   const formatDateForAPI = (dateStr) => {
     if (!dateStr) return null;
