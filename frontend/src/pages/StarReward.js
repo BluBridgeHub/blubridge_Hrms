@@ -381,10 +381,65 @@ const StarReward = () => {
     );
   }
 
+  // View History Modal - Rendered always to ensure it's available in all views
+  const ViewHistoryModal = () => (
+    <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
+      <DialogContent className="bg-[#fffdf7] max-w-2xl z-[100]">
+        <DialogHeader>
+          <DialogTitle style={{ fontFamily: 'Outfit, sans-serif' }}>
+            Star History - {selectedEmployee?.name}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <div className="flex items-center gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
+            <div>
+              <p className="text-sm text-gray-500">Current Stars</p>
+              <p className={`text-2xl font-bold ${(selectedEmployee?.stars || 0) >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                {selectedEmployee?.stars || 0}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Unsafe Count</p>
+              <p className="text-2xl font-bold text-amber-600">{selectedEmployee?.unsafe_count || 0}</p>
+            </div>
+          </div>
+          
+          {loadingHistory ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0b1f3b]"></div>
+            </div>
+          ) : starHistory.length === 0 ? (
+            <p className="text-center text-gray-500 py-8">No history records found</p>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {starHistory.map((record) => (
+                <div key={record.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">{record.type}</p>
+                    <p className="text-sm text-gray-600">{record.reason}</p>
+                    <p className="text-xs text-gray-400">{record.month}</p>
+                  </div>
+                  <Badge className={record.stars >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}>
+                    {record.stars > 0 ? `+${record.stars}` : record.stars}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowViewModal(false)}>Close</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   // RENDER ADD/EDIT FORM VIEW
   if (showAddForm && selectedEmployee) {
     return (
-      <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="star-add-form">
+      <>
+        <ViewHistoryModal />
+        <div className="space-y-4 animate-fade-in bg-[#efede5] min-h-screen p-6" data-testid="star-add-form">
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>
