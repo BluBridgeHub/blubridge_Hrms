@@ -218,7 +218,7 @@ const Dashboard = () => {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-3 border-[#004EEB] border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-12 h-12 border-3 border-[#063c88] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-slate-500 text-sm">Loading dashboard...</p>
         </div>
       </div>
@@ -229,7 +229,7 @@ const Dashboard = () => {
     { key: 'not_logged', label: 'Leaves/No Login', value: stats?.attendance?.not_logged || 0, color: '#f59e0b', icon: AlertCircle },
     { key: 'logged_in', label: 'Logged In', value: stats?.attendance?.logged_in || 0, color: '#10b981', icon: LogIn },
     { key: 'early_out', label: 'Early Out', value: stats?.attendance?.early_out || 0, color: '#ef4444', icon: LogOutIcon },
-    { key: 'logout', label: 'Completed', value: stats?.attendance?.logout || 0, color: '#004EEB', icon: UserCheck },
+    { key: 'logout', label: 'Completed', value: stats?.attendance?.logout || 0, color: '#063c88', icon: UserCheck },
     { key: 'late_login', label: 'Late Login', value: stats?.attendance?.late_login || 0, color: '#8b5cf6', icon: Timer },
   ];
 
@@ -241,7 +241,7 @@ const Dashboard = () => {
           title="Research Unit" 
           value={stats?.total_research_unit || 0} 
           icon={Users}
-          color="bg-gradient-to-br from-[#004EEB] to-[#0066ff]"
+          color="bg-gradient-to-br from-[#063c88] to-[#0a5cba]"
           trend="up"
           trendValue="+12% this month"
           onClick={() => handleStatCardClick('research_unit')}
@@ -290,7 +290,7 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#004EEB]" />
+                <div className="w-3 h-3 rounded-full bg-[#063c88]" />
                 <span className="text-slate-600">Present</span>
               </div>
               <div className="flex items-center gap-2">
@@ -308,8 +308,8 @@ const Dashboard = () => {
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorPresent" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#004EEB" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#004EEB" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#063c88" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#063c88" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -323,7 +323,7 @@ const Dashboard = () => {
                     boxShadow: '0 4px 20px rgba(0,0,0,0.1)' 
                   }}
                 />
-                <Area type="monotone" dataKey="present" stroke="#004EEB" strokeWidth={2} fillOpacity={1} fill="url(#colorPresent)" />
+                <Area type="monotone" dataKey="present" stroke="#063c88" strokeWidth={2} fillOpacity={1} fill="url(#colorPresent)" />
                 <Area type="monotone" dataKey="late" stroke="#f59e0b" strokeWidth={2} fill="transparent" />
                 <Area type="monotone" dataKey="absent" stroke="#f87171" strokeWidth={2} fill="transparent" />
               </AreaChart>
@@ -364,7 +364,7 @@ const Dashboard = () => {
                 <BarChart data={attendanceStatuses.slice(0, 4)} layout="vertical" margin={{ left: 0, right: 0 }}>
                   <XAxis type="number" hide />
                   <YAxis dataKey="label" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} width={80} />
-                  <Bar dataKey="value" radius={[0, 4, 4, 0]} fill="#004EEB" />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]} fill="#063c88" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -411,7 +411,7 @@ const Dashboard = () => {
           </div>
           <Button 
             onClick={handleFilter}
-            className="bg-[#004EEB] hover:bg-[#003cc9] text-white rounded-lg shadow-lg shadow-[#004EEB]/20"
+            className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg shadow-lg shadow-[#063c88]/20"
             data-testid="filter-btn"
           >
             <Filter className="w-4 h-4 mr-2" />
@@ -458,14 +458,14 @@ const Dashboard = () => {
             </h3>
             <p className="text-sm text-slate-500 mt-1">Detailed view of employee records</p>
           </div>
-          <Badge className="bg-[#004EEB]/10 text-[#004EEB] border-0 px-3 py-1">
+          <Badge className="bg-[#063c88]/10 text-[#063c88] border-0 px-3 py-1">
             {activeAttendanceTab === 'not_logged' ? leaveList.length : attendanceDetails.length} records
           </Badge>
         </div>
         
         {loadingDetails ? (
           <div className="flex items-center justify-center h-48">
-            <div className="w-8 h-8 border-2 border-[#004EEB] border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#063c88] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -585,7 +585,7 @@ const Dashboard = () => {
           {selectedEmployee && (
             <div className="py-6 space-y-6">
               <div className="flex items-center gap-4 pb-6 border-b border-slate-100">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center shadow-lg">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center shadow-lg">
                   <span className="text-white text-2xl font-bold">
                     {selectedEmployee.emp_name?.charAt(0)?.toUpperCase()}
                   </span>
