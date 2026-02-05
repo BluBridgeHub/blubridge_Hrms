@@ -78,7 +78,7 @@ const Layout = ({ children }) => {
         {/* Logo Section */}
         <div className="h-20 flex items-center px-6 border-b border-black/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#004EEB] flex items-center justify-center shadow-lg shadow-[#004EEB]/20">
+            <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center shadow-lg shadow-[#063c88]/20">
               <span className="text-white font-bold text-lg" style={{ fontFamily: 'Outfit' }}>B</span>
             </div>
             <div>
@@ -124,7 +124,7 @@ const Layout = ({ children }) => {
         {/* User Section */}
         <div className="p-4 border-t border-black/5">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/80 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center shadow-md">
               <span className="text-white font-semibold text-sm">
                 {user?.name?.charAt(0)?.toUpperCase()}
               </span>
@@ -179,7 +179,7 @@ const Layout = ({ children }) => {
                   <input 
                     type="text" 
                     placeholder="Search..." 
-                    className="w-64 h-10 pl-10 pr-4 rounded-xl bg-slate-100/80 border-0 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#004EEB]/20 focus:bg-white transition-all"
+                    className="w-64 h-10 pl-10 pr-4 rounded-xl bg-slate-100/80 border-0 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#063c88]/20 focus:bg-white transition-all"
                   />
                 </div>
               </div>
@@ -197,7 +197,7 @@ const Layout = ({ children }) => {
                     className="flex items-center gap-3 hover:bg-slate-100 rounded-xl px-3 py-2 transition-colors" 
                     data-testid="admin-profile-dropdown"
                   >
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#004EEB] to-[#0066ff] flex items-center justify-center shadow-md">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center shadow-md">
                       <span className="text-white font-semibold text-sm">
                         {user?.name?.charAt(0)?.toUpperCase()}
                       </span>
