@@ -107,6 +107,7 @@ Build production-ready Enterprise HRMS with:
 - Star Rating Redesign: 100% pass rate (iteration_8.json)
 - Shift Rules & Payroll: 100% pass rate (iteration_9.json) - Feb 5, 2026
 - Star Rating Logic & Theme Fixes: 100% pass rate (iteration_10.json) - Feb 5, 2026
+- Star Rating View Members & Check-In Sync: 100% pass rate (iteration_11.json) - Feb 5, 2026
 
 ---
 
