@@ -30,8 +30,8 @@
         /* BluBridge Premium Colors */
         --bb-bg: #efede5;
         --bb-container: #fffdf7;
-        --bb-primary: #004EEB;
-        --bb-primary-hover: #003cc9;
+        --bb-primary: #063c88;
+        --bb-primary-hover: #052d66;
         --bb-navy: #0b1f3b;
         --bb-navy-light: #162d4d;
         --bb-success: #10b981;
@@ -215,8 +215,8 @@
 }
 
 .nav-item-active {
-    @apply bg-[#004EEB] text-white shadow-lg;
-    box-shadow: 0 4px 14px rgba(0, 78, 235, 0.35);
+    @apply bg-[#063c88] text-white shadow-lg;
+    box-shadow: 0 4px 14px rgba(6, 60, 136, 0.35);
 }
 
 .nav-item-inactive {
@@ -282,7 +282,7 @@
 
 /* Premium Input Focus */
 input:focus, select:focus, textarea:focus {
-    @apply outline-none ring-2 ring-[#004EEB]/20 border-[#004EEB];
+    @apply outline-none ring-2 ring-[#063c88]/20 border-[#063c88];
 }
 
 /* Button Active State */
@@ -313,12 +313,12 @@ a[href*="emergent.sh"][style*="bottom: 20px"] {
 
 /* Custom focus visible */
 .focus-ring {
-    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#004EEB] focus-visible:ring-offset-2;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#063c88] focus-visible:ring-offset-2;
 }
 
 /* Gradient text */
 .gradient-text {
-    background: linear-gradient(135deg, #004EEB 0%, #0066ff 100%);
+    background: linear-gradient(135deg, #063c88 0%, #0a5cba 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
