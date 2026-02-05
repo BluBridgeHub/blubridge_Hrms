@@ -1459,7 +1459,30 @@ async def check_in(employee_id: str, current_user: dict = Depends(get_current_us
     if existing and existing.get("check_in"):
         raise HTTPException(status_code=400, detail="Already checked in today")
     
-    check_in_time = datetime.now(timezone.utc).strftime("%I:%M %p")
+    now = datetime.now(timezone.utc)
+    check_in_time = now.strftime("%I:%M %p")
+    check_in_24h = now.strftime("%H:%M")
+    
+    # Get shift timings for the employee
+    shift_timings = get_shift_timings(employee)
+    expected_login = shift_timings.get("login_time") if shift_timings else None
+    expected_logout = shift_timings.get("logout_time") if shift_timings else None
+    
+    # Initial status calculation (will be finalized on check-out)
+    initial_status = AttendanceStatus.LOGIN
+    is_lop = False
+    lop_reason = None
+    
+    # For fixed shifts, check if late login
+    if expected_login:
+        expected_mins = parse_time_24h_to_minutes(expected_login)
+        actual_mins = parse_time_24h_to_minutes(check_in_24h)
+        
+        if actual_mins > expected_mins:
+            late_mins = actual_mins - expected_mins
+            initial_status = AttendanceStatus.LOSS_OF_PAY
+            is_lop = True
+            lop_reason = f"Late login by {late_mins} minute(s). Expected: {expected_login}, Actual: {check_in_24h}"
     
     attendance = Attendance(
         employee_id=employee_id,
@@ -1468,7 +1491,13 @@ async def check_in(employee_id: str, current_user: dict = Depends(get_current_us
         department=employee["department"],
         date=today,
         check_in=check_in_time,
-        status="Login"
+        check_in_24h=check_in_24h,
+        status=initial_status,
+        is_lop=is_lop,
+        lop_reason=lop_reason,
+        shift_type=employee.get("shift_type", "General"),
+        expected_login=expected_login,
+        expected_logout=expected_logout
     )
     doc = attendance.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -1486,11 +1515,59 @@ async def check_out(employee_id: str, current_user: dict = Depends(get_current_u
     if attendance.get("check_out"):
         raise HTTPException(status_code=400, detail="Already checked out")
     
-    check_out_time = datetime.now(timezone.utc).strftime("%I:%M %p")
+    # Get employee for shift info
+    employee = await db.employees.find_one({"id": employee_id, "is_deleted": {"$ne": True}}, {"_id": 0})
+    shift_timings = get_shift_timings(employee) if employee else None
+    
+    now = datetime.now(timezone.utc)
+    check_out_time = now.strftime("%I:%M %p")
+    check_out_24h = now.strftime("%H:%M")
+    
+    check_in_24h = attendance.get("check_in_24h")
+    if not check_in_24h and attendance.get("check_in"):
+        check_in_24h = parse_time_12h_to_24h(attendance.get("check_in"))
+    
+    # Calculate attendance status with strict LOP rules
+    if shift_timings:
+        status_result = calculate_attendance_status(check_in_24h, check_out_24h, shift_timings)
+    else:
+        # No shift timings - just mark as completed
+        status_result = {
+            "status": AttendanceStatus.COMPLETED,
+            "is_lop": False,
+            "lop_reason": None,
+            "total_hours_decimal": 0.0
+        }
+        # Calculate hours manually
+        if check_in_24h:
+            in_mins = parse_time_24h_to_minutes(check_in_24h)
+            out_mins = parse_time_24h_to_minutes(check_out_24h)
+            if out_mins < in_mins:
+                total_mins = 24 * 60 - in_mins + out_mins
+            else:
+                total_mins = out_mins - in_mins
+            status_result["total_hours_decimal"] = total_mins / 60
+    
+    total_hours_str = calculate_total_hours_str(status_result.get("total_hours_decimal", 0))
+    
+    # If already marked as LOP from late login, keep it
+    final_is_lop = attendance.get("is_lop", False) or status_result.get("is_lop", False)
+    final_lop_reason = attendance.get("lop_reason") or status_result.get("lop_reason")
+    final_status = AttendanceStatus.LOSS_OF_PAY if final_is_lop else status_result.get("status", AttendanceStatus.COMPLETED)
+    
+    update_data = {
+        "check_out": check_out_time,
+        "check_out_24h": check_out_24h,
+        "total_hours": total_hours_str,
+        "total_hours_decimal": status_result.get("total_hours_decimal", 0),
+        "status": final_status,
+        "is_lop": final_is_lop,
+        "lop_reason": final_lop_reason
+    }
     
     await db.attendance.update_one(
         {"employee_id": employee_id, "date": today},
-        {"$set": {"check_out": check_out_time, "status": "Completed"}}
+        {"$set": update_data}
     )
     
     updated = await db.attendance.find_one({"employee_id": employee_id, "date": today}, {"_id": 0})
