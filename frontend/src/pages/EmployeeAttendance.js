@@ -51,7 +51,7 @@ const EmployeeAttendance = () => {
     <div className="space-y-6 animate-fade-in" data-testid="employee-attendance-page">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[#063c88] flex items-center justify-center">
           <CalendarCheck className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -63,7 +63,7 @@ const EmployeeAttendance = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Present', value: stats.present, icon: LogOutIcon, color: 'emerald' },
+          { label: 'Present', value: stats.present, icon: LogOutIcon, color: 'blue' },
           { label: 'Late Login', value: stats.late, icon: Clock, color: 'amber' },
           { label: 'Absent/LOP', value: stats.absent, icon: AlertCircle, color: 'red' },
           { label: 'Leave', value: stats.leave, icon: CalendarCheck, color: 'purple' },
@@ -93,7 +93,7 @@ const EmployeeAttendance = () => {
             <label className="text-sm text-slate-600 mb-1.5 block font-medium">To Date</label>
             <DatePicker value={filters.toDate} onChange={(val) => setFilters({ ...filters, toDate: val })} placeholder="Select date" data-testid="filter-to" />
           </div>
-          <Button onClick={fetchAttendance} className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg" data-testid="apply-filter-btn">
+          <Button onClick={fetchAttendance} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg" data-testid="apply-filter-btn">
             Apply
           </Button>
         </div>
@@ -103,7 +103,7 @@ const EmployeeAttendance = () => {
       <div className="card-premium overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-2 border-[#063c88] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="overflow-x-auto">
