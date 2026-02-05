@@ -1606,7 +1606,7 @@ async def get_attendance_stats(
 ):
     # Use single date or date range
     if not date and not from_date:
-        date = datetime.now(timezone.utc).strftime("%d-%m-%Y")
+        date = get_ist_today()
     
     # Only count active employees with attendance tracking enabled
     total_employees = await db.employees.count_documents({
