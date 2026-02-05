@@ -30,10 +30,11 @@ Build production-ready Enterprise HRMS with:
 - **Employee Management**: Full CRUD, section-based forms, search/filter, pagination, CSV export, reactivation logic
 - **Attendance Tracking**: Daily check-in/out tracking, status management, filters (department, team, status, date range), LOP detection
 - **Leave Management**: Request/approval workflow, approve/reject modals, email notifications, corrected leave type filter
-- **Star Rating Module**: COMPLETE REDESIGN (Feb 4, 2026)
+- **Star Rating Module**: COMPLETE REDESIGN (Feb 4, 2026) - View modal fix (Feb 5, 2026)
 - **Team Dashboard**: Department tabs, team cards with member counts
 - **Reports**: Attendance, Leave, Employee reports with CSV export
 - **Payroll Module**: NEW (Feb 5, 2026) - Full payroll management with LOP calculations
+- **Admin Profile & Password Change Pages**: NEW (Feb 5, 2026)
 
 ### Employee Module (Completed)
 - **Dashboard**: Summary cards, live clock, clock-in/out, quick links
@@ -52,8 +53,9 @@ Build production-ready Enterprise HRMS with:
   - Custom: Admin-defined login/logout times
   
 **Strict LOP Rules (No Grace Period):**
-- Late Login (even 1 minute) = Loss of Pay
-- Early Logout (even 1 minute) = Loss of Pay
+- Late Login (even 1 minute) = 0.5 Day LOP
+- Early Logout (even 1 minute) = 0.5 Day LOP
+- Both Late Login AND Early Logout = 1 Full Day LOP
 - Insufficient Hours = Loss of Pay
 - All rules enforced in backend, frontend is display-only
 
@@ -75,6 +77,24 @@ Build production-ready Enterprise HRMS with:
 - Payroll.js: Summary cards, Attendance View (calendar grid), Salary View (table with LOP columns)
 - Employees.js: Custom Shift option with login/logout time inputs, Monthly Salary field
 - Attendance.js: LOP status filter, expected times display, LOP reason display
+
+---
+
+## Recent Bug Fix (Feb 5, 2026)
+
+### Star Rating "View" Button Modal Fix
+**Issue:** When clicking the "View" button for an employee in the Star Rating module, the modal with employee details failed to appear.
+
+**Root Cause:** The Dialog component was only rendered in the main list view's return statement. When in Team Details view or Add Form view (both use early returns), the Dialog was never rendered.
+
+**Solution:** Extracted the modal into a reusable `ViewHistoryModal` component and included it in all three return statements:
+1. Add/Edit Form view (line 439)
+2. Team Details view (line 651)
+3. Main List view (line 771)
+
+**Files Modified:** `frontend/src/pages/StarReward.js`
+
+**Test Results:** 100% pass rate (iteration_14.json)
 
 ---
 
@@ -110,6 +130,7 @@ Build production-ready Enterprise HRMS with:
 - Star Rating View Members & Check-In Sync: 100% pass rate (iteration_11.json) - Feb 5, 2026
 - Date Picker & LOP 0.5 Day Calculation: 100% pass rate (iteration_12.json) - Feb 5, 2026
 - IST Timezone Implementation: 100% pass rate (iteration_13.json) - Feb 5, 2026
+- Star Rating View Button Modal Fix: 100% pass rate (iteration_14.json) - Feb 5, 2026
 
 ---
 
@@ -129,3 +150,4 @@ None - All issues resolved.
 - Dark mode support
 - Payroll PDF export
 - Payslip generation
+- Backend modularization using Flask Blueprints (server.py is large)
