@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { toast } from 'sonner';
-import { Lock, User, Eye, EyeOff, Loader2, ArrowRight, Shield, Users, BarChart3 } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -59,69 +59,70 @@ const Login = () => {
     }
   };
 
-  const features = [
-    { icon: Users, label: 'Employee Management', desc: 'Streamlined HR operations' },
-    { icon: BarChart3, label: 'Analytics & Reports', desc: 'Data-driven insights' },
-    { icon: Shield, label: 'Secure & Compliant', desc: 'Enterprise-grade security' },
-  ];
-
   return (
     <div className="min-h-screen bg-[#efede5] flex">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#063c88] via-[#0854a0] to-[#052d66]">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
-        </div>
+      {/* Left Panel - Premium Branding */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#063c88]">
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#063c88] via-[#052d66] to-[#041d44]" />
+        
+        {/* Subtle Grid Pattern */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px'
+        }} />
+        
+        {/* Floating Orbs */}
+        <div className="absolute top-20 right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-40 left-10 w-96 h-96 bg-blue-400/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-white/3 rounded-full blur-2xl" />
         
         {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full h-full">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <img src="/logo-white.png" alt="BluBridge" className="w-auto" />
-            <div>
-              <p className="text-xs text-white/60 uppercase tracking-widest">HRMS Platform</p>
-            </div>
+          <div>
+            <img src="/logo-white.png" alt="BluBridge" className="h-10 w-auto" />
           </div>
 
-          {/* Main Content */}
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-4xl lg:text-5xl font-bold text-white leading-tight" style={{ fontFamily: 'Outfit' }}>
-                Enterprise HR<br />Management<br />
-                <span className="text-white/70">Simplified</span>
-              </h2>
-              <p className="mt-6 text-lg text-white/70 max-w-md">
-                A complete human resource management solution designed for modern enterprises.
-              </p>
-            </div>
-
-            {/* Features */}
-            <div className="space-y-4">
-              {features.map((feature, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 animate-slide-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">{feature.label}</p>
-                    <p className="text-white/60 text-sm">{feature.desc}</p>
-                  </div>
-                </div>
-              ))}
+          {/* Main Content - Centered */}
+          <div className="flex-1 flex flex-col justify-center max-w-lg">
+            <h1 className="text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight" style={{ fontFamily: 'Outfit' }}>
+              Elevate your
+              <br />
+              <span className="text-white/60">workforce</span>
+              <br />
+              management
+            </h1>
+            <p className="mt-8 text-lg text-white/50 leading-relaxed">
+              Streamline HR operations with an intelligent platform built for modern enterprises.
+            </p>
+            
+            {/* Stats Row */}
+            <div className="mt-12 flex gap-12">
+              <div>
+                <p className="text-3xl font-bold text-white" style={{ fontFamily: 'Outfit' }}>500+</p>
+                <p className="text-sm text-white/40 mt-1">Enterprises</p>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-white" style={{ fontFamily: 'Outfit' }}>50K+</p>
+                <p className="text-sm text-white/40 mt-1">Employees</p>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-white" style={{ fontFamily: 'Outfit' }}>99.9%</p>
+                <p className="text-sm text-white/40 mt-1">Uptime</p>
+              </div>
             </div>
           </div>
 
           {/* Footer */}
-          <p className="text-white/40 text-sm">
-            Trusted by 500+ enterprises worldwide
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-white/30 text-sm">Enterprise-grade security</p>
+            <div className="flex gap-1">
+              {[1,2,3,4,5].map(i => (
+                <div key={i} className="w-1.5 h-1.5 rounded-full bg-white/20" />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -130,12 +131,7 @@ const Login = () => {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-10">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <img src="/logo-black.png" alt="BluBridge" className="h-12 w-auto" />
-              <div className="text-left">
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest">HRMS Platform</p>
-              </div>
-            </div>
+            <img src="/logo-black.png" alt="BluBridge" className="h-10 w-auto mx-auto" />
           </div>
 
           {/* Login Card */}
