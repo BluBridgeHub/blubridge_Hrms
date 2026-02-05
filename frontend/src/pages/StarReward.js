@@ -748,11 +748,10 @@ const StarReward = () => {
 
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">Month</span>
-            <Input
-              type="month"
+            <MonthPicker
               value={filters.month}
-              onChange={(e) => setFilters({ ...filters, month: e.target.value })}
-              className="w-36 bg-white border-gray-300"
+              onChange={(val) => setFilters({ ...filters, month: val })}
+              className="w-40"
               data-testid="filter-month"
             />
           </div>
