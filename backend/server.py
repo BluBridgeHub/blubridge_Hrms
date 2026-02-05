@@ -1597,10 +1597,10 @@ async def get_attendance_stats(
     else:
         date_query = {"date": date}
     
-    # Count all logged in (including Late Login and Early Out since they also logged in)
+    # Count all logged in (including Late Login, Early Out, Present, Loss of Pay since they also logged in)
     logged_in = await db.attendance.count_documents({
         **date_query, 
-        "status": {"$in": ["Login", "Completed", "Late Login", "Early Out"]}
+        "status": {"$in": ["Login", "Completed", "Late Login", "Early Out", "Present", "Loss of Pay"]}
     })
     not_logged = total_employees - logged_in
     
@@ -1610,10 +1610,20 @@ async def get_attendance_stats(
     # Count late login (can overlap with early out)
     late_login = await db.attendance.count_documents({**date_query, "status": "Late Login"})
     
+    # Count Loss of Pay
+    lop_count = await db.attendance.count_documents({**date_query, "is_lop": True})
+    
     # Count completed (logged out)
     logout = await db.attendance.count_documents({
         **date_query, 
-        "status": {"$in": ["Completed", "Early Out"]}
+        "status": {"$in": ["Completed", "Early Out", "Present", "Loss of Pay"]}
+    })
+    
+    # Count present (no LOP)
+    present = await db.attendance.count_documents({
+        **date_query, 
+        "status": {"$in": ["Present", "Completed"]},
+        "is_lop": {"$ne": True}
     })
     
     return {
@@ -1622,7 +1632,9 @@ async def get_attendance_stats(
         "not_logged": max(0, not_logged),
         "early_out": early_out,
         "late_login": late_login,
-        "logout": logout
+        "logout": logout,
+        "lop_count": lop_count,
+        "present": present
     }
 
 # ============== LEAVE ROUTES ==============
