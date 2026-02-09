@@ -61,10 +61,11 @@ const Attendance = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      // On initial load, don't filter by date to show all records
+      // The user can apply date filters manually
       const [attendanceRes, teamsRes, deptsRes] = await Promise.all([
         axios.get(`${API}/attendance`, {
-          headers: getAuthHeaders(),
-          params: { from_date: formatDateForApi(filters.fromDate), to_date: formatDateForApi(filters.toDate) }
+          headers: getAuthHeaders()
         }),
         axios.get(`${API}/teams`, { headers: getAuthHeaders() }),
         axios.get(`${API}/departments`, { headers: getAuthHeaders() })
