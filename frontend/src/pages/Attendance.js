@@ -89,6 +89,37 @@ const Attendance = () => {
     }
   };
 
+  const handleReset = async () => {
+    const dates = getDefaultDateRange();
+    const resetFilters = { 
+      empName: '', 
+      team: 'All', 
+      department: 'All', 
+      fromDate: dates.fromDate, 
+      toDate: dates.toDate, 
+      status: 'All' 
+    };
+    setFilters(resetFilters);
+    
+    // Fetch with reset filter values directly
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API}/attendance`, {
+        headers: getAuthHeaders(),
+        params: { 
+          from_date: formatDateForApi(dates.fromDate), 
+          to_date: formatDateForApi(dates.toDate) 
+        }
+      });
+      setAttendance(response.data);
+      toast.info('Filters reset');
+    } catch (error) {
+      toast.error('Failed to reset');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleFilter = async () => {
     try {
       setLoading(true);
