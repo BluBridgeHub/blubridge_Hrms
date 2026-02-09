@@ -11,13 +11,16 @@ import {
   Clock,
   LogIn,
   LogOut as LogOutIcon,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  BarChart3
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { DatePicker } from '../components/ui/date-picker';
+import EmployeeLeaveDetail from '../components/EmployeeLeaveDetail';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
