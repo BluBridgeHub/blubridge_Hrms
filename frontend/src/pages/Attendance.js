@@ -58,14 +58,22 @@ const Attendance = () => {
 
   useEffect(() => { fetchData(); }, []);
 
+  const formatDateForApi = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      // On initial load, don't filter by date to show all records
-      // The user can apply date filters manually
       const [attendanceRes, teamsRes, deptsRes] = await Promise.all([
         axios.get(`${API}/attendance`, {
-          headers: getAuthHeaders()
+          headers: getAuthHeaders(),
+          params: { 
+            from_date: formatDateForApi(filters.fromDate), 
+            to_date: formatDateForApi(filters.toDate) 
+          }
         }),
         axios.get(`${API}/teams`, { headers: getAuthHeaders() }),
         axios.get(`${API}/departments`, { headers: getAuthHeaders() })
@@ -79,12 +87,6 @@ const Attendance = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatDateForApi = (date) => {
-    if (!date) return '';
-    const d = new Date(date);
-    return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
   };
 
   const handleFilter = async () => {
