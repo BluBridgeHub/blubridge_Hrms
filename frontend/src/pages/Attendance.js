@@ -35,24 +35,13 @@ const Attendance = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showLeaveDetail, setShowLeaveDetail] = useState(false);
   
-  // Default date range: last 30 days
-  const getDefaultDateRange = () => {
-    const today = new Date();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-    return {
-      fromDate: thirtyDaysAgo.toISOString().split('T')[0],
-      toDate: today.toISOString().split('T')[0]
-    };
-  };
-  
-  const defaultDates = getDefaultDateRange();
+  // Default: today's date (original behavior)
   const [filters, setFilters] = useState({
     empName: '',
     team: 'All',
     department: 'All',
-    fromDate: defaultDates.fromDate,
-    toDate: defaultDates.toDate,
+    fromDate: new Date().toISOString().split('T')[0],
+    toDate: new Date().toISOString().split('T')[0],
     status: 'All'
   });
 
