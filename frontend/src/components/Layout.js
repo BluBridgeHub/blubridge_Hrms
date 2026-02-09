@@ -204,7 +204,11 @@ const Layout = ({ children }) => {
                   <input 
                     type="text" 
                     placeholder="Search..." 
+                    value={headerSearch}
+                    onChange={(e) => setHeaderSearch(e.target.value)}
+                    onKeyDown={handleHeaderSearch}
                     className="w-64 h-10 pl-10 pr-4 rounded-xl bg-slate-100/80 border-0 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#063c88]/20 focus:bg-white transition-all"
+                    data-testid="header-search-input"
                   />
                 </div>
               </div>
