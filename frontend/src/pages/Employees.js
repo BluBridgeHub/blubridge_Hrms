@@ -212,6 +212,7 @@ const Employees = () => {
       } else {
         toast.success('Employee added successfully');
       }
+      resetForm();
       setShowAddSheet(false);
       fetchData();
     } catch (error) {
