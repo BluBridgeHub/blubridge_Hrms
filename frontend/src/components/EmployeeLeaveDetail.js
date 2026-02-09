@@ -546,7 +546,7 @@ const EmployeeLeaveDetail = ({ employee, onClose }) => {
             {/* Monthly Bar Chart View */}
             {viewMode === 'month' && (
               <div className="h-[300px]" data-testid="monthly-chart">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
                   <BarChart data={monthlyChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                     <XAxis 
