@@ -127,7 +127,7 @@ const Login = () => {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-10">
-            <img src="/logo-black.png" alt="BluBridge" className="h-10 w-auto mx-auto" />
+            <img src="/logo-black.png" alt="BluBridge" className="w-auto mx-auto" />
           </div>
 
           {/* Login Card */}
