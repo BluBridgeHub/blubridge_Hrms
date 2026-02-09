@@ -337,6 +337,17 @@ const Attendance = () => {
           </div>
         )}
       </div>
+
+      {/* Employee Leave Detail Modal */}
+      {showLeaveDetail && selectedEmployee && (
+        <EmployeeLeaveDetail 
+          employee={selectedEmployee}
+          onClose={() => {
+            setShowLeaveDetail(false);
+            setSelectedEmployee(null);
+          }}
+        />
+      )}
     </div>
   );
 };
