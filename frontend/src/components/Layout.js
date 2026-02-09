@@ -45,6 +45,7 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [headerSearch, setHeaderSearch] = useState('');
 
   const handleLogout = () => {
     logout();
@@ -54,6 +55,33 @@ const Layout = ({ children }) => {
   const getPageTitle = () => {
     const current = navItems.find(item => location.pathname === item.path);
     return current?.label || 'Dashboard';
+  };
+
+  // Handle search navigation
+  const handleHeaderSearch = (e) => {
+    if (e.key === 'Enter' && headerSearch.trim()) {
+      const searchLower = headerSearch.toLowerCase();
+      // Navigate to relevant page based on search
+      if (searchLower.includes('employee') || searchLower.includes('staff') || searchLower.includes('worker')) {
+        navigate(`/employees?search=${encodeURIComponent(headerSearch)}`);
+      } else if (searchLower.includes('attend') || searchLower.includes('check') || searchLower.includes('login')) {
+        navigate('/attendance');
+      } else if (searchLower.includes('leave') || searchLower.includes('vacation') || searchLower.includes('holiday')) {
+        navigate('/leave');
+      } else if (searchLower.includes('team') || searchLower.includes('department')) {
+        navigate('/team');
+      } else if (searchLower.includes('payroll') || searchLower.includes('salary') || searchLower.includes('pay')) {
+        navigate('/payroll');
+      } else if (searchLower.includes('star') || searchLower.includes('reward') || searchLower.includes('point')) {
+        navigate('/star-reward');
+      } else if (searchLower.includes('report')) {
+        navigate('/reports');
+      } else {
+        // Default: search in employees
+        navigate(`/employees?search=${encodeURIComponent(headerSearch)}`);
+      }
+      setHeaderSearch('');
+    }
   };
 
   return (
