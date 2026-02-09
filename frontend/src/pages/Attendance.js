@@ -259,7 +259,7 @@ const Attendance = () => {
             <Button onClick={handleFilter} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg" data-testid="apply-filter-btn">
               <Filter className="w-4 h-4 mr-2" /> Apply Filter
             </Button>
-            <Button variant="outline" onClick={() => { setFilters({ empName: '', team: 'All', department: 'All', fromDate: new Date().toISOString().split('T')[0], toDate: new Date().toISOString().split('T')[0], status: 'All' }); fetchData(); }} className="rounded-lg" data-testid="reset-filter-btn">
+            <Button variant="outline" onClick={() => { const dates = getDefaultDateRange(); setFilters({ empName: '', team: 'All', department: 'All', fromDate: dates.fromDate, toDate: dates.toDate, status: 'All' }); fetchData(); }} className="rounded-lg" data-testid="reset-filter-btn">
               Reset
             </Button>
           </div>
