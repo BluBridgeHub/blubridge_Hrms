@@ -58,6 +58,7 @@ const StatCard = ({ title, value, icon: Icon, color, bgColor }) => (
 
 const Employees = () => {
   const { getAuthHeaders, user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [employees, setEmployees] = useState([]);
   const [stats, setStats] = useState(null);
   const [teams, setTeams] = useState([]);
@@ -66,8 +67,10 @@ const Employees = () => {
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, pages: 0 });
   
+  // Initialize search from URL params
+  const initialSearch = searchParams.get('search') || '';
   const [filters, setFilters] = useState({
-    search: '',
+    search: initialSearch,
     department: 'All',
     team: 'All',
     status: 'All',
