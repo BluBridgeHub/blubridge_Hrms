@@ -623,7 +623,7 @@ const Employees = () => {
       </div>
 
       {/* Add Dialog */}
-      <Dialog open={showAddSheet} onOpenChange={setShowAddSheet}>
+      <Dialog open={showAddSheet} onOpenChange={(open) => { if (!open) resetForm(); setShowAddSheet(open); }}>
         <DialogContent className="bg-[#fffdf7] max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Outfit' }}>Add New Employee</DialogTitle>
@@ -631,7 +631,7 @@ const Employees = () => {
           </DialogHeader>
           <div className="py-4"><EmployeeForm /></div>
           <DialogFooter className="flex gap-2 pt-4 border-t border-slate-100">
-            <Button variant="outline" onClick={() => setShowAddSheet(false)} className="rounded-lg">Cancel</Button>
+            <Button variant="outline" onClick={() => { resetForm(); setShowAddSheet(false); }} className="rounded-lg">Cancel</Button>
             <Button onClick={submitAdd} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg" data-testid="submit-add">Save Employee</Button>
           </DialogFooter>
         </DialogContent>
