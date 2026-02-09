@@ -140,6 +140,18 @@ const Attendance = () => {
     absent: sortedAttendance.filter(a => a.status === 'Not Logged' || a.is_lop).length,
   };
 
+  // Handle employee click to show leave detail
+  const handleEmployeeClick = (record) => {
+    setSelectedEmployee({
+      emp_name: record.emp_name,
+      employee_id: record.employee_id,
+      team: record.team,
+      department: record.department,
+      emp_id: record.emp_id
+    });
+    setShowLeaveDetail(true);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in" data-testid="attendance-page">
       {/* Header */}
