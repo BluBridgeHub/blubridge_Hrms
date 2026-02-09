@@ -831,7 +831,186 @@ const Employees = () => {
             <DialogTitle style={{ fontFamily: 'Outfit' }}>Edit Employee - {selectedEmployee?.emp_id}</DialogTitle>
             <DialogDescription>Update employee information</DialogDescription>
           </DialogHeader>
-          <div className="py-4"><EmployeeForm isEdit /></div>
+          <div className="py-4">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-xl">
+                <TabsTrigger value="personal" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Personal</TabsTrigger>
+                <TabsTrigger value="employment" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Employment</TabsTrigger>
+                <TabsTrigger value="organization" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Organization</TabsTrigger>
+                <TabsTrigger value="system" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">System</TabsTrigger>
+              </TabsList>
+              <TabsContent value="personal" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Full Name <span className="text-red-500">*</span></Label>
+                    <Input value={form.full_name} onChange={(e) => setForm(prev => ({ ...prev, full_name: e.target.value }))} placeholder="Enter full name" className="mt-1.5 rounded-lg" data-testid="input-full-name" />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Official Email <span className="text-red-500">*</span></Label>
+                    <Input type="email" value={form.official_email} onChange={(e) => setForm(prev => ({ ...prev, official_email: e.target.value }))} placeholder="Enter email" className="mt-1.5 rounded-lg" data-testid="input-email" disabled />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Phone Number</Label>
+                    <Input value={form.phone_number} onChange={(e) => setForm(prev => ({ ...prev, phone_number: e.target.value }))} placeholder="Enter phone" className="mt-1.5 rounded-lg" data-testid="input-phone" />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Gender</Label>
+                    <Select value={form.gender} onValueChange={(val) => setForm(prev => ({ ...prev, gender: val }))}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue placeholder="Select gender" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Male">Male</SelectItem>
+                        <SelectItem value="Female">Female</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-slate-700">Date of Birth</Label>
+                  <Input type="date" value={form.date_of_birth} onChange={(e) => setForm(prev => ({ ...prev, date_of_birth: e.target.value }))} className="mt-1.5 rounded-lg" data-testid="input-dob" />
+                </div>
+              </TabsContent>
+              <TabsContent value="employment" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Date of Joining</Label>
+                    <Input type="date" value={form.date_of_joining} onChange={(e) => setForm(prev => ({ ...prev, date_of_joining: e.target.value }))} className="mt-1.5 rounded-lg" data-testid="input-doj" />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Employment Type</Label>
+                    <Select value={form.employment_type} onValueChange={(val) => setForm(prev => ({ ...prev, employment_type: val }))}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {config.employmentTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Designation <span className="text-red-500">*</span></Label>
+                    <Input value={form.designation} onChange={(e) => setForm(prev => ({ ...prev, designation: e.target.value }))} placeholder="Job title" className="mt-1.5 rounded-lg" data-testid="input-designation" />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Tier Level</Label>
+                    <Select value={form.tier_level} onValueChange={(val) => setForm(prev => ({ ...prev, tier_level: val }))}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {config.tierLevels.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Reporting Manager</Label>
+                    <Select value={form.reporting_manager_id} onValueChange={(val) => setForm(prev => ({ ...prev, reporting_manager_id: val }))}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue placeholder="Select manager" /></SelectTrigger>
+                      <SelectContent>
+                        {allEmployees.filter(e => e.id !== selectedEmployee?.id).map(e => <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Work Location</Label>
+                    <Select value={form.work_location} onValueChange={(val) => setForm(prev => ({ ...prev, work_location: val }))}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {config.workLocations.map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </TabsContent>
+              <TabsContent value="organization" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Department <span className="text-red-500">*</span></Label>
+                    <Select value={form.department} onValueChange={(val) => setForm(prev => ({ ...prev, department: val, team: '' }))}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue placeholder="Select department" /></SelectTrigger>
+                      <SelectContent>
+                        {departments.map(d => <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Team <span className="text-red-500">*</span></Label>
+                    <Select value={form.team} onValueChange={(val) => setForm(prev => ({ ...prev, team: val }))} disabled={!form.department}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue placeholder="Select team" /></SelectTrigger>
+                      <SelectContent>
+                        {filteredTeams.map(t => <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Leave Policy</Label>
+                    <Select value={form.leave_policy} onValueChange={(val) => setForm(prev => ({ ...prev, leave_policy: val }))}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Standard">Standard</SelectItem>
+                        <SelectItem value="Extended">Extended</SelectItem>
+                        <SelectItem value="Probation">Probation</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">Shift Type</Label>
+                    <Select value={form.shift_type} onValueChange={(val) => setForm(prev => ({ ...prev, shift_type: val }))}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="General">General (9 AM - 6 PM)</SelectItem>
+                        <SelectItem value="Morning">Morning (6 AM - 3 PM)</SelectItem>
+                        <SelectItem value="Evening">Evening (2 PM - 11 PM)</SelectItem>
+                        <SelectItem value="Night">Night (10 PM - 7 AM)</SelectItem>
+                        <SelectItem value="Flexible">Flexible</SelectItem>
+                        <SelectItem value="Custom">Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                {form.shift_type === 'Custom' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium text-slate-700">Custom Login Time</Label>
+                      <Input type="time" value={form.custom_login_time} onChange={(e) => setForm(prev => ({ ...prev, custom_login_time: e.target.value }))} className="mt-1.5 rounded-lg" />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-slate-700">Custom Logout Time</Label>
+                      <Input type="time" value={form.custom_logout_time} onChange={(e) => setForm(prev => ({ ...prev, custom_logout_time: e.target.value }))} className="mt-1.5 rounded-lg" />
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <Label className="text-sm font-medium text-slate-700">Monthly Salary (INR)</Label>
+                  <Input type="number" value={form.monthly_salary} onChange={(e) => setForm(prev => ({ ...prev, monthly_salary: parseFloat(e.target.value) || 0 }))} placeholder="0" className="mt-1.5 rounded-lg" data-testid="input-salary" />
+                </div>
+              </TabsContent>
+              <TabsContent value="system" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700">User Role</Label>
+                    <Select value={form.user_role} onValueChange={(val) => setForm(prev => ({ ...prev, user_role: val }))}>
+                      <SelectTrigger className="mt-1.5 rounded-lg"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {config.userRoles.map(r => <SelectItem key={r} value={r}>{r.replace('_', ' ').toUpperCase()}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                  <div>
+                    <p className="font-medium text-slate-900">Attendance Tracking</p>
+                    <p className="text-sm text-slate-500">Enable daily attendance</p>
+                  </div>
+                  <Switch checked={form.attendance_tracking_enabled} onCheckedChange={(checked) => setForm(prev => ({ ...prev, attendance_tracking_enabled: checked }))} />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
           <DialogFooter className="flex gap-2 pt-4 border-t border-slate-100">
             <Button variant="outline" onClick={() => setShowEditSheet(false)} className="rounded-lg">Cancel</Button>
             <Button onClick={submitEdit} className="bg-[#063c88] hover:bg-[#052d66] text-white rounded-lg" data-testid="submit-edit">Update Employee</Button>
