@@ -79,13 +79,13 @@ const Attendance = () => {
   };
 
   const handleReset = async () => {
-    const dates = getDefaultDateRange();
+    const today = new Date().toISOString().split('T')[0];
     const resetFilters = { 
       empName: '', 
       team: 'All', 
       department: 'All', 
-      fromDate: dates.fromDate, 
-      toDate: dates.toDate, 
+      fromDate: today, 
+      toDate: today, 
       status: 'All' 
     };
     setFilters(resetFilters);
@@ -96,8 +96,8 @@ const Attendance = () => {
       const response = await axios.get(`${API}/attendance`, {
         headers: getAuthHeaders(),
         params: { 
-          from_date: formatDateForApi(dates.fromDate), 
-          to_date: formatDateForApi(dates.toDate) 
+          from_date: formatDateForApi(today), 
+          to_date: formatDateForApi(today) 
         }
       });
       setAttendance(response.data);
