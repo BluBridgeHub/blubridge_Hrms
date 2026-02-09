@@ -10,13 +10,42 @@ Build a complete Human Resource Management System (HRMS) with admin and employee
 - Payroll with attendance-based calculations
 - Reports generation and export
 
-## Latest Update: Premium UI/UX Redesign (Feb 5, 2026)
+## Latest Update: Employee Leave Visualization (Feb 9, 2026)
+
+### Completed: Employee Leave Detail Modal
+**100% Complete** - Detailed, visual Leave Overview for individual employees when clicked from Attendance Module.
+
+#### Features Implemented
+- **Employee Header**: Shows name, Employee ID, department, designation with avatar
+- **Month Navigation**: Previous/Next buttons with month/year display
+- **KPI Summary Cards**: 5 cards showing Total Leaves Taken, Remaining Leaves, Approved This Month, Pending Requests, LOP Days
+- **View Toggle**: Day/Week/Month view options with smooth transitions
+- **Monthly Bar Chart**: Color-coded bars for each day (Present, Leave, Half Day/Late, LOP, Week Off, Absent)
+- **Weekly Summary Chart**: Grouped bar chart showing weekly breakdown
+- **Daily Calendar View**: 7-day grid with color-coded tiles and status labels
+- **Leave Type Filter**: Dropdown to filter by leave types (Sick, Emergency, Preplanned, etc.)
+- **Leave History Log Table**: Detailed table with Date, Leave Type, Duration, Reason, Status, Approved By
+
+#### Implementation Details
+- New component: `/app/frontend/src/components/EmployeeLeaveDetail.js`
+- Integrated into Attendance.js with clickable chart icon per employee row
+- Uses Recharts library for visualization (BarChart, ResponsiveContainer)
+- Fetches data from existing APIs: /api/attendance, /api/leaves, /api/employees
+
+#### Testing Status
+- **Testing Agent**: Iteration 17 - 100% Pass Rate (13/13 features)
+- All features working: modal open/close, month navigation, view toggles, filters, chart rendering
+
+### Previous Update: Dashboard Attendance Chart Filters (Feb 5, 2026)
+**100% Complete** - Filters for Attendance Overview chart implemented and tested
+
+## Premium UI/UX Redesign (Feb 5, 2026)
 
 ### Completed: Full Visual Redesign
-**100% Complete** - All pages redesigned with premium  UI/UX
+**100% Complete** - All pages redesigned with premium UI/UX
 
 #### Design System
-- **Color Palette**: Primary Blue (#004EEB), Background (#efede5), Cards (#fffdf7)
+- **Color Palette**: Primary Blue (#063c88), Background (#efede5), Cards (#fffdf7)
 - **Typography**: Outfit for headings, Public Sans for body, JetBrains Mono for numbers
 - **Components**: Glassmorphism sidebar, Bento grid layouts, Premium stat cards
 - **Charts**: Recharts integration for data visualization
@@ -27,7 +56,7 @@ Build a complete Human Resource Management System (HRMS) with admin and employee
 3. **Employee Layout** - Simplified employee navigation with emerald/teal accent
 4. **Dashboard** - Bento grid with stats, Weekly Attendance chart, Attendance Distribution
 5. **Employees** - Stats cards, advanced filters, premium table, tabbed forms
-6. **Attendance** - Quick stats, sortable table, status badges with icons
+6. **Attendance** - Quick stats, sortable table, status badges with icons, Employee Leave Detail modal
 7. **Leave** - Request/History tabs, approve/reject workflows
 8. **Star Reward** - Amber/gold theme, employees/teams tabs, grid/table views
 9. **Team** - Department tabs, team cards grid, member modals
@@ -39,27 +68,6 @@ Build a complete Human Resource Management System (HRMS) with admin and employee
 15. **Employee Attendance** - Personal attendance history
 16. **Employee Leave** - Leave balance and application
 17. **Employee Profile** - Personal information display
-
-### Latest Feature: Dashboard Attendance Chart Filters (Feb 5, 2026)
-**100% Complete** - Filters for Attendance Overview chart implemented and tested
-
-#### Filter Features
-- **Team Filter**: Filter by "All Teams" or any specific team (14+ teams available)
-- **Date Range Filter**: Today, This Week, Last Week, This Month, Last Month, Custom
-- **Custom Date Range**: Displays date picker inputs when "Custom" is selected
-- **Dynamic Chart Updates**: Chart data refreshes automatically when filters change
-
-#### Implementation Details
-- State management with `chartFilters` state in Dashboard.js
-- `getDateRangeParams()` function calculates date ranges
-- `fetchChartData()` calls `/api/attendance` endpoint with filter params
-- Proper status counting: Login, Completed, Early Out, Late Login mapped correctly
-
-### Testing Status
-- **Testing Agent**: Iteration 16 - 100% Pass Rate (8/8 chart filter features)
-- **Previous**: Iteration 15 - 100% Pass Rate (11/11 UI redesign features)
-- **All functionality preserved** - No breaking changes
-- **Design Guidelines**: `/app/design_guidelines.json`
 
 ## Technology Stack
 - **Frontend**: React 18, Tailwind CSS, Shadcn/UI, Recharts
@@ -81,10 +89,10 @@ Build a complete Human Resource Management System (HRMS) with admin and employee
 6. ✅ Team dashboard by departments
 7. ✅ Payroll with LOP calculations
 8. ✅ CSV export for reports
+9. ✅ Employee Leave Visualization (NEW)
 
 ## Future Enhancements (Backlog)
 - P2: Email notifications for leave approvals
-- P2: Calendar view for attendance
 - P3: Performance review module
 - P3: Document management
 
@@ -92,26 +100,27 @@ Build a complete Human Resource Management System (HRMS) with admin and employee
 ```
 /app/frontend/src/
 ├── components/
-│   ├── Layout.js          # Admin layout with premium sidebar
-│   ├── EmployeeLayout.js  # Employee layout
-│   └── ui/                # Shadcn components
+│   ├── Layout.js              # Admin layout with premium sidebar
+│   ├── EmployeeLayout.js      # Employee layout
+│   ├── EmployeeLeaveDetail.js # NEW: Employee leave visualization modal
+│   └── ui/                    # Shadcn components
 ├── pages/
-│   ├── Login.js           # Premium login page
-│   ├── Dashboard.js       # Admin dashboard with charts
-│   ├── Employees.js       # Employee management
-│   ├── Attendance.js      # Attendance tracking
-│   ├── Leave.js           # Leave management
-│   ├── StarReward.js      # Star rewards (amber theme)
-│   ├── Team.js            # Team dashboard
-│   ├── Payroll.js         # Payroll management
-│   ├── Reports.js         # Report generation
-│   ├── AdminProfile.js    # Admin profile
-│   ├── ChangePassword.js  # Password change
+│   ├── Login.js               # Premium login page
+│   ├── Dashboard.js           # Admin dashboard with charts
+│   ├── Employees.js           # Employee management
+│   ├── Attendance.js          # Attendance tracking + Leave Detail modal
+│   ├── Leave.js               # Leave management
+│   ├── StarReward.js          # Star rewards (amber theme)
+│   ├── Team.js                # Team dashboard
+│   ├── Payroll.js             # Payroll management
+│   ├── Reports.js             # Report generation
+│   ├── AdminProfile.js        # Admin profile
+│   ├── ChangePassword.js      # Password change
 │   ├── EmployeeDashboard.js
 │   ├── EmployeeAttendance.js
 │   ├── EmployeeLeave.js
 │   └── EmployeeProfile.js
-└── index.css              # Global premium styles
+└── index.css                  # Global premium styles
 ```
 
 ## Test Credentials
