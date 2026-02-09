@@ -264,6 +264,7 @@ const Attendance = () => {
             <table className="table-premium">
               <thead>
                 <tr>
+                  <th className="w-12"></th>
                   <th className="cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('emp_name')}>Employee {getSortIcon('emp_name')}</th>
                   <th className="cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('team')}>Team {getSortIcon('team')}</th>
                   <th className="cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('date')}>Date {getSortIcon('date')}</th>
@@ -276,20 +277,34 @@ const Attendance = () => {
               <tbody>
                 {sortedAttendance.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="text-center py-12 text-slate-500">
+                    <td colSpan="8" className="text-center py-12 text-slate-500">
                       <CalendarCheck className="w-10 h-10 mx-auto mb-2 text-slate-300" />
                       <p>No attendance records found</p>
                     </td>
                   </tr>
                 ) : (
                   sortedAttendance.map((record, index) => (
-                    <tr key={record.id || index} className={record.is_lop ? 'bg-red-50/50' : ''}>
+                    <tr key={record.id || index} className={`${record.is_lop ? 'bg-red-50/50' : ''} group`}>
                       <td>
-                        <div className="flex items-center gap-3">
+                        <button 
+                          className="p-2 hover:bg-[#063c88]/10 rounded-lg transition-colors opacity-60 group-hover:opacity-100"
+                          onClick={() => handleEmployeeClick(record)}
+                          data-testid={`view-leave-btn-${index}`}
+                          title="View Leave & Attendance Details"
+                        >
+                          <BarChart3 className="w-4 h-4 text-[#063c88]" />
+                        </button>
+                      </td>
+                      <td>
+                        <div 
+                          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => handleEmployeeClick(record)}
+                          data-testid={`employee-row-${index}`}
+                        >
                           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#063c88] to-[#0a5cba] flex items-center justify-center">
                             <span className="text-white text-xs font-medium">{record.emp_name?.charAt(0)}</span>
                           </div>
-                          <span className="font-medium text-slate-900">{record.emp_name}</span>
+                          <span className="font-medium text-slate-900 hover:text-[#063c88] transition-colors">{record.emp_name}</span>
                         </div>
                       </td>
                       <td className="text-slate-600">{record.team}</td>
