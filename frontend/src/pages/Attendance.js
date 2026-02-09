@@ -32,6 +32,8 @@ const Attendance = () => {
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState('emp_name');
   const [sortOrder, setSortOrder] = useState('asc');
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [showLeaveDetail, setShowLeaveDetail] = useState(false);
   const [filters, setFilters] = useState({
     empName: '',
     team: 'All',
